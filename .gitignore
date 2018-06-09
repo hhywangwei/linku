@@ -76,6 +76,33 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+### macOS template
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
 ### Gradle template
 .gradle
 /build/
@@ -92,62 +119,3 @@ gradle-app.setting
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
 
-.gitignore
-.gradle/
-.idea/codeStyles/
-.idea/compiler.xml
-.idea/dbnavigator.xml
-.idea/dictionaries/
-.idea/encodings.xml
-.idea/gradle.xml
-.idea/inspectionProfiles/
-.idea/libraries/
-.idea/markdown-navigator.xml
-.idea/markdown-navigator/
-.idea/misc.xml
-.idea/modules.xml
-.idea/modules/
-.idea/sbt.xml
-.idea/scala_settings.xml
-.idea/uiDesigner.xml
-.idea/workspace.xml
-build.gradle
-build/
-logs/
-scripts/test/
-settings.gradle
-src/main/java/com/linku/server/Application.java
-src/main/java/com/linku/server/BaseException.java
-src/main/java/com/linku/server/api/ApiConfigure.java
-src/main/java/com/linku/server/api/ApiDocConfigure.java
-src/main/java/com/linku/server/api/BaseExceptionAdvice.java
-src/main/java/com/linku/server/api/CorsConfigure.java
-src/main/java/com/linku/server/api/client/
-src/main/java/com/linku/server/api/common/
-src/main/java/com/linku/server/api/form/
-src/main/java/com/linku/server/api/interceptor/
-src/main/java/com/linku/server/api/manage/
-src/main/java/com/linku/server/api/sys/
-src/main/java/com/linku/server/api/vo/
-src/main/java/com/linku/server/base/
-src/main/java/com/linku/server/common/
-src/main/java/com/linku/server/configure/
-src/main/java/com/linku/server/eticket/
-src/main/java/com/linku/server/game/
-src/main/java/com/linku/server/goods/
-src/main/java/com/linku/server/marketing/
-src/main/java/com/linku/server/order/dao/
-src/main/java/com/linku/server/order/domain/
-src/main/java/com/linku/server/order/event/
-src/main/java/com/linku/server/order/service/
-src/main/java/com/linku/server/security/
-src/main/java/com/linku/server/shop/
-src/main/java/com/linku/server/tencent/
-src/main/java/com/linku/server/upload/
-src/main/java/com/linku/server/user/
-src/main/java/com/linku/server/wx/
-src/main/resources/application.yml
-src/main/resources/db/
-src/main/resources/keystore/apiclient_cert.p12
-src/main/resources/logback.xml
-src/test/

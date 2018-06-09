@@ -1,0 +1,16 @@
+--用户注册
+POST
+http://localhost:8080/client/register
+{
+"shopId":"02be8ab70f26440a8bfb23e83b27fef1",
+"username":"hhywangwei",
+"password":"12345678"
+}
+
+--用户登陆
+POST
+http://localhost:8080/client/login
+{
+"username":"hhywangwei",
+"password":"12345678"
+}

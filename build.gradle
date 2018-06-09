@@ -1,0 +1,61 @@
+group 'com.linku'
+version '1.0M1'
+
+buildscript {
+    ext {
+        springBootVersion = '2.0.0.RELEASE'
+        lang3Version = '3.4'
+        oauth2ConfigureVersion='2.0.1.RELEASE'
+        swaggerVersion= '1.5.12'
+        springfoxVersion = '2.7.0'
+        bcprovVersion = '1.46'
+        thumbnailatorVersion = '0.4.8'
+    }
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: "idea"
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+    options.deprecation = true
+    options.encoding = 'UTF-8'
+    options.fork = true
+    options.forkOptions.executable = "javac"
+    options.compilerArgs << "-XDignore.symbol.file"
+    options.compilerArgs << "-Xlint:unchecked"
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile "org.springframework.boot:spring-boot-starter-jdbc"
+    compile "org.springframework.boot:spring-boot-starter-webflux"
+    compile 'org.springframework.boot:spring-boot-starter-data-redis'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'mysql:mysql-connector-java'
+    compile "org.bouncycastle:bcprov-jdk15:${bcprovVersion}"
+    compile "org.apache.commons:commons-lang3:${lang3Version}"
+    compile "io.swagger:swagger-annotations:${swaggerVersion}"
+    compile "io.springfox:springfox-swagger2:${springfoxVersion}"
+    compile "net.coobird:thumbnailator:${thumbnailatorVersion}"
+    testCompile "org.springframework.boot:spring-boot-starter-test"
+}
+
+
+springBoot {
+    mainClassName = 'com.linku.server.Application'
+}

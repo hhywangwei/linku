@@ -1,0 +1,21 @@
+--得到店铺
+GET
+http://localhost:8080/manage/shop
+
+--修改店铺信息
+PUT
+http://localhost:8080/manage/shop
+{
+"name":"天下第一店",
+"phone":"18601689972",
+"contact":"王先生",
+"province":"江西",
+"city":"九江",
+"county":"柴桑区",
+"address":"江西省九江市柴桑区沿河路1234号",
+"locations":[],
+"images":[],
+"detail":"<p><br /><br /><br />Java中去掉网页HTML标记的方法&nbsp;<br />Java里面去掉网页里的HTML标记的方法：&nbsp;<br /><br />/**&nbsp;<br />* 去掉字符串里面的html代码。&lt;br&gt;&nbsp;<br />* 要求数据要规范，比如大于小于号要配套,否则会被集体误杀。&nbsp;<br />*&nbsp;<br />* @param content&nbsp;<br />* 内容&nbsp;<br />* @return 去掉后的内容&nbsp;<br />*/&nbsp;</p>",
+"openTime":"8:00 - 18:00",
+"services":["WIFI","停车"]
+}

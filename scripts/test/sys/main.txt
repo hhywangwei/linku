@@ -1,0 +1,7 @@
+--登陆
+http://localhost:8080/sys/login
+method:post
+{
+"username":"admin",
+"password":"12345678"
+}

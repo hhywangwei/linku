@@ -1,0 +1,52 @@
+--http://localhost:8080/manage/goods
+POST
+{
+  "name":"血本大甩卖1",
+  "icon":"http://www.jict.org/2.jpg",
+  "images":["http://www.jict.org/2.jpg"],
+  "detail":"非常快",
+  "price":800000,
+  "discount": 10,
+  "catalog":"刀具1",
+  "tag":"hot",
+  "showOrder":1,
+  "stock":20,
+  "groupItems":[{
+    "goodsId":"813a77b8a7ac4b1289e7f05b53a72ced",
+    "count":2
+  },
+  {
+    "goodsId":"c457676532ce4bb6b194be6a3b1296b0",
+    "count":3
+  }]
+}
+
+--http://localhost:8080/manage/goods
+PUT
+{
+  "id": "9118780a3ca24985b98e565e8b06a19b",
+  "name":"血本大甩卖Group1",
+  "icon":"http://www.jict.org/2.jpg",
+  "images":["http://www.jict.org/2.jpg"],
+  "detail":"非常快",
+  "price":800000,
+  "discount": 10,
+  "catalog":"刀具1",
+  "tag":"hot",
+  "showOrder":1,
+  "stock":20,
+  "groupItems":[{
+    "goodsId":"813a77b8a7ac4b1289e7f05b53a72ced",
+    "count":2
+  },
+  {
+    "goodsId":"c457676532ce4bb6b194be6a3b1296b0",
+    "count":3
+  }]
+}
+
+--http://localhost:8080/manage/goods/9118780a3ca24985b98e565e8b06a19b
+GET
+
+--http://localhost:8080/manage/goods/9118780a3ca24985b98e565e8b06a19b
+DELETE

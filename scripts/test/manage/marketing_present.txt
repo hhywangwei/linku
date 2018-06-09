@@ -1,0 +1,47 @@
+--http://localhost:8080/manage/marketing/present
+POST
+{
+  "goodsId": "04e0c6cfe54748a3a31b11906328bb18",
+  "name":"多人行精品",
+  "icon":"http://www.jict.org/2.jpg",
+  "images":["http://www.jict.org/2.jpg"],
+  "detail":"非常快",
+  "price":80000,
+  "startTime": "2018-05-12",
+  "endTime": "2018-05-12",
+  "first": false,
+  "person": 2,
+  "days":1
+}
+
+--http://localhost:8080/manage//marketing/present
+PUT
+{
+  "id": "3fe790eadda84e7d9e5b735c29f711ac",
+  "goodsId": "04e0c6cfe54748a3a31b11906328bb18",
+  "name":"多人行精品1",
+  "icon":"http://www.jict.org/2.jpg",
+  "images":["http://www.jict.org/2.jpg"],
+  "detail":"非常快111",
+  "price":80000,
+  "startTime": "2018-05-12",
+  "endTime": "2018-05-12",
+  "first": true,
+  "person": 2,
+  "days":1
+}
+
+--http://localhost:8080/manage/marketing/present/3fe790eadda84e7d9e5b735c29f711ac
+GET
+
+--http://localhost:8080/manage/marketing/present/79a26887b6194453a32dd0c744b32cff
+DELETE
+
+--http://localhost:8080/manage/marketing/present/3fe790eadda84e7d9e5b735c29f711ac/open
+PUT
+
+--http://localhost:8080/manage/marketing/present/3fe790eadda84e7d9e5b735c29f711ac/close
+PUT
+
+--http://localhost:8080/manage/marketing/present
+GET

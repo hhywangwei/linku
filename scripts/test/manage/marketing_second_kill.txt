@@ -1,0 +1,45 @@
+--http://localhost:8080/manage/marketing/secondKill
+POST
+{
+  "goodsId": "04e0c6cfe54748a3a31b11906328bb18",
+  "name":"多人行精品",
+  "icon":"http://www.jict.org/2.jpg",
+  "images":["http://www.jict.org/2.jpg"],
+  "detail":"非常快",
+  "price":80000,
+  "startTime": "2018-05-12",
+  "endTime": "2018-05-12",
+  "stock": 200,
+  "remain": 150
+}
+
+--http://localhost:8080/manage//marketing/secondKill
+PUT
+{
+  "id": "3ea6462dc89044538d051cea83cb0907",
+  "goodsId": "04e0c6cfe54748a3a31b11906328bb18",
+  "name":"多人行精品222",
+  "icon":"http://www.jict.org/2.jpg",
+  "images":["http://www.jict.org/2.jpg"],
+  "detail":"非常快222",
+  "price":80000,
+  "startTime": "2018-05-12",
+  "endTime": "2018-05-12",
+  "stock": 200,
+  "remain": 150
+}
+
+--http://localhost:8080/manage/marketing/secondKill/3ea6462dc89044538d051cea83cb0907
+GET
+
+--http://localhost:8080/manage/marketing/secondKill/3ea6462dc89044538d051cea83cb0907
+DELETE
+
+--http://localhost:8080/manage/marketing/secondKill/3ea6462dc89044538d051cea83cb0907/open
+PUT
+
+--http://localhost:8080/manage/marketing/secondKill/3ea6462dc89044538d051cea83cb0907/close
+PUT
+
+--http://localhost:8080/manage/marketing/secondKill
+GET

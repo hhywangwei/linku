@@ -1,0 +1,7 @@
+--创建订单
+POST
+http://localhost:8080/client/order
+{
+"goodsIds":["04e0c6cfe54748a3a31b11906328bb18"],
+"counts":[1]
+}

@@ -1,0 +1,7 @@
+--店铺端登陆
+POST
+http://localhost:8080/manage/login
+{
+"username":"test2Admin",
+"password":"123456"
+}

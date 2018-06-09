@@ -1,0 +1,86 @@
+spring:
+  appliation:
+    name: linku-server
+    description: linku server application
+    author: <a href="mailto:hhywangwei@gmail.com">WangWei</a>
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+    multipart:
+      enabled: true
+      file-size-threshold: 0
+      max-file-size: 10MB
+      max-request-siz: 12MB
+  mvc:
+    date-format: yyyy-MM-dd HH:mm:ss
+    favicon:
+      enabled: false
+  jackson:
+      date-format: yyyy-MM-dd HH:mm:ss
+      default-property-inclusion: non_null
+      deserialization:
+        FAIL_ON_UNKNOWN_PROPERTIES: false
+      time-zone: GMT+8
+  datasource:
+      type: com.zaxxer.hikari.HikariDataSource
+      username: root
+      password: appeme.com
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/linku_db?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hikari:
+        maximum-pool-size: 20
+        idle-timeout: 3600000
+        max-lifetime: 21600000
+        data-source-properties:
+          cache-prep-stmts: true
+          useServerPrepStmts: true
+          prep-stmt-cache-size: 250
+          prep-stmt-cache-sql-limit: 2048
+  data:
+    redis:
+      repositories:
+        enabled: false
+  redis:
+    url: redis://127.0.0.1:6379
+    timeout: 10000
+    pool:
+      maxActive: 10
+      maxIdle: 10
+      maxWait: -1
+      minIdle: 5
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: text/html,application/json
+
+upload:
+  max: 3
+  root: /Users/weiwang/data
+  baseUrl: http://127.0.0.1/file
+  maxImageLength: 716800
+  thumbWidth: 256
+  thumbPrefix: _thumb_
+  orgiPrefix: _orgi_
+
+wx:
+  small:
+    appid: wx0754c0a5d2c4b67c
+    secret: a5debdd054289d80e76bc5046538b024
+  pay:
+    appid: wx0754c0a5d2c4b67c
+    mchid: 1494207272
+    key: Hw0Mrm9QAGIn2r9DyxdP6rU1tmXp2CgJ
+    bill-create-ip: 8.8.8.8
+    refundKey: 123456789
+    notify-url: https://api.re1001.com/api/client/wx/pay/notify
+    sign: linku pay
+    keystore:
+      uri: classpath:/keystore/apiclient_cert.p12
+      password: 1494207272
+
+tencent:
+  map_key: L2XBZ-L7LWD-GAV46-H23SI-KAGJF-KRFUN

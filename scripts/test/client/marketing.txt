@@ -1,0 +1,10 @@
+--查询营销活动
+GET
+http://localhost:8080/client/marketing
+
+--得到营销活动
+GET
+http://localhost:8080/client/marketing/group_buy/3419530f82c247d1a92b9160ad79be85
+
+--购买营销活动
+http://localhost:8080/client/marketing/buy/group_buy/3419530f82c247d1a92b9160ad79be85

@@ -1,0 +1,6 @@
+--查询商品
+GET
+http://localhost:8080/client/goods?catalog=刀
+
+--得到商品
+http://localhost:8080/client/goods/04e0c6cfe54748a3a31b11906328bb18

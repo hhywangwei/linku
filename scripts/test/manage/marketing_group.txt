@@ -1,0 +1,45 @@
+--http://localhost:8080/manage/marketing/groupBuy
+POST
+{
+  "goodsId": "04e0c6cfe54748a3a31b11906328bb18",
+  "name":"团购精品",
+  "icon":"http://www.jict.org/2.jpg",
+  "images":["http://www.jict.org/2.jpg"],
+  "detail":"非常快",
+  "price":80000,
+  "startTime": "2018-05-12",
+  "endTime": "2018-05-12",
+  "person": 2,
+  "days":1
+}
+
+--http://localhost:8080/manage//marketing/groupBuy
+PUT
+{
+  "id": "79a26887b6194453a32dd0c744b32cff",
+  "goodsId": "04e0c6cfe54748a3a31b11906328bb18",
+   "name":"团购精品1",
+   "icon":"http://www.jict.org/2.jpg",
+   "images":["http://www.jict.org/2.jpg"],
+   "detail":"非常快1",
+   "price":80000,
+   "startTime": "2018-05-12",
+   "endTime": "2018-06-12",
+   "person": 3,
+   "days":1
+}
+
+--http://localhost:8080/manage/marketing/groupBuy/79a26887b6194453a32dd0c744b32cff
+GET
+
+--http://localhost:8080/manage/marketing/groupBuy/79a26887b6194453a32dd0c744b32cff
+DELETE
+
+--http://localhost:8080/manage/marketing/groupBuy/79a26887b6194453a32dd0c744b32cff/open
+PUT
+
+--http://localhost:8080/manage/marketing/groupBuy/79a26887b6194453a32dd0c744b32cff/close
+PUT
+
+--http://localhost:8080/manage/marketing/groupBuy
+GET

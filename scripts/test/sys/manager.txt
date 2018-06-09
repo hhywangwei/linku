@@ -1,0 +1,52 @@
+--新增管理员
+method: post
+http://localhost:8080/sys/manager
+
+{
+"username":"wangwei",
+"password":"123457890",
+"roles": ["ROLE_SHOP_USER"]
+}
+
+--修改用户
+method: put
+http://localhost:8080/sys/manager
+{
+"id":"44cc8318c80043aab60123e72923414a",
+"name":"王伟",
+"phone":"18601689972",
+"roles": ["ROLE_SHOP_USER"]
+}
+
+--得到用户
+GET
+http://localhost:8080/sys/manager/44cc8318c80043aab60123e72923414a
+
+--删除用户
+DELETE
+http://localhost:8080/sys/manager/44cc8318c80043aab60123e72923414a
+
+--激活用户
+PUT
+http://localhost:8080/sys/manager/44cc8318c80043aab60123e72923414a/active
+
+--禁用用户
+PUT
+http://localhost:8080/sys/manager/44cc8318c80043aab60123e72923414a/inactive
+
+--修改密码
+PUT
+http://localhost:8080/sys/manager/updatePassword
+{
+"id":"5fd50a7dbf314be9b98412918d321b6c",
+"password":"12345678",
+"newPassword":"123456789"
+}
+
+--重置密码
+PUT
+http://localhost:8080/sys/manager/resetPassword
+{
+"id":"5fd50a7dbf314be9b98412918d321b6c",
+"newPassword":"123456789"
+}
