@@ -1,11 +1,11 @@
-package com.linku.server.eticket.service;
+package com.linku.server.ticket.service;
 
 import com.linku.server.BaseException;
 import com.linku.server.base.service.AutoNumberService;
 import com.linku.server.common.id.IdGenerators;
 import com.linku.server.common.utils.DateUtils;
-import com.linku.server.eticket.dao.EticketDao;
-import com.linku.server.eticket.domain.Eticket;
+import com.linku.server.ticket.dao.EticketDao;
+import com.linku.server.ticket.domain.Eticket;
 import com.linku.server.goods.domain.Goods;
 import com.linku.server.goods.service.GoodsService;
 import com.linku.server.user.domain.User;
@@ -80,7 +80,7 @@ public class EticketService {
     private String genCode(String shopId){
         String shopCode = String.format("%04d", shopId.hashCode() % 10000);
         String now = DateUtils.format("yyyyMMdd", new Date());
-        String key = shopId + "@" + now;
+        String key = shopId + "@eticket@" + now;
         String code = String.format("%06d", autoNumberService.maxNumber(key));
         return shopCode + now  + code;
     }
@@ -109,7 +109,7 @@ public class EticketService {
             }
         }
 
-        throw new BaseException("电子券使用失败，请再试。");
+        throw new BaseException("电子券使用失败");
     }
 
     public Eticket getByCode(String code){

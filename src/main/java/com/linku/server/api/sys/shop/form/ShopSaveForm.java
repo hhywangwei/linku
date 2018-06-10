@@ -27,17 +27,26 @@ public class ShopSaveForm {
     @ApiModelProperty(value = "联系人", required = true)
     private String contact;
     @NotBlank
-    @Size(max = 30)
+    @Size(max = 15)
     @ApiModelProperty(value = "省份")
     private String province;
-    @NotBlank
     @Size(max = 20)
+    @ApiModelProperty(value = "省份名称")
+    private String provinceName;
+    @NotBlank
+    @Size(max = 15)
     @ApiModelProperty(value = "城市")
     private String city;
+    @Size(max =20)
+    @ApiModelProperty(value = "城市名称")
+    private String cityName;
     @NotBlank
-    @Size(max = 20)
+    @Size(max = 15)
     @ApiModelProperty(value = "县")
     private String county;
+    @Size(max = 20)
+    @ApiModelProperty(value = "县名称")
+    private String countyName;
     @NotBlank
     @Size(max = 200)
     @ApiModelProperty(value = "地址")
@@ -102,6 +111,14 @@ public class ShopSaveForm {
         this.province = province;
     }
 
+    public String getProvinceName() {
+        return provinceName;
+    }
+
+    public void setProvinceName(String provinceName) {
+        this.provinceName = provinceName;
+    }
+
     public String getCity() {
         return city;
     }
@@ -110,12 +127,28 @@ public class ShopSaveForm {
         this.city = city;
     }
 
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
     public String getCounty() {
         return county;
     }
 
     public void setCounty(String county) {
         this.county = county;
+    }
+
+    public String getCountyName() {
+        return countyName;
+    }
+
+    public void setCountyName(String countyName) {
+        this.countyName = countyName;
     }
 
     public String getAddress() {
@@ -213,8 +246,11 @@ public class ShopSaveForm {
         t.setPhone(phone);
         t.setContact(contact);
         t.setProvince(province);
+        t.setProvinceName(provinceName);
         t.setCity(city);
+        t.setCityName(cityName);
         t.setCounty(county);
+        t.setCountyName(countyName);
         t.setAddress(address);
         t.setLocations(locations);
         t.setIcon(icon);

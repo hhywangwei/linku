@@ -1,4 +1,4 @@
-package com.linku.server.api.manage.eticket.form;
+package com.linku.server.api.manage.ticket.form;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

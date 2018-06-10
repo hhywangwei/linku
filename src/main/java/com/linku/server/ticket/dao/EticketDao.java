@@ -1,7 +1,7 @@
-package com.linku.server.eticket.dao;
+package com.linku.server.ticket.dao;
 
 import com.linku.server.common.utils.DaoUtils;
-import com.linku.server.eticket.domain.Eticket;
+import com.linku.server.ticket.domain.Eticket;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

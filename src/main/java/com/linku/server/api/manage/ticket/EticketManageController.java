@@ -1,13 +1,13 @@
-package com.linku.server.api.manage.eticket;
+package com.linku.server.api.manage.ticket;
 
 import com.linku.server.BaseException;
 import com.linku.server.api.manage.CredentialContextManageUtils;
-import com.linku.server.api.manage.eticket.form.UseForm;
+import com.linku.server.api.manage.ticket.form.UseForm;
 import com.linku.server.api.vo.ResultPageVo;
 import com.linku.server.api.vo.ResultVo;
 import com.linku.server.common.utils.SecurityUtils;
-import com.linku.server.eticket.domain.Eticket;
-import com.linku.server.eticket.service.EticketService;
+import com.linku.server.ticket.domain.Eticket;
+import com.linku.server.ticket.service.EticketService;
 import com.linku.server.user.domain.Account;
 import com.linku.server.user.service.UserService;
 import io.swagger.annotations.Api;

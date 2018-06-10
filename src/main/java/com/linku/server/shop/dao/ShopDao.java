@@ -30,8 +30,11 @@ public class ShopDao {
         t.setPhone(r.getString("phone"));
         t.setContact(r.getString("contact"));
         t.setProvince(r.getString("province"));
+        t.setProvinceName(r.getString("province_name"));
         t.setCity(r.getString("city"));
+        t.setCityName(r.getString("city_name"));
         t.setCounty(r.getString("county"));
+        t.setCountyName(r.getString("county_name"));
         t.setAddress(r.getString("address"));
         t.setLocations(DaoUtils.toArray(r.getString("location")));
         t.setIcon(r.getString("icon"));
@@ -57,13 +60,13 @@ public class ShopDao {
 
     public void insert(Shop t){
         final String sql = "INSERT INTO shop_info " +
-                "(id, name, phone, contact, province, city, county, address, location, icon, images, summary, detail, " +
-                "open_time, services, state, is_try, try_from_time, try_to_time, update_time, create_time) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "(id, name, phone, contact, province, province_name, city, city_name, county, county_name, address, " +
+                "location, icon, images, summary, detail, open_time, services, state, is_try, try_from_time, try_to_time, " +
+                " update_time, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         final Date now = new Date();
-        jdbcTemplate.update(sql, t.getId(), t.getName(), t.getPhone(), t.getContact(), t.getProvince(),
-                t.getCity(), t.getCounty(), t.getAddress(), DaoUtils.join(t.getLocations()), t.getIcon(),
-                DaoUtils.join(t.getImages()), StringUtils.defaultString(t.getSummary()),
+        jdbcTemplate.update(sql, t.getId(), t.getName(), t.getPhone(), t.getContact(), t.getProvince(), t.getProvinceName(),
+                t.getCity(),  t.getCityName(), t.getCounty(), t.getCountyName(), t.getAddress(), DaoUtils.join(t.getLocations()),
+                t.getIcon(), DaoUtils.join(t.getImages()), StringUtils.defaultString(t.getSummary()),
                 StringUtils.defaultString(t.getDetail()), t.getOpenTime(), DaoUtils.join(t.getServices()),
                 t.getState().name(), t.getTryUse(), DaoUtils.date(t.getTryFromTime()), DaoUtils.date(t.getTryToTime()),
                 DaoUtils.timestamp(now), DaoUtils.timestamp(now));
@@ -71,14 +74,14 @@ public class ShopDao {
 
     public boolean update(Shop t){
         final String sql = "UPDATE shop_info " +
-                "SET name =?, phone =?, contact =?, province =?, city =?, county =?, address =?, location =?, " +
-                "icon =?, images =?, summary = ?, detail =?, open_time =?, services =?, is_try =?, try_from_time=?, " +
+                "SET name =?, phone =?, contact =?, province =?, province_name = ?, city =?, city_name = ?, county = ?, county_name = ?, " +
+                "address =?, location =?, icon =?, images =?, summary = ?, detail =?, open_time =?, services =?, is_try =?, try_from_time=?, " +
                 "try_to_time =?, update_time =? WHERE id =?";
-        return jdbcTemplate.update(sql, t.getName(), t.getPhone(), t.getContact(), t.getProvince(), t.getCity(),
-                t.getCounty(), t.getAddress(), DaoUtils.join(t.getLocations()), t.getIcon(), DaoUtils.join(t.getImages()),
-                StringUtils.defaultString(t.getSummary()), StringUtils.defaultString(t.getDetail()), t.getOpenTime(),
-                DaoUtils.join(t.getServices()), t.getTryUse(), DaoUtils.date(t.getTryFromTime()), DaoUtils.date(t.getTryToTime()),
-                DaoUtils.timestamp(new Date()), t.getId()) > 0;
+        return jdbcTemplate.update(sql, t.getName(), t.getPhone(), t.getContact(), t.getProvince(), t.getProvinceName(),
+                t.getCity(), t.getCityName(), t.getCounty(), t.getCountyName(), t.getAddress(), DaoUtils.join(t.getLocations()),
+                t.getIcon(), DaoUtils.join(t.getImages()), StringUtils.defaultString(t.getSummary()),
+                StringUtils.defaultString(t.getDetail()), t.getOpenTime(), DaoUtils.join(t.getServices()), t.getTryUse(),
+                DaoUtils.date(t.getTryFromTime()), DaoUtils.date(t.getTryToTime()), DaoUtils.timestamp(new Date()), t.getId()) > 0;
     }
 
     public Shop findOne(String id){

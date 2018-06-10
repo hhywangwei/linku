@@ -3,7 +3,6 @@ package com.linku.server.shop.domain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -26,10 +25,16 @@ public class Shop {
     private String contact;
     @ApiModelProperty(value = "省份", required = true)
     private String province;
+    @ApiModelProperty(value = "省份名称")
+    private String provinceName;
     @ApiModelProperty(value = "城市", required = true)
     private String city;
+    @ApiModelProperty(value = "城市名称")
+    private String cityName;
     @ApiModelProperty(value = "县", required = true)
     private String county;
+    @ApiModelProperty(value = "县名称")
+    private String countyName;
     @ApiModelProperty(value = "所在地址", required = true)
     private String address;
     @ApiModelProperty(value = "地理位置")
@@ -103,6 +108,14 @@ public class Shop {
         this.province = province;
     }
 
+    public String getProvinceName() {
+        return provinceName;
+    }
+
+    public void setProvinceName(String provinceName) {
+        this.provinceName = provinceName;
+    }
+
     public String getCity() {
         return city;
     }
@@ -111,12 +124,28 @@ public class Shop {
         this.city = city;
     }
 
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
     public String getCounty() {
         return county;
     }
 
     public void setCounty(String county) {
         this.county = county;
+    }
+
+    public String getCountyName() {
+        return countyName;
+    }
+
+    public void setCountyName(String countyName) {
+        this.countyName = countyName;
     }
 
     public String getAddress() {
@@ -234,15 +263,18 @@ public class Shop {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Shop)) return false;
         Shop shop = (Shop) o;
         return Objects.equals(id, shop.id) &&
                 Objects.equals(name, shop.name) &&
                 Objects.equals(phone, shop.phone) &&
                 Objects.equals(contact, shop.contact) &&
                 Objects.equals(province, shop.province) &&
+                Objects.equals(provinceName, shop.provinceName) &&
                 Objects.equals(city, shop.city) &&
+                Objects.equals(cityName, shop.cityName) &&
                 Objects.equals(county, shop.county) &&
+                Objects.equals(countyName, shop.countyName) &&
                 Objects.equals(address, shop.address) &&
                 Arrays.equals(locations, shop.locations) &&
                 Objects.equals(icon, shop.icon) &&
@@ -262,7 +294,7 @@ public class Shop {
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(id, name, phone, contact, province, city, county, address, icon, summary, detail, openTime, state, tryUse, tryFromTime, tryToTime, createTime, updateTime);
+        int result = Objects.hash(id, name, phone, contact, province, provinceName, city, cityName, county, countyName, address, icon, summary, detail, openTime, state, tryUse, tryFromTime, tryToTime, createTime, updateTime);
         result = 31 * result + Arrays.hashCode(locations);
         result = 31 * result + Arrays.hashCode(images);
         result = 31 * result + Arrays.hashCode(services);
@@ -277,8 +309,11 @@ public class Shop {
                 .append("phone", phone)
                 .append("contact", contact)
                 .append("province", province)
+                .append("provinceName", provinceName)
                 .append("city", city)
+                .append("cityName", cityName)
                 .append("county", county)
+                .append("countyName", countyName)
                 .append("address", address)
                 .append("locations", locations)
                 .append("icon", icon)

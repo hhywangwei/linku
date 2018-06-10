@@ -125,7 +125,7 @@ public class ShopService {
 
         boolean ok = dao.delete(id);
         if(ok){
-            managerService.inactiveShop(id);
+            managerService.deleteShop(id);
         }
 
         return ok;

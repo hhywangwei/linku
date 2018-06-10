@@ -1,13 +1,13 @@
-package com.linku.server.api.client.eticket;
+package com.linku.server.api.client.ticket;
 
 import com.linku.server.BaseException;
 import com.linku.server.api.client.CredentialContextClientUtils;
-import com.linku.server.api.client.eticket.vo.QrcodeVo;
+import com.linku.server.api.client.ticket.vo.QrcodeVo;
 import com.linku.server.api.vo.ResultPageVo;
 import com.linku.server.api.vo.ResultVo;
 import com.linku.server.common.utils.SecurityUtils;
-import com.linku.server.eticket.domain.Eticket;
-import com.linku.server.eticket.service.EticketService;
+import com.linku.server.ticket.domain.Eticket;
+import com.linku.server.ticket.service.EticketService;
 import com.linku.server.security.Credential;
 import com.linku.server.user.domain.Account;
 import com.linku.server.user.service.UserService;

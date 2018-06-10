@@ -1,6 +1,6 @@
-package com.linku.server.api.client.eticket.vo;
+package com.linku.server.api.client.ticket.vo;
 
-import com.linku.server.eticket.domain.Eticket;
+import com.linku.server.ticket.domain.Eticket;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 

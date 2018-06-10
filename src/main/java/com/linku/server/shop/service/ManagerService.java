@@ -171,6 +171,11 @@ public class ManagerService {
         return dao.delete(id);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteShop(String shopId){
+        dao.findByShopId(shopId).forEach(e -> dao.delete(e.getId()));
+    }
+
     public boolean hasUsername(String username){
         return dao.hasUsername(username);
     }

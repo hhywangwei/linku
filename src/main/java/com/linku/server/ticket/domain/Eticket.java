@@ -1,4 +1,4 @@
-package com.linku.server.eticket.domain;
+package com.linku.server.ticket.domain;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
