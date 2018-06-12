@@ -1,0 +1,94 @@
+#!/bin/bash
+
+. /etc/profile
+
+APP_DIR="{{app_dir}}/{{app_name}}/bin"
+APP_JAR="{{jar}}"
+JAVA_OPTS="{{java_opts}}"
+APP_ARGS="{{app_args}}"
+
+OUT_FILE=/dev/null
+RUNNING_PID={{app_dir}}/{{app_name}}/bin/running.pid
+
+isRunning() {
+  # Check for running app
+  if [ -f "${RUNNING_PID}" ]; then
+    proc=$(cat ${RUNNING_PID});
+    if /bin/ps --pid ${proc} 1>&2 >/dev/null; then
+      return 0
+    fi
+  fi
+  return 1
+}
+
+start() {
+  if isRunning; then
+    echo "The application is already running"
+    return 0
+  fi
+
+  pushd ${APP_DIR} > /dev/null
+  nohup java ${JAVA_OPTS} -jar ${APP_JAR} ${APP_ARGS} > ${OUT_FILE} 2>&1 &
+  echo $! > ${RUNNING_PID}
+  popd > /dev/null
+
+  if isRunning; then
+    echo "Start Application"
+    exit 0
+  else
+    echo "The Application has not started - check log"
+    exit 3
+  fi
+}
+
+restart() {
+  echo "Restarting Application"
+  stop
+  start
+}
+
+stop() {
+  echo "Stopping Application"
+  if isRunning; then
+    kill `cat ${RUNNING_PID}`
+    rm ${RUNNING_PID}
+  fi
+}
+
+status() {
+  if isRunning; then
+    echo "Application is running"
+  else
+    echo "Application is either stopped or inaccessible"
+  fi
+}
+
+case "$1" in
+start)
+    start
+;;
+
+status)
+   status
+   exit 0
+;;
+
+stop)
+    if isRunning; then
+        stop
+        exit 0
+    else
+        echo "Application not running"
+        exit 3
+    fi
+;;
+
+restart)
+    stop
+    start
+;;
+
+*)
+    echo "Usage: $0 {status|start|stop|restart}"
+    exit 1
+esac
