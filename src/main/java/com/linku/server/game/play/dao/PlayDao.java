@@ -50,6 +50,11 @@ public class PlayDao {
                 t.getPrize(), t.getMoney(), t.getPticketId(), DaoUtils.timestamp(new Date()));
     }
 
+    public Play findOne(String id){
+        final String sql = "SELECT * FROM game_play WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, mapper);
+    }
+
     public long count(String gameId, String prize){
         final String sql = "SELECT COUNT(id) FROM game_play WHERE game_id = ? AND prize LIKE ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{gameId, DaoUtils.like(prize)}, Long.class);

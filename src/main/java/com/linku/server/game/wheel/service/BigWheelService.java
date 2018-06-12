@@ -48,6 +48,23 @@ public class BigWheelService {
         return dao.findOne(t.getId());
     }
 
+    private void setCursor(List<BigWheelItem> items){
+        int v = 360 / items.size();
+        int r = 360 % items.size();
+        int z = (v + r) / 2;
+
+        for(int i = 0; i < items.size(); i++){
+            BigWheelItem item = items.get(i);
+
+            if(i == 0){
+                item.setFromCursor(360 - z);
+            }else{
+                item.setFromCursor(i * v + r -z -1);
+            }
+            item.setToCursor((i + 1) * v + r - z);
+        }
+    }
+
     public BigWheel get(String id){
         try{
             return dao.findOne(id);
