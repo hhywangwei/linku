@@ -17,6 +17,8 @@ CREATE TABLE base_auto_number (
   UNIQUE KEY idx_base_auto_number_key (n_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+INSERT INTO base_auto_number(n_key, number) VALUES ('main_insert_key', 0);
+
 --========================================================================
 --系统管理员表
 
@@ -51,6 +53,10 @@ CREATE TABLE base_sys (
   PRIMARY KEY (id),
   UNIQUE KEY idx_base_sys_username (username)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--初始化系统管理员
+INSERT INTO base_sys(id, username, password, name, roles, is_manager, is_enable, is_delete, update_time, create_time)
+VALUES ("1", "admin", "12345678", "admin", "ROLE_SYS", 1, 1, 0, now(), now());
 
 --========================================================================
 --上传文件

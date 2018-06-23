@@ -66,7 +66,7 @@ public class CatalogManageController {
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("查询商品分类")
     public ResultPageVo<Catalog> query(@RequestParam(required = false) @ApiParam("分类名称") String name,
-                                       @RequestParam(defaultValue = "false") @ApiParam(value = "是否得到查询记录数") boolean isCount,
+                                       @RequestParam(defaultValue = "true") @ApiParam(value = "是否得到查询记录数") boolean isCount,
                                        @RequestParam(defaultValue = "0") @ApiParam(value = "查询页数") int page,
                                        @RequestParam(defaultValue = "15") @ApiParam(value = "查询每页记录数") int rows){
 

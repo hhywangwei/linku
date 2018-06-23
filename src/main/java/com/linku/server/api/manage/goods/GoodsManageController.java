@@ -109,7 +109,7 @@ public class GoodsManageController {
     public ResultPageVo<Goods> query(@RequestParam(required = false) @ApiParam("商品分类") String catalog,
                                  @RequestParam(required = false) @ApiParam("商品名称") String name,
                                  @RequestParam(required = false) @ApiParam("是否上架") Boolean isOpen,
-                                 @RequestParam(defaultValue = "false") @ApiParam(value = "是否得到查询记录数") boolean isCount,
+                                 @RequestParam(defaultValue = "true") @ApiParam(value = "是否得到查询记录数") boolean isCount,
                                  @RequestParam(defaultValue = "0") @ApiParam(value = "查询页数") int page,
                                  @RequestParam(defaultValue = "15") @ApiParam(value = "查询每页记录数") int rows){
 

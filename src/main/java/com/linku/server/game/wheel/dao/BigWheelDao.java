@@ -31,7 +31,7 @@ public class BigWheelDao {
         t.setHelp(r.getString("help"));
         t.setFromDate(r.getDate("from_date"));
         t.setToDate(r.getDate("to_date"));
-        t.setLimit(r.getInt("limit"));
+        t.setLimit(r.getInt("day_limit"));
         t.setPticketDays(r.getInt("pticket_days"));
         t.setState(BigWheel.State.valueOf(r.getString("state")));
         t.setCreateTime(r.getTimestamp("create_time"));
@@ -45,7 +45,7 @@ public class BigWheelDao {
     }
 
     public void insert(BigWheel t){
-        final String sql = "INSERT INTO game_big_wheel (id, shop_id, name, help, state, from_date, to_date, limit, " +
+        final String sql = "INSERT INTO game_big_wheel (id, shop_id, name, help, state, from_date, to_date, day_limit, " +
                 "pticket_days, is_delete, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, t.getId(), t.getShopId(), t.getName(), t.getHelp(), t.getState().name(),
                 DaoUtils.date(t.getFromDate()), DaoUtils.date(t.getToDate()), t.getLimit(), t.getPticketDays(),
@@ -53,7 +53,7 @@ public class BigWheelDao {
     }
 
     public boolean update(BigWheel t){
-        final String sql = "UPDATE game_big_wheel SET name = ?, help = ?, from_date = ?, to_date = ?, limit = ?, pticket_days = ? " +
+        final String sql = "UPDATE game_big_wheel SET name = ?, help = ?, from_date = ?, to_date = ?, day_limit = ?, pticket_days = ? " +
                 "WHERE id = ? AND is_delete = false";
         return jdbcTemplate.update(sql, t.getName(), t.getHelp(), DaoUtils.date(t.getFromDate()),
                 DaoUtils.date(t.getToDate()), t.getLimit(), t.getPticketDays(), t.getId()) > 0;

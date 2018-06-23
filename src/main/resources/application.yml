@@ -38,6 +38,10 @@ spring:
           useServerPrepStmts: true
           prep-stmt-cache-size: 250
           prep-stmt-cache-sql-limit: 2048
+  flyway:
+    locations: classpath:/db
+    enabled: false
+
   data:
     redis:
       repositories:
@@ -68,8 +72,8 @@ upload:
 
 wx:
   small:
-    appid: wx0754c0a5d2c4b67c
-    secret: a5debdd054289d80e76bc5046538b024
+    appid: wxd94a7c7b59afe68e
+    secret: 6057acee7638f5e828a437a4e569dd2f
   pay:
     appid: wx0754c0a5d2c4b67c
     mchid: 1494207272

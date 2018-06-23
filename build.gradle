@@ -47,6 +47,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-redis'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'mysql:mysql-connector-java'
+    compile 'org.flywaydb:flyway-core'
     compile "org.bouncycastle:bcprov-jdk15:${bcprovVersion}"
     compile "org.apache.commons:commons-lang3:${lang3Version}"
     compile "io.swagger:swagger-annotations:${swaggerVersion}"

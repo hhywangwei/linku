@@ -19,7 +19,7 @@ public class BigWheelItemDao {
 
         t.setId(r.getString("id"));
         t.setBigWheelId(r.getString("big_wheel_id"));
-        t.setIndex(r.getInt("index"));
+        t.setIndex(r.getInt("item_index"));
         t.setFromCursor(r.getInt("from_cursor"));
         t.setToCursor(r.getInt("to_cursor"));
         t.setMoney(r.getInt("money"));
@@ -35,7 +35,7 @@ public class BigWheelItemDao {
     }
 
     public void insert(BigWheelItem t){
-        final String sql = "INSERT INTO game_big_wheel_item (id, big_wheel_id, index, from_cursor, to_cursor, " +
+        final String sql = "INSERT INTO game_big_wheel_item (id, big_wheel_id, item_index, from_cursor, to_cursor, " +
                 "title, money, ratio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, t.getId(), t.getBigWheelId(), t.getIndex(), t.getFromCursor(), t.getToCursor(),
                 t.getTitle(), t.getMoney(), t.getRatio());

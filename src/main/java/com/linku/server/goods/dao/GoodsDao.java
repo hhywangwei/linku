@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -100,29 +101,52 @@ public class GoodsDao {
     }
 
     public long count(String shopId, String catalog, String name, Boolean isOpen){
-        String sql = "SELECT COUNT(id) FROM goods_info WHERE shop_id = ? AND catalog LIKE ? AND name LIKE ?";
-        if(isOpen != null){
-            sql = sql + "AND is_open = ?";
-        }
+        StringBuilder sql = new StringBuilder(50);
+        sql.append("SELECT COUNT(id) FROM goods_info ");
+        buildWhere(sql, shopId, catalog, name, isOpen);
         final Object[] params = buildParams(shopId, catalog, name, isOpen);
-        return jdbcTemplate.queryForObject(sql, params, Long.class);
+        return jdbcTemplate.queryForObject(sql.toString(), params, Long.class);
+    }
+
+    private void buildWhere(StringBuilder sql, String shopId, String catalog, String name, Boolean isOpen){
+        sql.append(" WHERE is_delete = false ");
+        if(StringUtils.isNotBlank(shopId)){
+            sql.append(" AND shop_id = ? ");
+        }
+        if(StringUtils.isNotBlank(catalog)){
+            sql.append(" AND catalog LIKE ? ");
+        }
+        if(StringUtils.isNotBlank(name)){
+            sql.append(" AND name LIKE ? ");
+        }
+        if(isOpen != null){
+            sql.append(" AND is_open = ?");
+        }
     }
 
     private Object[] buildParams(String shopId, String catalog, String name, Boolean isOpen){
-        final String catalogLike = DaoUtils.like(catalog);
-        final String nameLike = DaoUtils.like(name);
-        return isOpen != null?
-                new Object[]{shopId, catalogLike, nameLike, isOpen}: new Object[]{shopId, catalogLike, nameLike};
+        List<Object> params = new ArrayList<>(4);
+        if(StringUtils.isNotBlank(shopId)){
+            params.add(shopId);
+        }
+        if(StringUtils.isNotBlank(catalog)){
+            params.add(DaoUtils.like(catalog));
+        }
+        if(StringUtils.isNotBlank(name)){
+            params.add(DaoUtils.like(name));
+        }
+        if(isOpen != null){
+            params.add(isOpen);
+        }
+        return params.toArray();
     }
 
     public List<Goods> find(String shopId, String catalog, String name, Boolean isOpen, int offset, int limit){
-        String sql = "SELECT * FROM goods_info WHERE shop_id = ? AND catalog LIKE ? AND name LIKE ? ";
-        if(isOpen != null){
-            sql = sql + " AND is_open = ? ";
-        }
-        sql = sql + " ORDER BY show_order ASC, update_time DESC LIMIT ? OFFSET ?";
-
+        StringBuilder sql = new StringBuilder(50);
+        sql.append("SELECT * FROM goods_info ");
+        buildWhere(sql, shopId, catalog, name, isOpen);
+        sql.append(" ORDER BY show_order ASC, update_time DESC LIMIT ? OFFSET ?");
         final Object[] params = DaoUtils.appendOffsetLimit(buildParams(shopId, catalog, name, isOpen), offset, limit);
-        return jdbcTemplate.query(sql, params, mapper);
+        return jdbcTemplate.query(sql.toString(), params, mapper);
     }
 }
