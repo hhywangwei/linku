@@ -64,7 +64,7 @@ public class PticketService {
 
 
     private String genCode(String shopId){
-        String shopCode = String.format("%04d", shopId.hashCode() % 10000);
+        String shopCode = String.format("%04d", Math.abs(shopId.hashCode()) % 10000);
         String now = DateUtils.format("yyyyMMdd", new Date());
         String key = shopId + "@pticket@" + now;
         String code = String.format("%06d", autoNumberService.maxNumber(key));

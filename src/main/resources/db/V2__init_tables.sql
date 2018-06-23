@@ -58,6 +58,7 @@ CREATE TABLE game_big_wheel (
   pticket_days INT NOT NULL,
   state ENUM('WAIT', 'OPEN', 'CLOSE') COLLATE utf8_bin NOT NULL,
   from_date DATETIME NOT NULL,
+  is_delete TINYINT NOT NULL DEFAULT 0,
   to_date DATETIME NOT NULL,
   create_time DATETIME NOT NULL,
   PRIMARY KEY (id),

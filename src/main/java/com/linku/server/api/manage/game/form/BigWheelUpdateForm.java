@@ -19,8 +19,8 @@ public class BigWheelUpdateForm extends BigWheelSaveForm {
     }
 
     @Override
-    public BigWheel toDomain() {
-        BigWheel t = super.toDomain();
+    public BigWheel toDomain(String shopId) {
+        BigWheel t = super.toDomain(shopId);
         t.setId(id);
 
         return t;

@@ -1,13 +1,17 @@
 package com.linku.server.api.manage.game.form;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.linku.server.game.wheel.domain.BigWheel;
+import com.linku.server.game.wheel.domain.BigWheelItem;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,9 +28,11 @@ public class BigWheelSaveForm {
     @ApiModelProperty(value = "帮助")
     private String help;
     @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @ApiModelProperty(value = "游戏开始时间", required = true)
     private Date fromDate;
     @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @ApiModelProperty(value = "游戏结束时间", required = true)
     private Date toDate;
     @NotNull
@@ -36,6 +42,7 @@ public class BigWheelSaveForm {
     @ApiModelProperty(value = "奖券有效天数", required = true)
     private Integer pticketDays = 7;
     @NotEmpty
+    @Valid
     @ApiModelProperty(value = "中奖项目")
     private List<BigWheelSaveItemForm> items;
 
@@ -95,9 +102,10 @@ public class BigWheelSaveForm {
         this.items = items;
     }
 
-    public BigWheel toDomain(){
+    public BigWheel toDomain(String shopId){
         BigWheel t = new BigWheel();
 
+        t.setShopId(shopId);
         t.setName(name);
         t.setHelp(help);
         t.setLimit(limit);
@@ -108,7 +116,23 @@ public class BigWheelSaveForm {
         return t;
     }
 
-    @Validated
+    public List<BigWheelItem> toDomainItems(){
+        List<BigWheelItem> domainItems = new ArrayList<>();
+        for(int i = 0; i < items.size(); i++){
+            BigWheelSaveForm.BigWheelSaveItemForm t = items.get(i);
+            BigWheelItem item = new BigWheelItem();
+
+            item.setIndex(i);
+            item.setMoney(t.getMoney());
+            item.setTitle(t.getTitle());
+            item.setRatio(t.getRatio());
+
+            domainItems.add(item);
+        }
+
+        return domainItems;
+    }
+
     public static class BigWheelSaveItemForm{
         @NotNull
         @Size(min =  1)
@@ -118,6 +142,7 @@ public class BigWheelSaveForm {
         @Min(0)
         @ApiModelProperty(value = "中奖金额，0代表未中奖")
         private Integer money;
+        @NotNull
         @Min(1)
         @ApiModelProperty(value = "中奖率")
         private Integer ratio;

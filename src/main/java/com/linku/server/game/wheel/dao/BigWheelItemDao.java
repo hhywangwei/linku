@@ -47,7 +47,7 @@ public class BigWheelItemDao {
     }
 
     public List<BigWheelItem> find(String bigWheelId){
-        final String sql = "SELECT * FROM game_big_wheel_item WHERE big_wheel_id = ? ORDER BY index ASC";
+        final String sql = "SELECT * FROM game_big_wheel_item WHERE big_wheel_id = ? ORDER BY item_index ASC";
         return jdbcTemplate.query(sql, new Object[]{bigWheelId}, mapper);
     }
 }

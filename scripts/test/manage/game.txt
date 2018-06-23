@@ -1,0 +1,86 @@
+--http://localhost:8080/manage/game/wheel
+method:POST
+
+{
+"name":"618特惠大转盘",
+"fromDate": "2018-06-10",
+"toDate": "2018-07-01",
+"limit": 1,
+"pticketDays": 15,
+"items":[
+  {
+    "title": "一等奖",
+    "money": 200,
+    "ratio": 1
+  },
+  {
+    "title": "二等奖",
+    "money": 100,
+    "ratio": 1
+  },
+  {
+    "title": "三等奖",
+    "money": 50,
+    "ratio": 2
+  },
+  {
+    "title": "幸运奖",
+    "money": 20,
+    "ratio": 20
+  },
+  {
+    "title": "未中奖",
+    "money": 0,
+    "ratio": 76
+  }]
+}
+
+--http://localhost:8080/manage/game/wheel
+method:PUT
+
+{
+"id":"b834ebc5f3954445a16c3d8a6d7c85bc",
+"name":"618特惠大转盘1",
+"fromDate": "2018-06-10",
+"toDate": "2018-07-01",
+"limit": 1,
+"pticketDays": 15,
+"items":[
+  {
+    "title": "一等奖",
+    "money": 200,
+    "ratio": 1
+  },
+  {
+    "title": "二等奖",
+    "money": 100,
+    "ratio": 1
+  },
+  {
+    "title": "三等奖",
+    "money": 50,
+    "ratio": 2
+  },
+  {
+    "title": "幸运奖",
+    "money": 20,
+    "ratio": 30
+  },
+  {
+    "title": "未中奖",
+    "money": 0,
+    "ratio": 66
+  }]
+}
+
+--http://localhost:8080/manage/game/wheel/b834ebc5f3954445a16c3d8a6d7c85bc
+method:GET
+
+--http://localhost:8080/manage/game/wheel/b834ebc5f3954445a16c3d8a6d7c85bc/open
+method:PUT
+
+--http://localhost:8080/manage/game/wheel/b834ebc5f3954445a16c3d8a6d7c85bc/close
+method:PUT
+
+--http://localhost:8080/manage/game/wheel/b834ebc5f3954445a16c3d8a6d7c85bc
+method:DELETE

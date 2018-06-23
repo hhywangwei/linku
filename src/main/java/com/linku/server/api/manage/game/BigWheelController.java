@@ -14,20 +14,20 @@ import com.linku.server.game.wheel.service.BigWheelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @RestController
-@RequestMapping("/game/wheel")
-@Api(value = "/game/wheel", tags = "M-大转盘游戏管理API接口")
+@RequestMapping("/manage/game/wheel")
+@Api(value = "/manage/game/wheel", tags = "M-大转盘游戏管理API接口")
 public class BigWheelController {
 
     @Autowired
@@ -52,26 +52,9 @@ public class BigWheelController {
             return ResultVo.error(result.getAllErrors());
         }
 
-        BigWheel t = service.save(form.toDomain(), toItems(form));
+        BigWheel t = service.save(form.toDomain(currentShopId()), form.toDomainItems());
 
         return get(t.getId());
-    }
-
-    private List<BigWheelItem> toItems(BigWheelSaveForm form){
-        List<BigWheelItem> items = new ArrayList<>();
-        for(int i = 0; i < form.getItems().size(); i++){
-            BigWheelSaveForm.BigWheelSaveItemForm t = form.getItems().get(i);
-            BigWheelItem item = new BigWheelItem();
-
-            item.setIndex(i);
-            item.setMoney(t.getMoney());
-            item.setTitle(t.getTitle());
-            item.setRatio(t.getRatio());
-
-            items.add(item);
-        }
-
-        return items;
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -81,7 +64,7 @@ public class BigWheelController {
             return ResultVo.error(result.getAllErrors());
         }
 
-        BigWheel t = service.update(form.toDomain(), toItems(form));
+        BigWheel t = service.update(form.toDomain(currentShopId()), form.toDomainItems());
 
         return get(t.getId());
     }
@@ -112,21 +95,23 @@ public class BigWheelController {
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("查询大转盘游戏")
     public ResultPageVo<BigWheel> query(@RequestParam(required = false) @ApiParam("名称") String name,
-                                     @RequestParam(required = false) @ApiParam("状态") String state,
+                                     @RequestParam(required = false) @ApiParam("状态") BigWheel.State state,
                                      @RequestParam(defaultValue = "true") @ApiParam(value = "是否得到查询记录数") boolean isCount,
                                      @RequestParam(defaultValue = "0") @ApiParam(value = "查询页数") int page,
                                      @RequestParam(defaultValue = "15") @ApiParam(value = "查询每页记录数") int rows){
 
         final String shopId = currentShopId();
-        final BigWheel.State stateObj;
-        try{
-            stateObj = BigWheel.State.valueOf(state);
-        }catch (Exception e){
-            throw new BaseException("状态不存在");
-        }
+//        final BigWheel.State stateObj;
+//        try{
+//            if(StringUtils.isNotBlank(state)){
+//                stateObj = BigWheel.State.valueOf(state);
+//            }
+//        }catch (Exception e){
+//            throw new BaseException("状态不存在");
+//        }
 
-        return new ResultPageVo.Builder<>(page, rows, service.query(shopId, name, stateObj,page * rows, rows))
-                .count(isCount, () -> service.count(shopId, name, stateObj))
+        return new ResultPageVo.Builder<>(page, rows, service.query(shopId, name, state,page * rows, rows))
+                .count(isCount, () -> service.count(shopId, name, state))
                 .build();
     }
 

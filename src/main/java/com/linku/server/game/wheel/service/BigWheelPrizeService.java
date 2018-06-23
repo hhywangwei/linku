@@ -14,6 +14,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
@@ -39,7 +40,8 @@ public class BigWheelPrizeService {
         this.pticketService = pticketService;
     }
 
-    public Play prize(String id, String userId){
+    @Transactional(propagation = Propagation.REQUIRED)
+    public BigWheelPrize prize(String id, String userId){
         BigWheel t = service.get(id);
         User u = userService.get(userId);
         if(!StringUtils.equals(t.getShopId(), u.getShopId())){
@@ -68,7 +70,12 @@ public class BigWheelPrizeService {
             throw new BaseException("抽奖失败");
         }
 
-        return savePlay(t, prizeItem, u);
+        Play play = savePlay(t, prizeItem, u);
+        int angle = prizeItem.getFromCursor() +
+                ((prizeItem.getToCursor() - prizeItem.getFromCursor()) / 2) +
+                RandomUtils.nextInt(0, 4);
+
+        return new BigWheelPrize(angle, play);
     }
 
     private int getRand(List<Integer> ratios){
@@ -100,6 +107,8 @@ public class BigWheelPrizeService {
         if(item.getMoney() > 0){
             Pticket pticket = savePticket(t.getPticketDays(), item, user);
             play.setPticketId(pticket.getId());
+        }else{
+            play.setPticketId("-1");
         }
 
         return playService.save(play);
@@ -116,6 +125,24 @@ public class BigWheelPrizeService {
         t.setName("现金券");
 
         return pticketService.save(t);
+    }
+
+    public static class BigWheelPrize{
+        private final Integer angle;
+        private final Play play;
+
+        public BigWheelPrize(Integer angle, Play play) {
+            this.angle = angle;
+            this.play = play;
+        }
+
+        public Integer getAngle() {
+            return angle;
+        }
+
+        public Play getPlay() {
+            return play;
+        }
     }
 
 }

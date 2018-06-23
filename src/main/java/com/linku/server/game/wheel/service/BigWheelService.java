@@ -37,6 +37,7 @@ public class BigWheelService {
         t.setId(IdGenerators.uuid());
         dao.insert(t);
 
+        setCursor(items);
         for(int i = 0; i < items.size(); i++){
             BigWheelItem item = items.get(i);
             item.setId(IdGenerators.uuid());
@@ -59,9 +60,9 @@ public class BigWheelService {
             if(i == 0){
                 item.setFromCursor(360 - z);
             }else{
-                item.setFromCursor(i * v + r -z -1);
+                item.setFromCursor(i * v + r -z);
             }
-            item.setToCursor((i + 1) * v + r - z);
+            item.setToCursor((i + 1) * v + r - z - 1);
         }
     }
 
@@ -87,6 +88,7 @@ public class BigWheelService {
 
         dao.update(t);
         itemDao.deleteOfBigWheel(t.getId());
+        setCursor(items);
         for(int i = 0; i < items.size(); i++){
             BigWheelItem item = items.get(i);
             item.setId(IdGenerators.uuid());

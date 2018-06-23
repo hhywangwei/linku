@@ -1,0 +1,5 @@
+--http://localhost:8080/client/game/wheel/play
+method:POST
+{
+"gameId":"29de198b38c14a338a8bc2345a68d24b"
+}
