@@ -25,10 +25,10 @@ spring:
       time-zone: GMT+8
   datasource:
       type: com.zaxxer.hikari.HikariDataSource
-      username: root
-      password: appeme.com
+      username: dev
+      password: linku456258
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/linku_db?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      url: jdbc:mysql://39.104.120.219:3306/linku_db?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hikari:
         maximum-pool-size: 20
         idle-timeout: 3600000
@@ -47,7 +47,7 @@ spring:
       repositories:
         enabled: false
   redis:
-    url: redis://127.0.0.1:6379
+    url: redis://linku456258@39.104.120.219:6379
     timeout: 10000
     pool:
       maxActive: 10
@@ -63,7 +63,7 @@ server:
 
 upload:
   max: 3
-  root: /Users/weiwang/data
+  root: d:/data
   baseUrl: http://127.0.0.1/file
   maxImageLength: 716800
   thumbWidth: 256
@@ -71,6 +71,11 @@ upload:
   orgiPrefix: _orgi_
 
 wx:
+  component:
+    appid: wx55673486a4379678
+    secret: 09b8f183b1af1dfe124bdd41a2bae7eb
+    validateToken: tuoshecx_2018
+    encodingAesKey: AYqzeDHisHtdqADPMPeeCPRpEoKZjTMktHxTzXIOXMP
   small:
     appid: wxd94a7c7b59afe68e
     secret: 6057acee7638f5e828a437a4e569dd2f

@@ -1,5 +1,6 @@
 package com.linku.server.wx.configure;
 
+import com.linku.server.wx.configure.properties.WxComponentProperties;
 import com.linku.server.wx.configure.properties.WxPayProperties;
 import com.linku.server.wx.configure.properties.WxProperties;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -23,7 +24,7 @@ import java.security.KeyStore;
  * @author WangWei
  */
 @Configuration
-@EnableConfigurationProperties(value = {WxProperties.class, WxPayProperties.class})
+@EnableConfigurationProperties(value = {WxProperties.class, WxComponentProperties.class, WxPayProperties.class})
 public class WxConfigure {
     private static final Logger logger = LoggerFactory.getLogger(WxConfigure.class);
 

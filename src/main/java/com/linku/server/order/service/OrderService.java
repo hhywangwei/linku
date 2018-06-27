@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -233,11 +234,11 @@ public class OrderService {
         dao.cancel(o.getId(), o.getVersion());
     }
 
-    public long countByUser(String userId, Order.State state){
-        return dao.countByUser(userId, state);
+    public long count(String shopId, String userId, Order.State state, Date fromTime, Date toTime){
+        return dao.count(shopId, userId, state, fromTime, toTime);
     }
 
-    public List<Order> queryByUser(String userId, Order.State state, int offset, int limit){
-        return dao.findByUser(userId, state, offset, limit);
+    public List<Order> query(String shopId, String userId, Order.State state, Date fromTime, Date toTime, int offset, int limit){
+        return dao.find(shopId, userId, state, fromTime, toTime, offset, limit);
     }
 }

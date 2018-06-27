@@ -3,12 +3,14 @@ package com.linku.server.order.dao;
 import com.linku.server.marketing.domain.Marketing;
 import com.linku.server.common.utils.DaoUtils;
 import com.linku.server.order.domain.Order;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -107,16 +109,59 @@ public class OrderDao {
         return jdbcTemplate.query(sql, new Object[]{shopId, stateLike, limit, offset}, mapper);
     }
 
-    public long countByUser(String userId, Order.State state){
-        final String sql = "SELECT COUNT(id) FROM order_info WHERE user_id = ? AND is_delete = false AND state LIKE ?";
-        String stateLike = DaoUtils.blankLike(state == null? "": state.name());
-        return jdbcTemplate.queryForObject(sql, new Object[]{userId, stateLike}, Long.class);
+    public long count(String shopId, String userId, Order.State state, Date fromTime, Date toTime){
+        final StringBuilder sql = new StringBuilder(200);
+        sql.append("SELECT COUNT(id) FROM order_info ");
+        buildWhere(sql, shopId, userId, state, fromTime, toTime);
+        return jdbcTemplate.queryForObject(sql.toString(), params(shopId, userId, state, fromTime, toTime), Long.class);
     }
 
-    public List<Order> findByUser(String userId, Order.State state, int offset, int limit){
-        final String sql = "SELECT * FROM order_info WHERE user_id = ? AND is_delete = false AND state LIKE ? LIMIT ? OFFSET ?";
-        String stateLike = DaoUtils.blankLike(state == null? "": state.name());
-        return jdbcTemplate.query(sql, new Object[]{userId, stateLike, limit, offset}, mapper);
+    private void buildWhere(StringBuilder sql, String shopId, String userId, Order.State state, Date fromTime, Date toTime){
+        sql.append(" WHERE is_delete = false ");
+        if(StringUtils.isNotBlank(shopId)){
+            sql.append(" AND shop_id = ? ");
+        }
+        if(StringUtils.isNotBlank(userId)){
+            sql.append(" AND user_id = ? ");
+        }
+        if(state != null){
+            sql.append(" AND state = ? ");
+        }
+        if(fromTime != null){
+            sql.append(" AND create_time >= ? ");
+        }
+        if(toTime != null){
+            sql.append(" AND create_time <= ? ");
+        }
+    }
+
+    private  Object[] params(String shopId, String userId, Order.State state, Date fromTime, Date toTime){
+        List<Object> params = new ArrayList<>(5);
+        if(StringUtils.isNotBlank(shopId)){
+            params.add(shopId);
+        }
+        if(StringUtils.isNotBlank(userId)){
+            params.add(userId);
+        }
+        if(state != null){
+            params.add(state.name());
+        }
+        if(fromTime != null){
+            params.add(fromTime);
+        }
+        if(toTime != null){
+            params.add(toTime);
+        }
+        return params.toArray();
+    }
+
+    public List<Order> find(String shopId, String userId, Order.State state, Date fromTime, Date toTime, int offset, int limit){
+        final StringBuilder sql = new StringBuilder(200);
+        sql.append(" SELECT * FROM order_info ");
+        buildWhere(sql, shopId, userId, state, fromTime, toTime);
+        sql.append(" ORDER BY create_time desc LIMIT ? OFFSET ?");
+        Object[] params = DaoUtils.appendOffsetLimit(params(shopId, userId, state, fromTime, toTime), offset, limit);
+        return jdbcTemplate.query(sql.toString(), params, mapper);
     }
 
     public boolean hasUserIdAndActiveId(String userId, String activeId){

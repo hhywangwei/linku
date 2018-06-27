@@ -21,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
@@ -74,15 +75,15 @@ public class OrderClientController {
 
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("查询用户订单")
-    public ResultPageVo<Order> query(@RequestParam(defaultValue = "PAY") @ApiParam(value = "订单状态, PAY:已支付,WAIT:未支付") String state,
+    public ResultPageVo<Order> query(@RequestParam(defaultValue = "PAY") @ApiParam(value = "订单状态, PAY:已支付,WAIT:未支付") Order.State state,
+                                     @RequestParam(value = "fromTime", required = false) @ApiParam(value = "查询开始时间")Date fromTime,
+                                     @RequestParam(value = "toTime", required = false) @ApiParam(value = "查询结束时间")Date toTime,
                                      @RequestParam(defaultValue = "0") @ApiParam(value = "查询页数") int page,
                                      @RequestParam(defaultValue = "15") @ApiParam(value = "查询每页记录数") int rows){
 
-        Order.State orderState = Order.State.valueOf(StringUtils.upperCase(state));
         String userId = getCredential().getId();
-        List<Order> data = service.queryByUser(userId, orderState,page * rows, rows);
+        List<Order> data = service.query(StringUtils.EMPTY, userId, state, fromTime, toTime, page * rows, rows);
         return new ResultPageVo.Builder<>(page, rows, data).build();
-
     }
 
     private Credential getCredential(){

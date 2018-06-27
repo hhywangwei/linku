@@ -3,8 +3,9 @@ version '1.0M1'
 
 buildscript {
     ext {
-        springBootVersion = '2.0.0.RELEASE'
+        springBootVersion = '2.0.3.RELEASE'
         lang3Version = '3.4'
+        commonsCodecVersion = '1.11'
         oauth2ConfigureVersion='2.0.1.RELEASE'
         swaggerVersion= '1.5.12'
         springfoxVersion = '2.7.0'
@@ -50,6 +51,7 @@ dependencies {
     compile 'org.flywaydb:flyway-core'
     compile "org.bouncycastle:bcprov-jdk15:${bcprovVersion}"
     compile "org.apache.commons:commons-lang3:${lang3Version}"
+    compile "commons-codec:commons-codec:${commonsCodecVersion}"
     compile "io.swagger:swagger-annotations:${swaggerVersion}"
     compile "io.springfox:springfox-swagger2:${springfoxVersion}"
     compile "net.coobird:thumbnailator:${thumbnailatorVersion}"

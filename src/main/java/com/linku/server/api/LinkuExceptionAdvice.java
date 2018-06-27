@@ -21,6 +21,7 @@ public class LinkuExceptionAdvice {
 
     @ExceptionHandler(BaseException.class)
     @ResponseBody
+    @SuppressWarnings("unused")
     public ResultVo<String> handleBaseException(BaseException e){
         LOGGER.error("Controller error code {} message {}", e.getCode(), e.getMessage());
         return ResultVo.error(e.getCode(), e.getMessage());
@@ -28,6 +29,7 @@ public class LinkuExceptionAdvice {
 
     @ExceptionHandler(ConversionFailedException.class)
     @ResponseBody
+    @SuppressWarnings("unused")
     public ResultVo<String> handlerConversionFailedException(ConversionFailedException e){
         LOGGER.error("Parameter conversion fail, error is {}", e.getMessage());
         return ResultVo.error(100, "参数错误");
