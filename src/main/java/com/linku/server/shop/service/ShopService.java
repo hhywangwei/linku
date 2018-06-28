@@ -4,10 +4,10 @@ import com.linku.server.BaseException;
 import com.linku.server.common.id.IdGenerators;
 import com.linku.server.common.utils.HtmlUtils;
 import com.linku.server.shop.dao.ShopDao;
-import com.linku.server.shop.dao.WxConfigureDao;
+import com.linku.server.shop.dao.ShopWxTokenDao;
 import com.linku.server.shop.domain.Manager;
 import com.linku.server.shop.domain.Shop;
-import com.linku.server.shop.domain.WxConfigure;
+import com.linku.server.shop.domain.ShopWxToken;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +31,11 @@ public class ShopService {
     private static final Logger logger = LoggerFactory.getLogger(ShopService.class);
 
     private final ShopDao dao;
-    private final WxConfigureDao wxConfigureDao;
+    private final ShopWxTokenDao wxConfigureDao;
     private final ManagerService managerService;
 
     @Autowired
-    public ShopService(ShopDao dao, WxConfigureDao wxConfigureDao, ManagerService managerService){
+    public ShopService(ShopDao dao, ShopWxTokenDao wxConfigureDao, ManagerService managerService){
         this.dao = dao;
         this.wxConfigureDao = wxConfigureDao;
         this.managerService = managerService;
@@ -107,7 +107,7 @@ public class ShopService {
     public Shop getByAppid(String appid){
         try{
             logger.debug("Appid is {}", appid);
-            WxConfigure c = wxConfigureDao.findOneByAppid(appid);
+            ShopWxToken c = wxConfigureDao.findOneByAppid(appid);
             logger.debug("Shop id is {}", c.getShopId());
             return get(c.getShopId());
         }catch (DataAccessException e){

@@ -74,8 +74,9 @@ wx:
   component:
     appid: wx55673486a4379678
     secret: 09b8f183b1af1dfe124bdd41a2bae7eb
-    validateToken: tuoshecx_2018
-    encodingAesKey: AYqzeDHisHtdqADPMPeeCPRpEoKZjTMktHxTzXIOXMP
+    validate_token: tuoshecx_2018
+    encoding_aes_key: AYqzeDHisHtdqADPMPeeCPRpEoKZjTMktHxTzXIOXMP
+    redirect_uri: http://api.re1001.com/api/wx/component/
   small:
     appid: wxd94a7c7b59afe68e
     secret: 6057acee7638f5e828a437a4e569dd2f

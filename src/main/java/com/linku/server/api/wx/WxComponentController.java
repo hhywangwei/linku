@@ -9,6 +9,7 @@ import com.linku.server.wx.configure.properties.WxComponentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -77,5 +78,28 @@ public class WxComponentController {
         });
 
         return result;
+    }
+
+    @GetMapping(value = "authorizer", produces = MediaType.TEXT_HTML_VALUE)
+    public DeferredResult<ResponseEntity<String>> authorizer(
+            @RequestParam(value="auth_code") String authCode,
+            @RequestParam(value="expires_in", required=false) Integer expiresIn,
+            @RequestParam(value = "shop_id", required = false)String shopId){
+
+        LOGGER.info("Start shop {} authorizer auth code {} expire in {}", shopId, authCode, expiresIn);
+
+        DeferredResult<ResponseEntity<String>> result = new DeferredResult<>();
+
+        clientService.obtainQueryAuth(authCode).subscribe(e -> {
+            if(isSuccess(e.getCode())){
+                
+            }else{
+
+            }
+        });
+        return result;
+    }
+    private boolean isSuccess(int code){
+        return code == 0;
     }
 }

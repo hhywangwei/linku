@@ -1,5 +1,6 @@
 package com.linku.server.wx.configure.properties;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -13,6 +14,7 @@ public class WxComponentProperties {
     private String secret;
     private String validateToken;
     private String encodingAesKey;
+    private String redirectUri;
 
     public String getAppid() {
         return appid;
@@ -46,13 +48,22 @@ public class WxComponentProperties {
         this.encodingAesKey = encodingAesKey;
     }
 
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public void setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
+    }
+
     @Override
     public String toString() {
-        return "WxComponentProperties{" +
-                "appid='" + appid + '\'' +
-                ", secret='" + secret + '\'' +
-                ", validateToken='" + validateToken + '\'' +
-                ", encodingAesKey='" + encodingAesKey + '\'' +
-                '}';
+        return new ToStringBuilder(this)
+                .append("appid", appid)
+                .append("secret", secret)
+                .append("validateToken", validateToken)
+                .append("encodingAesKey", encodingAesKey)
+                .append("redirectUri", redirectUri)
+                .toString();
     }
 }
