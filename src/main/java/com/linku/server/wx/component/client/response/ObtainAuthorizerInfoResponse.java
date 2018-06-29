@@ -16,6 +16,7 @@ public class ObtainAuthorizerInfoResponse extends ComponentResponse{
     private final String signature;
     private final String principalName;
     private final String qrcodeUrl;
+    private final Map<String, Object> businessInfo;
     private final Map<String, Object> miniProgramInfo;
     private final Map<String, Object> authorizationInfo;
 
@@ -31,6 +32,7 @@ public class ObtainAuthorizerInfoResponse extends ComponentResponse{
         this.signature = (String)info.get("signature");
         this.principalName = (String)info.get("principal_name");
         this.qrcodeUrl = (String)info.get("qrcode_url");
+        this.businessInfo =(Map<String, Object>)info.get("business_info");
         this.miniProgramInfo = (Map<String, Object>)info.get("MiniProgramInfo");
         this.authorizationInfo = (Map<String, Object>)info.get("authorization_info");
     }
@@ -73,5 +75,9 @@ public class ObtainAuthorizerInfoResponse extends ComponentResponse{
 
     public String getQrcodeUrl() {
         return qrcodeUrl;
+    }
+
+    public Map<String, Object> getBusinessInfo() {
+        return businessInfo;
     }
 }

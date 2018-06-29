@@ -24,6 +24,8 @@ public class ShopWxToken {
     private String accessToken;
     @ApiModelProperty(value = "刷新Token令牌")
     private String refreshToken;
+    @ApiModelProperty(value = "token过期时间")
+    private Date expiresTime;
     @ApiModelProperty(value = "更新Token时间")
     private Date updateTime;
 
@@ -67,6 +69,14 @@ public class ShopWxToken {
         this.refreshToken = refreshToken;
     }
 
+    public Date getExpiresTime() {
+        return expiresTime;
+    }
+
+    public void setExpiresTime(Date expiresTime) {
+        this.expiresTime = expiresTime;
+    }
+
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -85,13 +95,14 @@ public class ShopWxToken {
                 Objects.equals(appid, that.appid) &&
                 Objects.equals(accessToken, that.accessToken) &&
                 Objects.equals(refreshToken, that.refreshToken) &&
+                Objects.equals(expiresTime, that.expiresTime) &&
                 Objects.equals(updateTime, that.updateTime);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, shopId, appid, accessToken, refreshToken, updateTime);
+        return Objects.hash(id, shopId, appid, accessToken, refreshToken, expiresTime, updateTime);
     }
 
     @Override
@@ -102,6 +113,7 @@ public class ShopWxToken {
                 .append("appid", appid)
                 .append("accessToken", accessToken)
                 .append("refreshToken", refreshToken)
+                .append("expiresTime", expiresTime)
                 .append("updateTime", updateTime)
                 .toString();
     }

@@ -28,7 +28,7 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 public class ShopService {
-    private static final Logger logger = LoggerFactory.getLogger(ShopService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShopService.class);
 
     private final ShopDao dao;
     private final ShopWxTokenDao wxConfigureDao;
@@ -99,16 +99,16 @@ public class ShopService {
         try{
             return dao.findOne(id);
         }catch (DataAccessException e){
-            logger.warn("Get shop fail, error is {}", e.getMessage());
+            LOGGER.warn("Get shop fail, error is {}", e.getMessage());
             throw new BaseException("店铺不存在");
         }
     }
 
     public Shop getByAppid(String appid){
         try{
-            logger.debug("Appid is {}", appid);
+            LOGGER.debug("Appid is {}", appid);
             ShopWxToken c = wxConfigureDao.findOneByAppid(appid);
-            logger.debug("Shop id is {}", c.getShopId());
+            LOGGER.debug("Shop id is {}", c.getShopId());
             return get(c.getShopId());
         }catch (DataAccessException e){
             throw new BaseException("店铺不存在");
@@ -196,7 +196,7 @@ public class ShopService {
                 try{
                     close(shop.getId());
                 }catch (Exception e){
-                    logger.error("Close try expired {} shop fail, error is {}", shop.getId(), e.getMessage());
+                    LOGGER.error("Close try expired {} shop fail, error is {}", shop.getId(), e.getMessage());
                 }
             }
         }

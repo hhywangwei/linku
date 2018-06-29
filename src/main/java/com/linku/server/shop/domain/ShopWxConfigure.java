@@ -21,10 +21,10 @@ public class ShopWxConfigure {
     private String username;
     private String name;
     private String businessInfo;
-    private String alias;
     private String qrcodeUrl;
     private String authorizationInfo;
     private Boolean authorization;
+    private String miniProgramInfo;
     private Date updateTime;
     private Date createTime;
 
@@ -108,14 +108,6 @@ public class ShopWxConfigure {
         this.businessInfo = businessInfo;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
     public String getQrcodeUrl() {
         return qrcodeUrl;
     }
@@ -138,6 +130,14 @@ public class ShopWxConfigure {
 
     public void setAuthorization(Boolean authorization) {
         this.authorization = authorization;
+    }
+
+    public String getMiniProgramInfo() {
+        return miniProgramInfo;
+    }
+
+    public void setMiniProgramInfo(String miniProgramInfo) {
+        this.miniProgramInfo = miniProgramInfo;
     }
 
     public Date getUpdateTime() {
@@ -171,10 +171,10 @@ public class ShopWxConfigure {
                 Objects.equals(username, that.username) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(businessInfo, that.businessInfo) &&
-                Objects.equals(alias, that.alias) &&
                 Objects.equals(qrcodeUrl, that.qrcodeUrl) &&
                 Objects.equals(authorizationInfo, that.authorizationInfo) &&
                 Objects.equals(authorization, that.authorization) &&
+                Objects.equals(miniProgramInfo, that.miniProgramInfo) &&
                 Objects.equals(updateTime, that.updateTime) &&
                 Objects.equals(createTime, that.createTime);
     }
@@ -182,7 +182,7 @@ public class ShopWxConfigure {
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, shopId, appid, nickname, headImg, serviceTypeInfo, verifyTypeInfo, username, name, businessInfo, alias, qrcodeUrl, authorizationInfo, authorization, updateTime, createTime);
+        return Objects.hash(id, shopId, appid, nickname, headImg, serviceTypeInfo, verifyTypeInfo, username, name, businessInfo, qrcodeUrl, authorizationInfo, authorization, miniProgramInfo, updateTime, createTime);
     }
 
     @Override
@@ -198,10 +198,10 @@ public class ShopWxConfigure {
                 .append("username", username)
                 .append("name", name)
                 .append("businessInfo", businessInfo)
-                .append("alias", alias)
                 .append("qrcodeUrl", qrcodeUrl)
                 .append("authorizationInfo", authorizationInfo)
                 .append("authorization", authorization)
+                .append("miniProgramInfo", miniProgramInfo)
                 .append("updateTime", updateTime)
                 .append("createTime", createTime)
                 .toString();

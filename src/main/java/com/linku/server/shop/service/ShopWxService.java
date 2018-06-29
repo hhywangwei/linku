@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +39,8 @@ public class ShopWxService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void saveToken(ShopWxToken t){
         if(tokenDao.hasAppid(t.getAppid())){
-            tokenDao.updateToken(t.getAppid(), t.getAccessToken(), t.getRefreshToken());
+            tokenDao.updateToken(t.getAppid(), t.getAccessToken(),
+                    t.getRefreshToken(), t.getExpiresTime(), t.getUpdateTime());
         }else{
             t.setId(IdGenerators.uuid());
             tokenDao.insert(t);
@@ -75,5 +77,9 @@ public class ShopWxService {
 
     public List<ShopWxConfigure> queryByShopId(String shopId){
         return configureDao.findByShopId(shopId);
+    }
+
+    public List<ShopWxToken> queryExpires(int limit){
+       return tokenDao.findExpires(new Date(), limit);
     }
 }
