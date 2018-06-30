@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Date;
@@ -84,9 +83,12 @@ public class WxComponentController {
     }
 
     @GetMapping(value = "preAuthorizer", produces = APPLICATION_JSON_UTF8_VALUE)
-    public DeferredResult<ResultVo<String>> preAuthorizer(@RequestParam String shopId){
+    public DeferredResult<ResultVo<String>> preAuthorizer(@RequestParam(required = false) String shopId){
         DeferredResult<ResultVo<String>> result = new DeferredResult<>();
-        String redirectUri = properties.getRedirectUri() + "?shop_id=" + shopId;
+
+        String redirectUri = properties.getRedirectUri() +
+                "?shop_id=" + (StringUtils.isBlank(shopId)? "wx10000001" : shopId);
+
         clientService.obtainPreAuthCode().subscribe(e ->{
             if(e.getCode() == 0){
                 String c = String.format("https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid=%s&pre_auth_code=%s&" +
@@ -106,7 +108,7 @@ public class WxComponentController {
     public DeferredResult<ResponseEntity<String>> authorizer(
             @RequestParam(value="auth_code") String authCode,
             @RequestParam(value="expires_in") Integer expiresIn,
-            @RequestParam(value = "shop_id")String shopId){
+            @RequestParam(value = "shop_id", required = false)String shopId){
 
         LOGGER.info("Start shop {} authorizer auth code {} expire in {}", shopId, authCode, expiresIn);
 

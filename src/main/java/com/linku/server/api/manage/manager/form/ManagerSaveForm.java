@@ -28,7 +28,7 @@ public class ManagerSaveForm {
     private String name;
     @Size(max = 200)
     @ApiModelProperty(value = "用户头像")
-    private String icon;
+    private String headImg;
     @Size(max = 20)
     @ApiModelProperty(value = "联系电话")
     private String phone;
@@ -59,12 +59,12 @@ public class ManagerSaveForm {
         this.name = name;
     }
 
-    public String getIcon() {
-        return icon;
+    public String getHeadImg() {
+        return headImg;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setHeadImg(String headImg) {
+        this.headImg = headImg;
     }
 
     public String getPhone() {
@@ -90,7 +90,7 @@ public class ManagerSaveForm {
         t.setUsername(username);
         t.setPassword(password);
         t.setName(name);
-        t.setHeadImg(icon);
+        t.setHeadImg(headImg);
         t.setPhone(phone);
         t.setRoles(roles);
         t.setManager(false);
