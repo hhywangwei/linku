@@ -52,6 +52,10 @@ public class ComponentTokenService {
 
     public boolean isExpired(String componentAppid){
         Double score = timeOperations.score(componentAppid);
-        return score == null || score.longValue() < System.currentTimeMillis();
+        if(score == null){
+            return true;
+        }
+        Long now = System.currentTimeMillis();
+        return score.longValue() < now;
     }
 }

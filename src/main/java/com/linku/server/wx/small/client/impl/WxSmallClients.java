@@ -1,7 +1,9 @@
 package com.linku.server.wx.small.client.impl;
 
 import com.linku.server.common.client.AsyncHttpClient;
-import com.linku.server.wx.configure.properties.WxProperties;
+import com.linku.server.wx.component.token.ComponentTokenService;
+import com.linku.server.wx.configure.properties.WxComponentProperties;
+import com.linku.server.wx.small.client.request.SendCustomMsgRequest;
 import com.linku.server.wx.small.client.request.SendTmpMsgRequest;
 import com.linku.server.wx.small.client.response.LoginResponse;
 import com.linku.server.wx.small.client.response.WxSmallResponse;
@@ -14,10 +16,12 @@ import com.linku.server.wx.small.client.response.WxSmallResponse;
 public class WxSmallClients {
     private final AsyncHttpClient<String, LoginResponse> loginClient;
     private final AsyncHttpClient<SendTmpMsgRequest, WxSmallResponse> sendTmpMsgClient;
+    private final AsyncHttpClient<SendCustomMsgRequest, WxSmallResponse> sendCustomMsgClient;
 
-    public WxSmallClients(WxProperties properties) {
-        this.loginClient = new LoginClient(properties);
-        this.sendTmpMsgClient = new SendTmpMsgClient(properties);
+    public WxSmallClients(WxComponentProperties properties, ComponentTokenService tokenService) {
+        this.loginClient = new LoginClient(properties, tokenService);
+        this.sendTmpMsgClient = new SendTmpMsgClient();
+        this.sendCustomMsgClient = new SendCustomMsgClient();
     }
 
     /**
@@ -36,5 +40,14 @@ public class WxSmallClients {
      */
     public AsyncHttpClient<SendTmpMsgRequest, WxSmallResponse> sendTmpMsgClient(){
         return sendTmpMsgClient;
+    }
+
+    /**
+     *  发送客户消息
+     *
+     * @return {@link SendCustomMsgClient}
+     */
+    public AsyncHttpClient<SendCustomMsgRequest, WxSmallResponse> sendCustomMsgClient() {
+        return sendCustomMsgClient;
     }
 }

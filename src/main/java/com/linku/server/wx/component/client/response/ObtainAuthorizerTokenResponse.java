@@ -14,9 +14,9 @@ public class ObtainAuthorizerTokenResponse extends ComponentResponse {
 
     public ObtainAuthorizerTokenResponse(Map<String, Object> data) {
         super(data);
-        this.authorizerAccessToken = (String) data.get("authorizer_access_token");
-        this.authorizerRefreshToken = (String) data.get("authorizer_refresh_token");
-        this.expiresIn = (Integer) data.get("expires_in");
+        this.authorizerAccessToken = (String) data.getOrDefault("authorizer_access_token", "");
+        this.authorizerRefreshToken = (String) data.getOrDefault("authorizer_refresh_token", "");
+        this.expiresIn = (Integer) data.getOrDefault("expires_in", -1);
     }
 
     public String getAuthorizerAccessToken() {

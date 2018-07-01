@@ -1,8 +1,10 @@
 package com.linku.server.wx.small;
 
 import com.linku.server.BaseException;
-import com.linku.server.wx.configure.properties.WxProperties;
-import com.linku.server.wx.gzh.token.GzhTokenService;
+import com.linku.server.shop.domain.ShopWxToken;
+import com.linku.server.shop.service.ShopWxService;
+import com.linku.server.wx.component.token.ComponentTokenService;
+import com.linku.server.wx.configure.properties.WxComponentProperties;
 import com.linku.server.wx.small.client.impl.WxSmallClients;
 import com.linku.server.wx.small.session.RedisSessionDao;
 import com.linku.server.wx.small.session.SessionDao;
@@ -21,20 +23,19 @@ import java.util.Optional;
  */
 @Service
 public class WxSmallService {
-    private final GzhTokenService tokenService;
+    private final ShopWxService wxService;
     private final SessionDao sessionDao;
     private final WxSmallClients clients;
-    private final WxProperties properties;
 
     @Autowired
-    public WxSmallService(GzhTokenService tokenService,
+    public WxSmallService(ShopWxService wxService,
                           StringRedisTemplate redisTemplate,
-                          WxProperties properties) {
+                          WxComponentProperties properties,
+                          ComponentTokenService tokenService) {
 
-        this.tokenService = tokenService;
+        this.wxService = wxService;
         this.sessionDao = new RedisSessionDao(redisTemplate);
-        this.clients = new WxSmallClients(properties);
-        this.properties = properties;
+        this.clients = new WxSmallClients(properties, tokenService);
     }
 
     /**
@@ -58,11 +59,12 @@ public class WxSmallService {
     /**
      * 发送模板消息
      *
+     * @param appid appid
      * @param builder 构建模板消息
      * @return
      */
-    public Mono<Boolean> sendTmpMsg(SendTmpMsgRequestBuilder builder){
-        String token = getAccessToken();
+    public Mono<Boolean> sendTmpMsg(String appid, SendTmpMsgRequestBuilder builder){
+        String token = getAccessToken(appid);
         return clients.sendTmpMsgClient()
                 .request(builder.build(token))
                 .map(e -> e.getCode() == 0);
@@ -104,8 +106,8 @@ public class WxSmallService {
         sessionDao.remove(openid);
     }
 
-    private String getAccessToken(){
-        Optional<String> optional = tokenService.getAccessToken(properties.getAppid());
-        return optional.orElseThrow(() -> new BaseException(5001, "微信公众号Token失效"));
+    private String getAccessToken(String appid){
+        Optional<ShopWxToken> optional = wxService.getToken(appid);
+        return optional.orElseThrow(() -> new BaseException(5001, "微信公众号Token失效")).getAccessToken();
     }
 }

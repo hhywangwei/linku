@@ -13,8 +13,8 @@ public class ObtainPreAuthCodeResponse extends ComponentResponse {
 
     public ObtainPreAuthCodeResponse(Map<String, Object> data) {
         super(data);
-        this.preAuthCode = (String)data.get("pre_auth_code");
-        this.expiresIn = (Integer)data.get("expires_in");
+        this.preAuthCode = (String)data.getOrDefault("pre_auth_code", "");
+        this.expiresIn = (Integer)data.getOrDefault("expires_in", -1);
     }
 
     public String getPreAuthCode() {

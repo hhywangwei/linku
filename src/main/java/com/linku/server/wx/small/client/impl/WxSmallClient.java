@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeBase;
 import com.linku.server.BaseException;
 import com.linku.server.common.client.AsyncHttpClient;
-import com.linku.server.wx.configure.properties.WxProperties;
 import com.linku.server.wx.small.client.response.WxSmallResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,34 +23,30 @@ abstract class WxSmallClient<T, R extends WxSmallResponse> implements AsyncHttpC
     private static final Logger logger = LoggerFactory.getLogger(WxSmallClient.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final WxProperties properties;
     private final String apiName;
 
     /**
      * 构建请求
      *
-     * @param properties {@link WxProperties}
      * @param apiName 调用API名
      */
-    WxSmallClient(WxProperties properties, String apiName) {
-        this.properties = properties;
+    WxSmallClient(String apiName) {
         this.apiName = apiName;
     }
 
     public Mono<R> request(T t){
         WebClient client = WebClient.create();
-        return doRequest(client, properties, t).map(this::responseLogger);
+        return doRequest(client, t).map(this::responseLogger);
     }
 
     /**
      * 生成请求
      *
      * @param client {@link WebClient}
-     * @param p 微信小程序配置属性
      * @param t 请求参数
      * @return
      */
-    protected abstract Mono<byte[]> doRequest(WebClient client, WxProperties p, T t);
+    protected abstract Mono<byte[]> doRequest(WebClient client, T t);
 
     /**
      * API接口输出信息日志

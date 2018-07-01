@@ -25,7 +25,7 @@ public class ShopWxConfigureDao {
         t.setHeadImg(r.getString("head_img"));
         t.setServiceTypeInfo(r.getInt("service_type_info"));
         t.setVerifyTypeInfo(r.getInt("verify_type_info"));
-        t.setUsername(r.getString("user_name"));
+        t.setUsername(r.getString("username"));
         t.setName(r.getString("name"));
         t.setBusinessInfo(r.getString("business_info"));
         t.setQrcodeUrl(r.getString("qrcode_url"));
@@ -44,7 +44,7 @@ public class ShopWxConfigureDao {
     }
 
     public void insert(ShopWxConfigure t){
-        final String sql = "INSERT INTO shop_wx_configure (id, shop_id. appid, nickname, head_img, service_type_info," +
+        final String sql = "INSERT INTO shop_wx_configure (id, shop_id, appid, nickname, head_img, service_type_info," +
                 "verify_type_info, username, name, business_info, mini_program_info, qrcode_url, authorization_info, authorization, update_time, create_time) VALUES " +
                 "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -62,6 +62,11 @@ public class ShopWxConfigureDao {
         return jdbcTemplate.update(sql, t.getNickname(), t.getHeadImg(), t.getServiceTypeInfo(), t.getVerifyTypeInfo(),
                 t.getUsername(), t.getName(), t.getBusinessInfo(), t.getMiniProgramInfo(), t.getQrcodeUrl(), t.getAuthorizationInfo(),
                 t.getAuthorization(), DaoUtils.timestamp(new Date()), t.getAppid()) > 0;
+    }
+
+    public boolean delete(String appid){
+        final String sql = "DELETE FROM shop_wx_configure WHERE appid = ?";
+        return jdbcTemplate.update(sql, appid) > 0;
     }
 
     public boolean hasAppid(String appid){

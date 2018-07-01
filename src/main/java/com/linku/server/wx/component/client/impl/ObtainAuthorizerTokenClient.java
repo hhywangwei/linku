@@ -2,8 +2,9 @@ package com.linku.server.wx.component.client.impl;
 
 import com.linku.server.wx.component.client.ComponentHttpClient;
 import com.linku.server.wx.component.client.request.ObtainAuthorizerTokenRequest;
-import com.linku.server.wx.component.client.response.ObtainAccessTokenResponse;
 import com.linku.server.wx.component.client.response.ObtainAuthorizerTokenResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 class ObtainAuthorizerTokenClient extends ComponentHttpClient<ObtainAuthorizerTokenRequest, ObtainAuthorizerTokenResponse> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObtainAuthorizerTokenClient.class);
 
     ObtainAuthorizerTokenClient() {
         super("obtain_authorizer_token");
@@ -30,8 +32,10 @@ class ObtainAuthorizerTokenClient extends ComponentHttpClient<ObtainAuthorizerTo
     }
 
     private String buildBody(ObtainAuthorizerTokenRequest request){
-        return String.format("{\"component_access_token\": \"%s\", " + "\"authorizer_appid\": \"%s\", \"authorizer_refresh_token\": \"%s\"}",
+        String body = String.format("{\"component_appid\": \"%s\", " + "\"authorizer_appid\": \"%s\", \"authorizer_refresh_token\": \"%s\"}",
                 request.getComponentAppid(), request.getAuthorizerAppid(),request.getAuthorizerRefreshToken());
+        LOGGER.debug("Obtain authorizer token request body is {}", body);
+        return body;
     }
     @Override
     protected ObtainAuthorizerTokenResponse buildResponse(Map<String, Object> data) {

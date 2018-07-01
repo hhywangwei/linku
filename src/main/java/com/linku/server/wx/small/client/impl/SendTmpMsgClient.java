@@ -1,6 +1,5 @@
 package com.linku.server.wx.small.client.impl;
 
-import com.linku.server.wx.configure.properties.WxProperties;
 import com.linku.server.wx.small.client.request.SendTmpMsgRequest;
 import com.linku.server.wx.small.client.response.WxSmallResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -27,12 +26,12 @@ class SendTmpMsgClient extends WxSmallClient<SendTmpMsgRequest, WxSmallResponse>
     private static final Logger logger = LoggerFactory.getLogger(SendTmpMsgClient.class);
     private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
 
-    SendTmpMsgClient(WxProperties properties) {
-        super(properties, "sendTemplateMessage");
+    SendTmpMsgClient() {
+        super( "sendTemplateMessage");
     }
 
     @Override
-    protected Mono<byte[]> doRequest(WebClient client, WxProperties p, SendTmpMsgRequest request) {
+    protected Mono<byte[]> doRequest(WebClient client, SendTmpMsgRequest request) {
         String body = body(request);
         long contentLength = body.getBytes(UTF_8_CHARSET).length;
 

@@ -1,5 +1,7 @@
 package com.linku.server.wx.component.client.response;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,12 +15,12 @@ public class ObtainQueryAuthResponse extends ComponentResponse {
     @SuppressWarnings("unchecked")
     public ObtainQueryAuthResponse(Map<String, Object> data) {
         super(data);
-        Map<String, Object> info = (Map<String, Object>)data.get("authorization_info");
-        this.authorizerAppid = (String)info.get("authorizer_appid");
-        this.authorizerAccessToken = (String)info.get("authorizer_access_token");
-        this.expiresIn = (Integer)info.get("expires_in");
-        this.authorizerRefreshToken = (String)info.get("authorizer_refresh_token");
-        this.func = func((List<Map<String, Object>>)info.get("func_info"));
+        Map<String, Object> info = (Map<String, Object>)data.getOrDefault("authorization_info", Collections.emptyMap());
+        this.authorizerAppid = (String)info.getOrDefault("authorizer_appid", "");
+        this.authorizerAccessToken = (String)info.getOrDefault("authorizer_access_token", "");
+        this.expiresIn = (Integer)info.getOrDefault("expires_in", -1);
+        this.authorizerRefreshToken = (String)info.getOrDefault("authorizer_refresh_token", "");
+        this.func = func((List<Map<String, Object>>)info.getOrDefault("func_info", Collections.emptyMap()));
     }
 
     @SuppressWarnings("unchecked")

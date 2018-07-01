@@ -3,6 +3,8 @@ package com.linku.server.wx.component.client.impl;
 import com.linku.server.wx.component.client.ComponentHttpClient;
 import com.linku.server.wx.component.client.request.ObtainQueryAuthRequest;
 import com.linku.server.wx.component.client.response.ObtainQueryAuthResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -10,6 +12,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 class ObtainQueryAuthClient extends ComponentHttpClient<ObtainQueryAuthRequest, ObtainQueryAuthResponse> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObtainQueryAuthClient.class);
 
     ObtainQueryAuthClient() {
         super("obtain_query_auth");
@@ -29,7 +32,11 @@ class ObtainQueryAuthClient extends ComponentHttpClient<ObtainQueryAuthRequest, 
     }
 
     private String buildBody(ObtainQueryAuthRequest request){
-        return String.format("{\"component_appid\": \"%s\", \"authorization_code\": \"%s\"}", request.getComponentAppid(), request.getAuthorizationCode());
+        String body = String.format("{\"component_appid\": \"%s\", \"authorization_code\": \"%s\"}",
+                request.getComponentAppid(), request.getAuthorizationCode());
+
+        LOGGER.debug("Obtain query auth request body is {}", body);
+        return body;
     }
 
     @Override

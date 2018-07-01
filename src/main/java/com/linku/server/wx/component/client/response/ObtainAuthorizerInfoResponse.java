@@ -1,5 +1,6 @@
 package com.linku.server.wx.component.client.response;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -23,18 +24,18 @@ public class ObtainAuthorizerInfoResponse extends ComponentResponse{
     @SuppressWarnings("unchecked")
     public ObtainAuthorizerInfoResponse(Map<String, Object> data) {
         super(data);
-        Map<String, Object> info = (Map<String, Object>)data.get("authorizer_info");
-        this.nickname = (String)info.get("nick_name");
-        this.headImg = (String)info.get("head_img");
-        this.serviceTypeInfo = (Integer)((Map<String, Object>)info.get("service_type_info")).get("id");
-        this.verifyTypeInfo = (Integer)((Map<String, Object>)info.get("verify_type_info")).get("id");
-        this.username = (String)info.get("user_name");
-        this.signature = (String)info.get("signature");
-        this.principalName = (String)info.get("principal_name");
-        this.qrcodeUrl = (String)info.get("qrcode_url");
-        this.businessInfo =(Map<String, Object>)info.get("business_info");
-        this.miniProgramInfo = (Map<String, Object>)info.get("MiniProgramInfo");
-        this.authorizationInfo = (Map<String, Object>)info.get("authorization_info");
+        Map<String, Object> info = (Map<String, Object>)data.getOrDefault("authorizer_info", Collections.emptyMap());
+        this.nickname = (String)info.getOrDefault("nick_name", "");
+        this.headImg = (String)info.getOrDefault("head_img", "");
+        this.serviceTypeInfo = (Integer)((Map<String, Object>)info.getOrDefault("service_type_info", Collections.emptyMap())).getOrDefault("id", -1);
+        this.verifyTypeInfo = (Integer)((Map<String, Object>)info.getOrDefault("verify_type_info", Collections.emptyMap())).getOrDefault("id", -1);
+        this.username = (String)info.getOrDefault("user_name", "");
+        this.signature = (String)info.getOrDefault("signature", "");
+        this.principalName = (String)info.getOrDefault("principal_name", "");
+        this.qrcodeUrl = (String)info.getOrDefault("qrcode_url", "");
+        this.businessInfo =(Map<String, Object>)info.getOrDefault("business_info", Collections.emptyMap());
+        this.miniProgramInfo = (Map<String, Object>)info.getOrDefault("MiniProgramInfo", Collections.emptyMap());
+        this.authorizationInfo = (Map<String, Object>)data.getOrDefault("authorization_info", Collections.emptyMap());
     }
 
     public String getNickname() {

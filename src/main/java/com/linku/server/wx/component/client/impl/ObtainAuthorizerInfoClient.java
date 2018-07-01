@@ -3,6 +3,8 @@ package com.linku.server.wx.component.client.impl;
 import com.linku.server.wx.component.client.ComponentHttpClient;
 import com.linku.server.wx.component.client.request.ObtainAuthorizerInfoRequest;
 import com.linku.server.wx.component.client.response.ObtainAuthorizerInfoResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -10,6 +12,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 class ObtainAuthorizerInfoClient extends ComponentHttpClient<ObtainAuthorizerInfoRequest, ObtainAuthorizerInfoResponse> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ObtainAuthorizerInfoClient.class);
 
     ObtainAuthorizerInfoClient() {
         super("obtain_authorizer_info");
@@ -30,8 +33,10 @@ class ObtainAuthorizerInfoClient extends ComponentHttpClient<ObtainAuthorizerInf
     }
 
     private String buildBody(ObtainAuthorizerInfoRequest request){
-        return String.format("{\"component_appid\": \"%s\", \"authorizer_appid\": \"%s\"}",
+        String body = String.format("{\"component_appid\": \"%s\", \"authorizer_appid\": \"%s\"}",
                 request.getComponentAppid(), request.getAuthorizerAppid());
+        LOGGER.debug("Obtain authorizer info request body is {}", body);
+        return body;
     }
 
     @Override

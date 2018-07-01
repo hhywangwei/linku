@@ -26,9 +26,9 @@ spring:
   datasource:
       type: com.zaxxer.hikari.HikariDataSource
       username: dev
-      password: linku456258
+      password: appeme_com
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://39.104.120.219:3306/linku_db?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      url: jdbc:mysql://gz-cdb-3plbi3ut.sql.tencentcdb.com:62462/linku_db?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hikari:
         maximum-pool-size: 20
         idle-timeout: 3600000
@@ -47,7 +47,7 @@ spring:
       repositories:
         enabled: false
   redis:
-    url: redis://linku456258@39.104.120.219:6379
+    url: redis://linku456258@203.195.237.87:6379
     timeout: 10000
     pool:
       maxActive: 10
@@ -76,10 +76,9 @@ wx:
     secret: 09b8f183b1af1dfe124bdd41a2bae7eb
     validate_token: tuoshecx_2018
     encoding_aes_key: AYqzeDHisHtdqADPMPeeCPRpEoKZjTMktHxTzXIOXMP
-    redirect_uri: http://api.re1001.com/api/wx/component/
-  small:
-    appid: wxd94a7c7b59afe68e
-    secret: 6057acee7638f5e828a437a4e569dd2f
+    redirect_uri: http://api.tuoshecx.com/wx/component/authorizer
+    success_uri: http://manage.tuoshecx.com/wx/auth_success.html
+    fail_uri: http://manage.tuoshecx.com/wx/auth_fail.html
   pay:
     appid: wx0754c0a5d2c4b67c
     mchid: 1494207272

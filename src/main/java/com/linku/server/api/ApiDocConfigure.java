@@ -52,7 +52,7 @@ public class ApiDocConfigure {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Linku API文档")
-                .termsOfServiceUrl("http://apidoc.linku.com")
+                .termsOfServiceUrl("http://api.tuoshecx.com")
                 .contact(new Contact("WangWei", "", "hhywangwei@gmail.com"))
                 .version("1.0")
                 .build();

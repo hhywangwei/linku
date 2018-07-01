@@ -3,6 +3,7 @@ package com.linku.server.shop.service;
 import com.linku.server.common.id.IdGenerators;
 import com.linku.server.shop.dao.ShopWxConfigureDao;
 import com.linku.server.shop.dao.ShopWxTokenDao;
+import com.linku.server.shop.dao.ShopWxUnauthorizedDao;
 import com.linku.server.shop.domain.ShopWxConfigure;
 import com.linku.server.shop.domain.ShopWxToken;
 import org.slf4j.Logger;
@@ -29,11 +30,13 @@ public class ShopWxService {
 
     private final ShopWxConfigureDao configureDao;
     private final ShopWxTokenDao tokenDao;
+    private final ShopWxUnauthorizedDao unauthorizedDao;
 
     @Autowired
-    public ShopWxService(ShopWxConfigureDao configureDao, ShopWxTokenDao tokenDao) {
+    public ShopWxService(ShopWxConfigureDao configureDao, ShopWxTokenDao tokenDao, ShopWxUnauthorizedDao unauthorizedDao) {
         this.configureDao = configureDao;
         this.tokenDao = tokenDao;
+        this.unauthorizedDao = unauthorizedDao;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -81,5 +84,19 @@ public class ShopWxService {
 
     public List<ShopWxToken> queryExpires(int limit){
        return tokenDao.findExpires(new Date(), limit);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void unauthorized(String appid){
+        if(!configureDao.hasAppid(appid)){
+            LOGGER.debug("unauthorized appid {} not exist", appid);
+            return ;
+        }
+
+        ShopWxConfigure configure = configureDao.findOneByAppid(appid);
+        unauthorizedDao.insert(configure);
+        LOGGER.debug("Save {} unauthorized success", appid);
+        configureDao.delete(appid);
+        tokenDao.delete(appid);
     }
 }

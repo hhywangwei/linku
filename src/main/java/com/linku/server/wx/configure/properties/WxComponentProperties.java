@@ -15,6 +15,8 @@ public class WxComponentProperties {
     private String validateToken;
     private String encodingAesKey;
     private String redirectUri;
+    private String successUri;
+    private String failUri;
 
     public String getAppid() {
         return appid;
@@ -56,6 +58,22 @@ public class WxComponentProperties {
         this.redirectUri = redirectUri;
     }
 
+    public String getSuccessUri() {
+        return successUri;
+    }
+
+    public void setSuccessUri(String successUri) {
+        this.successUri = successUri;
+    }
+
+    public String getFailUri() {
+        return failUri;
+    }
+
+    public void setFailUri(String failUri) {
+        this.failUri = failUri;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -64,6 +82,8 @@ public class WxComponentProperties {
                 .append("validateToken", validateToken)
                 .append("encodingAesKey", encodingAesKey)
                 .append("redirectUri", redirectUri)
+                .append("successUri", successUri)
+                .append("failUri", failUri)
                 .toString();
     }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 class VerifyTicketEventHandler extends BaseEventHandler {
     private final ComponentVerifyTicketService service;
 
-    public VerifyTicketEventHandler(ComponentVerifyTicketService service) {
+    VerifyTicketEventHandler(ComponentVerifyTicketService service) {
         this.service = service;
     }
 

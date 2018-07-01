@@ -13,8 +13,8 @@ public class ObtainAccessTokenResponse extends ComponentResponse {
 
     public ObtainAccessTokenResponse(Map<String, Object> data) {
         super(data);
-        this.componentAccessToken = (String)data.get("component_access_token");
-        this.expiresIn = (Integer)data.get("expires_in");
+        this.componentAccessToken = (String)data.getOrDefault("component_access_token", "");
+        this.expiresIn = (Integer)data.getOrDefault("expires_in", -1);
     }
 
     public String getComponentAccessToken() {

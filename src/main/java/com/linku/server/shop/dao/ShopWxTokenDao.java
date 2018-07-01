@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.List;
 
@@ -50,6 +51,11 @@ public class ShopWxTokenDao {
     public boolean updateToken(String appid, String accessToken, String refreshToken, Date expiresTime, Date updateTime){
         final String sql = "UPDATE shop_wx_token SET access_token = ?, refresh_token = ?, expires_time = ?, update_time = ? WHERE appid = ?";
         return jdbcTemplate.update(sql, accessToken, refreshToken, DaoUtils.timestamp(expiresTime), DaoUtils.timestamp(updateTime), appid) > 0;
+    }
+
+    public boolean delete(String appid){
+        final String sql = "DELETE FROM shop_wx_token WHERE appid = ?";
+        return jdbcTemplate.update(sql, appid) > 0;
     }
 
     public ShopWxToken findOne(String id){
