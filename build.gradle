@@ -60,5 +60,5 @@ dependencies {
 
 
 springBoot {
-    mainClassName = 'com.linku.server.Application'
+    mainClassName = 'com.tuoshecx.server.Application'
 }
