@@ -33,15 +33,15 @@ class SendTmpMsgClient extends WxSmallClient<SendTmpMsgRequest, WxSmallResponse>
     @Override
     protected Mono<byte[]> doRequest(WebClient client, SendTmpMsgRequest request) {
         String body = body(request);
-        long contentLength = body.getBytes(UTF_8_CHARSET).length;
+        logger.debug("Request send template message is {}", body);
 
-        logger.debug("Request send template message is {}, content length {}", body, contentLength);
+        byte[] bytes = body.getBytes(UTF_8_CHARSET);
 
         return client.post()
                 .uri(e -> buildUrl(e, request))
-                .headers(e -> e.setContentLength(contentLength))
+                .headers(e -> e.setContentLength(bytes.length))
                 .accept(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(body))
+                .body(BodyInserters.fromObject(bytes))
                 .retrieve()
                 .bodyToMono(byte[].class);
     }

@@ -13,7 +13,7 @@ import java.util.Optional;
 public class RedisSessionDao implements SessionDao {
     private static final String KEY = "wx.small.session_key";
 
-    private final BoundHashOperations<String, Object, Object> operations;
+    private final BoundHashOperations<String, String, String> operations;
 
     public RedisSessionDao(StringRedisTemplate redisTemplate) {
         this.operations = redisTemplate.boundHashOps(KEY);
@@ -27,7 +27,7 @@ public class RedisSessionDao implements SessionDao {
 
     @Override
     public Optional<String> getKey(String openid) {
-        return Optional.ofNullable((String)operations.get(openid));
+        return Optional.ofNullable(operations.get(openid));
     }
 
     @Override

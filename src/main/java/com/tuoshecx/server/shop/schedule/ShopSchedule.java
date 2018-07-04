@@ -62,7 +62,7 @@ public class ShopSchedule {
                     o.setAccessToken(e.getAuthorizerAccessToken());
                     o.setRefreshToken(e.getAuthorizerRefreshToken());
                     Date now = new Date();
-                    o.setExpiresTime(DateUtils.addSeconds(now, e.getExpiresIn()));
+                    o.setExpiresTime(DateUtils.addSeconds(now, (e.getExpiresIn() - 6 * 60)));
                     o.setUpdateTime(now);
 
                     wxService.saveToken(o);

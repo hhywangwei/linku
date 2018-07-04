@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * 发生微信客服消息
  *
- * @author <a href="hhywangwei@gmail.com">WangWei</a>
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 class SendCustomMsgClient extends WxSmallClient<SendCustomMsgRequest, WxSmallResponse> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SendCustomMsgClient.class);
@@ -31,15 +31,15 @@ class SendCustomMsgClient extends WxSmallClient<SendCustomMsgRequest, WxSmallRes
     @Override
     protected Mono<byte[]> doRequest(WebClient client, SendCustomMsgRequest request) {
         String body = body(request);
-        long contentLength = body.getBytes(UTF_8_CHARSET).length;
+        LOGGER.debug("Request send custom body is {}", body);
 
-        LOGGER.debug("Request send template message is {}, content length {}", body, contentLength);
+        byte[] bytes = body.getBytes(UTF_8_CHARSET);
 
         return client.post()
                 .uri(e -> buildUrl(e, request))
-                .headers(e -> e.setContentLength(contentLength))
+                .headers(e -> e.setContentLength(bytes.length))
                 .accept(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(body))
+                .body(BodyInserters.fromObject(bytes))
                 .retrieve()
                 .bodyToMono(byte[].class);
     }
