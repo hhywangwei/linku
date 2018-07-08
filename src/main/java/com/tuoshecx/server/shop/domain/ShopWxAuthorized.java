@@ -1,31 +1,46 @@
 package com.tuoshecx.server.shop.domain;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
 import java.util.Objects;
 
 /**
- * 店铺托管小程序配置信息
+ * 店铺托管小程序信息
  *
  * @author <a href="hhywangwei@gmail.com">WangWei</a>
  */
-public class ShopWxConfigure {
+public class ShopWxAuthorized {
+    @ApiModelProperty(value = "编号")
     private String id;
+    @ApiModelProperty(value = "店铺编号")
     private String shopId;
+    @ApiModelProperty(value = "微信appid")
     private String appid;
+    @ApiModelProperty(value = "昵称")
     private String nickname;
+    @ApiModelProperty(value = "头像")
     private String headImg;
+    @ApiModelProperty(hidden = true)
     private Integer serviceTypeInfo;
+    @ApiModelProperty(hidden = true )
     private Integer verifyTypeInfo;
+    @ApiModelProperty(value = "授权方公众号的原始ID")
     private String username;
+    @ApiModelProperty(value = "公众号的主体名称")
     private String name;
     private String businessInfo;
+    @ApiModelProperty(value = "二维码图片的URL")
     private String qrcodeUrl;
+    @ApiModelProperty(value = "授权信息")
     private String authorizationInfo;
     private Boolean authorization;
+    @ApiModelProperty(value = "小程序配置信息")
     private String miniProgramInfo;
+    @ApiModelProperty(value = "修改时间")
     private Date updateTime;
+    @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
     public String getId() {
@@ -160,7 +175,7 @@ public class ShopWxConfigure {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ShopWxConfigure that = (ShopWxConfigure) o;
+        ShopWxAuthorized that = (ShopWxAuthorized) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(shopId, that.shopId) &&
                 Objects.equals(appid, that.appid) &&

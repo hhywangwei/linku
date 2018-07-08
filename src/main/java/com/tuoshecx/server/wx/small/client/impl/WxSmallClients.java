@@ -1,8 +1,6 @@
 package com.tuoshecx.server.wx.small.client.impl;
 
 import com.tuoshecx.server.common.client.AsyncHttpClient;
-import com.tuoshecx.server.wx.component.token.ComponentTokenService;
-import com.tuoshecx.server.wx.configure.properties.WxComponentProperties;
 import com.tuoshecx.server.wx.small.client.request.*;
 import com.tuoshecx.server.wx.small.client.response.*;
 
@@ -12,8 +10,8 @@ import com.tuoshecx.server.wx.small.client.response.*;
  * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 public class WxSmallClients {
-    private final AsyncHttpClient<String, LoginResponse> loginClient;
-    private final AsyncHttpClient<SendTmpMsgRequest, WxSmallResponse> sendTmpMsgClient;
+    private final AsyncHttpClient<LoginRequest, LoginResponse> loginClient;
+    private final AsyncHttpClient<SendTemplateMsgRequest, WxSmallResponse> sendTmpMsgClient;
     private final AsyncHttpClient<SendCustomMsgRequest, WxSmallResponse> sendCustomMsgClient;
     private final AsyncHttpClient<GetAuditStatusRequest, GetAuditStatusResponse> getAuditStatusClient;
     private final AsyncHttpClient<WxSmallRequest, GetCategoryResponse> getCategoryClient;
@@ -22,10 +20,13 @@ public class WxSmallClients {
     private final AsyncHttpClient<SetWebViewDomainRequest, WxSmallResponse> setWebViewDomainClient;
     private final AsyncHttpClient<SubmitAuditRequest, SubmitAuditResponse> submitAuditClient;
     private final AsyncHttpClient<UpdateDomainRequest, WxSmallResponse> updateDomainClient;
+    private final AsyncHttpClient<MessageTemplateAddRequest, MessageTemplateAddResponse> messageTemplateAddClient;
+    private final AsyncHttpClient<MessageTemplateDelRequest, WxSmallResponse> messageTemplateDelClient;
+    private final AsyncHttpClient<MessageTemplateQueryRequest, MessageTemplateQueryResponse> messageTemplateQueryClient;
 
-    public WxSmallClients(WxComponentProperties properties, ComponentTokenService tokenService) {
-        this.loginClient = new LoginClient(properties, tokenService);
-        this.sendTmpMsgClient = new SendTmpMsgClient();
+    public WxSmallClients() {
+        this.loginClient = new LoginClient();
+        this.sendTmpMsgClient = new SendTemplateMsgClient();
         this.sendCustomMsgClient = new SendCustomMsgClient();
         this.getAuditStatusClient = new GetAuditStatusClient();
         this.getCategoryClient = new GetCategoryClient();
@@ -34,6 +35,9 @@ public class WxSmallClients {
         this.setWebViewDomainClient = new SetWebViewDomainClinet();
         this.submitAuditClient = new SubmitAuditClient();
         this.updateDomainClient = new UpdateDomainClient();
+        this.messageTemplateAddClient = new MessageTemplateAddClient();
+        this.messageTemplateDelClient = new MessageTemplateDelClient();
+        this.messageTemplateQueryClient = new MessageTemplateQueryClient();
     }
 
     /**
@@ -41,16 +45,16 @@ public class WxSmallClients {
      *
      * @return {@link LoginClient}
      */
-    public AsyncHttpClient<String, LoginResponse> loginClient(){
+    public AsyncHttpClient<LoginRequest, LoginResponse> loginClient(){
         return loginClient;
     }
 
     /**
      * 发送模板消息
      *
-     * @return {@link SendTmpMsgClient}
+     * @return {@link SendTemplateMsgClient}
      */
-    public AsyncHttpClient<SendTmpMsgRequest, WxSmallResponse> sendTmpMsgClient(){
+    public AsyncHttpClient<SendTemplateMsgRequest, WxSmallResponse> sendTmpMsgClient(){
         return sendTmpMsgClient;
     }
 
@@ -89,5 +93,17 @@ public class WxSmallClients {
 
     public AsyncHttpClient<UpdateDomainRequest, WxSmallResponse> updateDomainClient() {
         return updateDomainClient;
+    }
+
+    public AsyncHttpClient<MessageTemplateAddRequest, MessageTemplateAddResponse> messageTemplateAddClient(){
+        return messageTemplateAddClient;
+    }
+
+    public AsyncHttpClient<MessageTemplateDelRequest, WxSmallResponse> messageTemplateDelClient(){
+        return messageTemplateDelClient;
+    }
+
+    public AsyncHttpClient<MessageTemplateQueryRequest, MessageTemplateQueryResponse> messageTemplateQueryClient(){
+        return messageTemplateQueryClient;
     }
 }

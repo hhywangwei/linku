@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * 微信支付配置属性
  *
- * @author WangWei
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 @ConfigurationProperties(prefix = "wx.pay")
 public class WxPayProperties {

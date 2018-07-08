@@ -1,9 +1,7 @@
 package com.tuoshecx.server.wx.small.event;
 
-import com.tuoshecx.server.wx.component.encrypt.WxEncrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 import java.util.Optional;
@@ -16,23 +14,17 @@ import java.util.Optional;
 abstract class SmallBaseEventHandler implements SmallEventHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(SmallBaseEventHandler.class);
 
-    private final WxEncrypt encrypt;
-
-    SmallBaseEventHandler(WxEncrypt encrypt){
-        this.encrypt = encrypt;
-    }
-
     @Override
-    public Optional<ResponseEntity<String>> handler(String appid, Map<String, String> data) {
+    public Optional<String> handler(String appid, Map<String, String> data) {
         if(data.isEmpty()){
             LOGGER.warn("WeiXin {} push message is empty", appid);
-            return Optional.of(ResponseEntity.ok().body("fail"));
+            return Optional.of("fail");
         }
 
         if(isHandler(data)){
             String m = doHandler(appid , data);
             LOGGER.debug("Small event response is {}", m);
-            return Optional.of(ResponseEntity.ok(encodeMessage(encrypt, m)));
+            return Optional.of(m);
         }
 
         return Optional.empty();

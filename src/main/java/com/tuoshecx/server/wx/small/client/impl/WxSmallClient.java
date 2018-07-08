@@ -20,7 +20,7 @@ import java.util.Map;
  * @param <R> 输出数据类型
  */
 abstract class WxSmallClient<T, R extends WxSmallResponse> implements AsyncHttpClient<T, R> {
-    private static final Logger logger = LoggerFactory.getLogger(WxSmallClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WxSmallClient.class);
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String apiName;
@@ -56,7 +56,7 @@ abstract class WxSmallClient<T, R extends WxSmallResponse> implements AsyncHttpC
      */
     private R responseLogger(byte[] data){
         String content = new String(data, Charset.forName("UTF-8"));
-        logger.debug("Response is {}", content);
+        LOGGER.debug("Response is {}", content);
 
         try{
             TypeBase mapType = objectMapper.getTypeFactory().
@@ -66,12 +66,13 @@ abstract class WxSmallClient<T, R extends WxSmallResponse> implements AsyncHttpC
             R r = buildResponse(map);
 
             if(!r.isOk()){
-                logger.error("Request api is {}, code is {}, message is {}",
+                LOGGER.error("Request api is {}, code is {}, message is {}",
                         apiName, r.getCode(), r.getMessage());
             }
 
             return r;
         }catch (Exception e){
+            LOGGER.error("Parse json fail, error is {}", e.getMessage());
             throw new BaseException("解析Json错误");
         }
     }

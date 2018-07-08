@@ -2,6 +2,8 @@ package com.tuoshecx.server.wx.small.event;
 
 import com.tuoshecx.server.wx.component.client.ComponentClientService;
 import com.tuoshecx.server.wx.component.encrypt.WxEncrypt;
+import com.tuoshecx.server.wx.small.client.impl.WxSmallClients;
+import com.tuoshecx.server.wx.small.client.request.SendCustomMsgRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,12 +11,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 class WxMessageTestHandler extends SmallBaseEventHandler {
-    private static final Logger logger = LoggerFactory.getLogger(WxMessageTestHandler.class);
-    private final ComponentClientService clientService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(WxMessageTestHandler.class);
+    private final ComponentClientService componentClientService;
+    private final WxSmallClients clients;
 
-    WxMessageTestHandler(WxEncrypt encrypt, ComponentClientService clientService) {
-        super(encrypt);
-        this.clientService = clientService;
+    WxMessageTestHandler( ComponentClientService clientService) {
+        this.componentClientService = clientService;
+        this.clients = new WxSmallClients();
     }
 
     @Override
@@ -32,15 +35,29 @@ class WxMessageTestHandler extends SmallBaseEventHandler {
         String content = data.get("Content");
         String authCode = StringUtils.remove(content, "QUERY_AUTH_CODE:");
 
-        logger.debug("WeiXin send message test, auth code is {}", authCode);
-//        clientService.obtainAuthorizerToken(authCode, o ->{
-//            //clientService.customSend(appid, toUser, "text", buildContent(authCode));
-//        }, e -> logger.error("Weixin send message test fail, code is {}", e));
+        LOGGER.debug("WeiXin send message test, auth code is {}", authCode);
+        componentClientService.obtainQueryAuth(authCode).subscribe(e -> {
+            if(e.getCode() != 0){
+                LOGGER.error("Query auth fail, error code {} message", e.getCode(), e.getMessage());
+                return ;
+            }
+
+            SendCustomMsgRequest request =  SendCustomMsgRequest.buildText(
+                    e.getAuthorizerAccessToken(), toUser, buildContent(authCode));
+
+            clients.sendCustomMsgClient().request(request).subscribe(o -> {
+                if(o.getCode() == 0){
+                    LOGGER.info("Send custom test message success");
+                }else{
+                    LOGGER.error("Send custom test message fail, code {} message {}", o.getCode(), o.getMessage());
+                }
+            });
+        });
 
         return "success";
     }
 
     private String buildContent(String code){
-        return String.format("\"text\":{\"content\":\"%s_from_api\"}", code);
+        return String.format("%s_from_api", code);
     }
 }

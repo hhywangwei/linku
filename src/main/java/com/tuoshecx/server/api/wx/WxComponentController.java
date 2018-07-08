@@ -3,8 +3,9 @@ package com.tuoshecx.server.api.wx;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.BaseException;
 import com.tuoshecx.server.api.vo.ResultVo;
+import com.tuoshecx.server.common.utils.SecurityUtils;
 import com.tuoshecx.server.shop.domain.Shop;
-import com.tuoshecx.server.shop.domain.ShopWxConfigure;
+import com.tuoshecx.server.shop.domain.ShopWxAuthorized;
 import com.tuoshecx.server.shop.domain.ShopWxToken;
 import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.shop.service.ShopWxService;
@@ -14,11 +15,14 @@ import com.tuoshecx.server.wx.component.encrypt.WxEncrypt;
 import com.tuoshecx.server.wx.component.encrypt.WxEncryptException;
 import com.tuoshecx.server.wx.component.event.ComponentEventHandlers;
 import com.tuoshecx.server.wx.configure.properties.WxComponentProperties;
+import com.tuoshecx.server.wx.small.event.SmallEventHandlers;
+import com.tuoshecx.server.wx.small.message.service.InitSmallTemplateEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,15 +44,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 @RequestMapping("/wx/component")
 public class WxComponentController {
     private static final Logger LOGGER = LoggerFactory.getLogger(WxComponentController.class);
+    private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
 
     private WxComponentProperties properties;
     private final ComponentEventHandlers eventHandlers;
     private final ComponentClientService clientService;
     private final ShopService shopService;
     private final ShopWxService shopWxService;
+    private final ApplicationContext applicationContext;
     private final ObjectMapper objectMapper;
-    private final WxEncrypt crypt;
-    private final Charset charsetUTF = Charset.forName("UTF-8");
+    private final WxEncrypt encrypt;
+    private final SmallEventHandlers smallEventHandlers;
 
     @Autowired
     public WxComponentController(WxComponentProperties properties,
@@ -56,15 +62,20 @@ public class WxComponentController {
                                  ComponentClientService clientService,
                                  ShopService shopService,
                                  ShopWxService shopWxService,
-                                 ObjectMapper objectMapper) {
+                                 ApplicationContext applicationContext,
+                                 ObjectMapper objectMapper,
+                                 WxEncrypt encrypt,
+                                 SmallEventHandlers smallEventHandlers) {
 
         this.properties = properties;
         this.eventHandlers = eventHandlers;
         this.clientService = clientService;
         this.shopService = shopService;
         this.shopWxService = shopWxService;
+        this.applicationContext = applicationContext;
         this.objectMapper = objectMapper;
-        this.crypt = new WxEncrypt(properties.getValidateToken(), properties.getEncodingAesKey(), properties.getAppid());
+        this.encrypt = encrypt;
+        this.smallEventHandlers = smallEventHandlers;
     }
 
     @PostMapping(value="event")
@@ -75,11 +86,11 @@ public class WxComponentController {
 
         LOGGER.debug("Timestamp is {}, nonce is {}, signature is {}", timestamp, nonce, msgSignature);
 
-        String body = new String(bytes, charsetUTF);
+        String body = new String(bytes, UTF_8_CHARSET);
         LOGGER.debug("Body is {}", body);
 
         try{
-            String decBody = crypt.decryptMsg(msgSignature, timestamp, nonce, body);
+            String decBody = encrypt.decryptMsg(msgSignature, timestamp, nonce, body);
             LOGGER.debug("Desc body is {}", decBody);
             return eventHandlers.handler(decBody);
         }catch(WxEncryptException e){
@@ -141,11 +152,18 @@ public class WxComponentController {
             }
             LOGGER.debug("Validate appid {} code is {}", e.getAuthorizerAppid(), validateCode);
 
-            if(isSuccess(e.getCode())){
-                saveAuthorizerToken(shopId, e);
-                saveAuthorizerConfigure(shopId, e.getAuthorizerAppid(), result);
-            }else{
+            if(!isSuccess(e.getCode())){
                 LOGGER.error("Obtain token fail, shopId {} code {} message {}", shopId, e.getCode(), e.getMessage());
+                String uri = properties.getFailUri() + "?code=" + 20000;
+                redirectUri(result, uri);
+            }
+
+            try {
+                saveAuthorizerToken(shopId, e);
+                noticeInitMessageTemplate(e.getAuthorizerAppid());
+                saveAuthorizerConfigure(shopId, e.getAuthorizerAppid(), result);
+            }catch (Exception ex){
+                LOGGER.error("Init {} authorizer info fail, error is {}", ex.getMessage());
                 String uri = properties.getFailUri() + "?code=" + 20000;
                 redirectUri(result, uri);
             }
@@ -174,7 +192,7 @@ public class WxComponentController {
     }
 
     private int validateAppid(String shopId, String appid){
-        Optional<ShopWxConfigure> optional = shopWxService.getConfigure(appid);
+        Optional<ShopWxAuthorized> optional = shopWxService.getAuthorized(appid);
         if(!optional.isPresent()){
             return 0;
         }
@@ -183,7 +201,7 @@ public class WxComponentController {
             return 20001;
         }
 
-        if(shopWxService.queryByShopId(shopId).size() > 1){
+        if(shopWxService.queryAuthorized(shopId).size() > 1){
             return 20002;
         }
 
@@ -193,7 +211,7 @@ public class WxComponentController {
     private void saveAuthorizerConfigure(String shopId, String authorizerAppid, DeferredResult<ResponseEntity<String>> result){
         clientService.obtainAuthorizerInfo(authorizerAppid).subscribe(e -> {
             if(isSuccess(e.getCode())){
-                ShopWxConfigure t = new ShopWxConfigure();
+                ShopWxAuthorized t = new ShopWxAuthorized();
                 t.setAppid(authorizerAppid);
                 t.setShopId(shopId);
                 t.setAuthorization(true);
@@ -208,7 +226,8 @@ public class WxComponentController {
                 t.setMiniProgramInfo(toJson(e.getMiniProgramInfo()));
                 t.setBusinessInfo(toJson(e.getBusinessInfo()));
 
-                shopWxService.saveConfigure(t);
+                shopWxService.saveAuthorized(t);
+
                 String uri = properties.getSuccessUri() + "?appid=" + authorizerAppid;
                 redirectUri(result, uri);
             }else {
@@ -232,6 +251,10 @@ public class WxComponentController {
         }
     }
 
+    private void noticeInitMessageTemplate(String appid){
+        applicationContext.publishEvent(new InitSmallTemplateEvent(this, appid));
+    }
+
     @RequestMapping(value="/authorizer/event/{appid}")
     public ResponseEntity<String> organEvent(@PathVariable(value="appid") String appid,
                                      @RequestParam(value="signature") String signature,
@@ -239,7 +262,7 @@ public class WxComponentController {
                                      @RequestParam(value="nonce") String nonce,
                                      @RequestParam(value="encrypt_type") String encryptType,
                                      @RequestParam(value="msg_signature") String msgSignature,
-                                     @RequestBody(required=true) byte[] bytes){
+                                     @RequestBody byte[] bytes){
 
         LOGGER.debug("Appid is {} ,timestamp is {}, nonce is {}, signature is {}", appid, timestamp, nonce, msgSignature);
 
@@ -247,13 +270,29 @@ public class WxComponentController {
         LOGGER.debug("Wx event Body is {}", body);
 
         try{
-            String decBody = crypt.decryptMsg(msgSignature, timestamp, nonce, body);
+            String decBody = encrypt.decryptMsg(msgSignature, timestamp, nonce, body);
             LOGGER.debug("Desc body is {}", decBody);
-//            return organEventHandler.handler(decBody);
-            return ResponseEntity.ok("success");
+            String m = smallEventHandlers.handler(appid, decBody);
+            return ResponseEntity.ok(encodeMessage(encrypt, m));
         }catch(WxEncryptException e){
             LOGGER.debug("Receive message is fail, error is {}", e.getMessage());
-            return ResponseEntity.ok("fail");
+            return ResponseEntity.ok("");
         }
+    }
+
+    /**
+     * 消息加密
+     *
+     * @param encrypt 加密对象
+     * @param message 消息
+     * @return
+     */
+    private String encodeMessage(WxEncrypt encrypt, String message)throws WxEncryptException{
+        String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
+        String nonce = SecurityUtils.randomStr(16);
+
+        String e = encrypt.encryptMsg(message, timeStamp, nonce);
+        LOGGER.debug("Encrypt content is {}", e);
+        return e;
     }
 }

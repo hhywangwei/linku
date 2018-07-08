@@ -1,6 +1,6 @@
 package com.tuoshecx.server.wx.small.client.impl;
 
-import com.tuoshecx.server.wx.small.client.request.SendTmpMsgRequest;
+import com.tuoshecx.server.wx.small.client.request.SendTemplateMsgRequest;
 import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -13,25 +13,23 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 发送微信小程序模板消息
  *
  * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
-class SendTmpMsgClient extends WxSmallClient<SendTmpMsgRequest, WxSmallResponse> {
-    private static final Logger logger = LoggerFactory.getLogger(SendTmpMsgClient.class);
+class SendTemplateMsgClient extends WxSmallClient<SendTemplateMsgRequest, WxSmallResponse> {
+    private static final Logger logger = LoggerFactory.getLogger(SendTemplateMsgClient.class);
     private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
 
-    SendTmpMsgClient() {
+    SendTemplateMsgClient() {
         super( "sendTemplateMessage");
     }
 
     @Override
-    protected Mono<byte[]> doRequest(WebClient client, SendTmpMsgRequest request) {
+    protected Mono<byte[]> doRequest(WebClient client, SendTemplateMsgRequest request) {
         String body = body(request);
         logger.debug("Request send template message is {}", body);
 
@@ -46,7 +44,7 @@ class SendTmpMsgClient extends WxSmallClient<SendTmpMsgRequest, WxSmallResponse>
                 .bodyToMono(byte[].class);
     }
 
-    private URI buildUrl(UriBuilder builder, SendTmpMsgRequest request){
+    private URI buildUrl(UriBuilder builder, SendTemplateMsgRequest request){
         return builder
                 .scheme("https")
                 .host("api.weixin.qq.com")
@@ -60,7 +58,7 @@ class SendTmpMsgClient extends WxSmallClient<SendTmpMsgRequest, WxSmallResponse>
         return new WxSmallResponse(data);
     }
 
-    private String body(SendTmpMsgRequest request){
+    private String body(SendTemplateMsgRequest request){
         StringBuilder builder = new StringBuilder(200);
 
         builder.append("{\"touser\":\"").append(request.getOpenid()).append("\",");
@@ -75,14 +73,8 @@ class SendTmpMsgClient extends WxSmallClient<SendTmpMsgRequest, WxSmallResponse>
         if(StringUtils.isNotBlank(request.getPage())){
             builder.append("\"page\":\"").append(request.getPage()).append("\",");
         }
-        builder.append("\"data\":{").append(data(request.getItems())).append("}}");
+        builder.append("\"data\":").append(request.getData()).append("}");
 
         return builder.toString();
-    }
-
-    private String data(List<SendTmpMsgRequest.Item> items){
-        return items.stream().
-                map(e -> String.format("\"%s\": {\"value\":\"%s\", \"color\":\"%s\"}", e.getKey(), e.getValue(), e.getColor())).
-                collect(Collectors.joining(","));
     }
 }

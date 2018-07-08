@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * 微信第三方平台配置
  *
- * @author <a href="hhywangwei@gmail.com">WangWei</a>
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 @ConfigurationProperties(prefix = "wx.component")
 public class WxComponentProperties {

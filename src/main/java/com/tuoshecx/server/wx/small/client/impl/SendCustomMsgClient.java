@@ -63,7 +63,8 @@ class SendCustomMsgClient extends WxSmallClient<SendCustomMsgRequest, WxSmallRes
 
         builder.append("{\"touser\":\"").append(request.getOpenid()).append("\",");
         builder.append("\"msgtype\":\"").append(request.getMsgType()).append("\",");
-        builder.append("\"").append(request.getMsgType()).append("\":\"").append("{");
+        builder.append("\"").append(request.getMsgType()).append("\":");
+        builder.append("{");
         builder.append(buildContent(request.getContent()));
         builder.append("}}");
         return builder.toString();

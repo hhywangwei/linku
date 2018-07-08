@@ -47,7 +47,7 @@ public class ShopSchedule {
     public void refreshToken(){
         int row;
         do{
-            List<ShopWxToken> list = wxService.queryExpires(LIMIT);
+            List<ShopWxToken> list = wxService.queryExpiresToken(LIMIT);
             list.forEach(this::refreshToken);
             row = list.size();
         }while (row == LIMIT);

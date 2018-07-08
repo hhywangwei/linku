@@ -1,6 +1,8 @@
 package com.tuoshecx.server.wx.configure;
 
+import com.tuoshecx.server.wx.component.encrypt.WxEncrypt;
 import com.tuoshecx.server.wx.configure.properties.WxComponentProperties;
+import com.tuoshecx.server.wx.configure.properties.WxMessageTemplateProperties;
 import com.tuoshecx.server.wx.configure.properties.WxPayProperties;
 import io.netty.handler.ssl.SslContextBuilder;
 import org.slf4j.Logger;
@@ -20,10 +22,10 @@ import java.security.KeyStore;
 /**
  * 微信配置信息
  *
- * @author WangWei
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 @Configuration
-@EnableConfigurationProperties(value = {WxComponentProperties.class, WxPayProperties.class})
+@EnableConfigurationProperties(value = {WxComponentProperties.class, WxMessageTemplateProperties.class, WxPayProperties.class})
 public class WxConfigure {
     private static final Logger logger = LoggerFactory.getLogger(WxConfigure.class);
 
@@ -56,5 +58,11 @@ public class WxConfigure {
             logger.error("Set ssl context fail, error is {}", e.getMessage());
             throw new RuntimeException("Set ssl context fail, error is " + e.getMessage());
         }
+    }
+
+    @Bean
+    @Autowired
+    public WxEncrypt initWxEncrypt(WxComponentProperties properties){
+        return new WxEncrypt(properties.getValidateToken(), properties.getEncodingAesKey(), properties.getAppid());
     }
 }

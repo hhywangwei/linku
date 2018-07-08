@@ -1,7 +1,7 @@
 package com.tuoshecx.server.shop.dao;
 
 import com.tuoshecx.server.common.utils.DaoUtils;
-import com.tuoshecx.server.shop.domain.ShopWxConfigure;
+import com.tuoshecx.server.shop.domain.ShopWxAuthorized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,11 +12,11 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public class ShopWxConfigureDao {
+public class ShopWxAuthorizedDao {
     private final JdbcTemplate jdbcTemplate;
 
-    private final RowMapper<ShopWxConfigure> mapper = (r, i) -> {
-        ShopWxConfigure t = new ShopWxConfigure();
+    private final RowMapper<ShopWxAuthorized> mapper = (r, i) -> {
+        ShopWxAuthorized t = new ShopWxAuthorized();
 
         t.setId(r.getString("id"));
         t.setShopId(r.getString("shop_id"));
@@ -39,12 +39,12 @@ public class ShopWxConfigureDao {
     };
 
     @Autowired
-    public ShopWxConfigureDao(DataSource dataSource){
+    public ShopWxAuthorizedDao(DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public void insert(ShopWxConfigure t){
-        final String sql = "INSERT INTO shop_wx_configure (id, shop_id, appid, nickname, head_img, service_type_info," +
+    public void insert(ShopWxAuthorized t){
+        final String sql = "INSERT INTO shop_wx_authorized (id, shop_id, appid, nickname, head_img, service_type_info," +
                 "verify_type_info, username, name, business_info, mini_program_info, qrcode_url, authorization_info, authorization, update_time, create_time) VALUES " +
                 "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -54,8 +54,8 @@ public class ShopWxConfigureDao {
                 t.getAuthorizationInfo(), t.getAuthorization(), DaoUtils.timestamp(now), DaoUtils.timestamp(now));
     }
 
-    public boolean update(ShopWxConfigure t) {
-        final String sql = "UPDATE shop_wx_configure SET nickname = ?, head_img = ?, service_type_info = ?," +
+    public boolean update(ShopWxAuthorized t) {
+        final String sql = "UPDATE shop_wx_authorized SET nickname = ?, head_img = ?, service_type_info = ?," +
                 "verify_type_info = ?, username = ?, name = ?, business_info = ?, mini_program_info = ?, qrcode_url = ?," +
                 "authorization_info = ?, authorization = ?, update_time = ? WHERE appid = ? ";
 
@@ -65,24 +65,24 @@ public class ShopWxConfigureDao {
     }
 
     public boolean delete(String appid){
-        final String sql = "DELETE FROM shop_wx_configure WHERE appid = ?";
+        final String sql = "DELETE FROM shop_wx_authorized WHERE appid = ?";
         return jdbcTemplate.update(sql, appid) > 0;
     }
 
     public boolean hasAppid(String appid){
-        return jdbcTemplate.queryForObject("SELECT COUNT(id) FROM shop_wx_configure WHERE appid = ?",
+        return jdbcTemplate.queryForObject("SELECT COUNT(id) FROM shop_wx_authorized WHERE appid = ?",
                 new Object[]{appid}, Integer.class) > 0;
     }
 
-    public ShopWxConfigure findOne(String id){
-        return jdbcTemplate.queryForObject("SELECT * FROM shop_wx_configure WHERE id = ?", new Object[]{id}, mapper);
+    public ShopWxAuthorized findOne(String id){
+        return jdbcTemplate.queryForObject("SELECT * FROM shop_wx_authorized WHERE id = ?", new Object[]{id}, mapper);
     }
 
-    public ShopWxConfigure findOneByAppid(String appid){
-        return jdbcTemplate.queryForObject("SELECT * FROM shop_wx_configure WHERE appid = ?", new Object[]{appid}, mapper);
+    public ShopWxAuthorized findOneByAppid(String appid){
+        return jdbcTemplate.queryForObject("SELECT * FROM shop_wx_authorized WHERE appid = ?", new Object[]{appid}, mapper);
     }
 
-    public List<ShopWxConfigure> findByShopId(String shopId){
-        return jdbcTemplate.query("SELECT * FROM shop_wx_configure WHERE shop_id = ?", new Object[]{shopId}, mapper);
+    public List<ShopWxAuthorized> findByShopId(String shopId){
+        return jdbcTemplate.query("SELECT * FROM shop_wx_authorized WHERE shop_id = ?", new Object[]{shopId}, mapper);
     }
 }

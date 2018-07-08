@@ -2,7 +2,6 @@ package com.tuoshecx.server.api.client.form;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.validation.constraints.NotBlank;
 
@@ -14,8 +13,19 @@ import javax.validation.constraints.NotBlank;
 @ApiModel("微信登陆提交数据")
 public class WxLoginForm {
     @NotBlank
+    @ApiModelProperty(value = "微信appid", required = true)
+    private String appid;
+    @NotBlank
     @ApiModelProperty(value = "code", required = true)
     private String code;
+
+    public String getAppid() {
+        return appid;
+    }
+
+    public void setAppid(String appid) {
+        this.appid = appid;
+    }
 
     public String getCode() {
         return code;
@@ -25,10 +35,4 @@ public class WxLoginForm {
         this.code = code;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("code", code)
-                .toString();
-    }
 }

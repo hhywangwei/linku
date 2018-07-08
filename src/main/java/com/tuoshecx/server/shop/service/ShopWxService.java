@@ -1,10 +1,10 @@
 package com.tuoshecx.server.shop.service;
 
 import com.tuoshecx.server.common.id.IdGenerators;
-import com.tuoshecx.server.shop.dao.ShopWxConfigureDao;
+import com.tuoshecx.server.shop.dao.ShopWxAuthorizedDao;
 import com.tuoshecx.server.shop.dao.ShopWxTokenDao;
 import com.tuoshecx.server.shop.dao.ShopWxUnauthorizedDao;
-import com.tuoshecx.server.shop.domain.ShopWxConfigure;
+import com.tuoshecx.server.shop.domain.ShopWxAuthorized;
 import com.tuoshecx.server.shop.domain.ShopWxToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,13 +28,13 @@ import java.util.Optional;
 public class ShopWxService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShopWxService.class);
 
-    private final ShopWxConfigureDao configureDao;
+    private final ShopWxAuthorizedDao authorizedDao;
     private final ShopWxTokenDao tokenDao;
     private final ShopWxUnauthorizedDao unauthorizedDao;
 
     @Autowired
-    public ShopWxService(ShopWxConfigureDao configureDao, ShopWxTokenDao tokenDao, ShopWxUnauthorizedDao unauthorizedDao) {
-        this.configureDao = configureDao;
+    public ShopWxService(ShopWxAuthorizedDao authorizedDao, ShopWxTokenDao tokenDao, ShopWxUnauthorizedDao unauthorizedDao) {
+        this.authorizedDao = authorizedDao;
         this.tokenDao = tokenDao;
         this.unauthorizedDao = unauthorizedDao;
     }
@@ -60,43 +60,43 @@ public class ShopWxService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveConfigure(ShopWxConfigure t){
-        if(configureDao.hasAppid(t.getAppid())){
-            configureDao.update(t);
+    public void saveAuthorized(ShopWxAuthorized t){
+        if(authorizedDao.hasAppid(t.getAppid())){
+            authorizedDao.update(t);
         }else{
             t.setId(IdGenerators.uuid());
-            configureDao.insert(t);
+            authorizedDao.insert(t);
         }
     }
 
-    public Optional<ShopWxConfigure> getConfigure(String appid){
+    public Optional<ShopWxAuthorized> getAuthorized(String appid){
         try{
-            return Optional.of(configureDao.findOneByAppid(appid));
+            return Optional.of(authorizedDao.findOneByAppid(appid));
         }catch (DataAccessException e){
             LOGGER.error("Get wx configure {}", e.getMessage());
             return Optional.empty();
         }
     }
 
-    public List<ShopWxConfigure> queryByShopId(String shopId){
-        return configureDao.findByShopId(shopId);
+    public List<ShopWxAuthorized> queryAuthorized(String shopId){
+        return authorizedDao.findByShopId(shopId);
     }
 
-    public List<ShopWxToken> queryExpires(int limit){
+    public List<ShopWxToken> queryExpiresToken(int limit){
        return tokenDao.findExpires(new Date(), limit);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public void unauthorized(String appid){
-        if(!configureDao.hasAppid(appid)){
+        if(!authorizedDao.hasAppid(appid)){
             LOGGER.debug("unauthorized appid {} not exist", appid);
             return ;
         }
 
-        ShopWxConfigure configure = configureDao.findOneByAppid(appid);
+        ShopWxAuthorized configure = authorizedDao.findOneByAppid(appid);
         unauthorizedDao.insert(configure);
         LOGGER.debug("Save {} unauthorized success", appid);
-        configureDao.delete(appid);
+        authorizedDao.delete(appid);
         tokenDao.delete(appid);
     }
 }

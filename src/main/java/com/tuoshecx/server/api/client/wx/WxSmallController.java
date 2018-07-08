@@ -11,7 +11,7 @@ import com.tuoshecx.server.security.Credential;
 import com.tuoshecx.server.security.token.TokenService;
 import com.tuoshecx.server.user.domain.User;
 import com.tuoshecx.server.user.service.UserService;
-import com.tuoshecx.server.wx.small.WxSmallService;
+import com.tuoshecx.server.wx.small.client.WxSmallClientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +48,7 @@ public class WxSmallController {
     private TokenService tokenService;
 
     @Autowired
-    private WxSmallService wxService;
+    private WxSmallClientService wxService;
 
     @PostMapping(value = "saveUser", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("保存微信小程序用户")
@@ -64,10 +64,10 @@ public class WxSmallController {
         String openid = currentOpenid();
         logger.debug("Save user openid is {}", openid);
 
-        if(!wxService.isSignature(openid, form.getRawData(), form.getSignature())){
-            logger.info("Signature fail, Wx signature is {}", form.getSignature());
-            return ResultVo.error(new String[]{"数据签名错误"});
-        }
+//        if(!wxService.isSignature(openid, form.getRawData(), form.getSignature())){
+//            logger.info("Signature fail, Wx signature is {}", form.getSignature());
+//            return ResultVo.error(new String[]{"数据签名错误"});
+//        }
 
         Optional<String> data = wxService.decrypt(openid, form.getEncryptedData(), form.getIv());
         if(!data.isPresent()){

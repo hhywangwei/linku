@@ -79,6 +79,12 @@ wx:
     redirect_uri: http://api.tuoshecx.com/wx/component/authorizer
     success_uri: http://manage.tuoshecx.com/wx/auth_success.html
     fail_uri: http://manage.tuoshecx.com/wx/auth_fail.html
+  small:
+    msg_templates:
+    - id: AT0002,
+      call_key: buy_notice
+      keyword_ids: [3, 4, 5]
+      remark: 购买成功通知
   pay:
     appid: wx0754c0a5d2c4b67c
     mchid: 1494207272

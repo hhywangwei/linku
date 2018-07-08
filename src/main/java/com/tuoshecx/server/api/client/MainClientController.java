@@ -9,7 +9,7 @@ import com.tuoshecx.server.security.Credential;
 import com.tuoshecx.server.security.token.TokenService;
 import com.tuoshecx.server.user.domain.User;
 import com.tuoshecx.server.user.service.UserService;
-import com.tuoshecx.server.wx.small.WxSmallService;
+import com.tuoshecx.server.wx.small.client.WxSmallClientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +45,7 @@ public class MainClientController {
     private TokenService tokenService;
 
     @Autowired
-    private WxSmallService wxService;
+    private WxSmallClientService wxService;
 
     @PostMapping(value = "wxLogin", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "微信小程序用户登陆")
@@ -54,7 +54,7 @@ public class MainClientController {
             return Mono.create(e -> ResultVo.error(result.getAllErrors()));
         }
 
-        return wxService.login(form.getCode())
+        return wxService.login(form.getAppid(), form.getCode())
                 .map(e -> e.map(this::loginOpenid).orElseGet(()-> ResultVo.error(100, "用登陆失败")));
     }
 
