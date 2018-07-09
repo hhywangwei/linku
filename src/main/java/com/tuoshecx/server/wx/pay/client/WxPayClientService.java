@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * 实现微信支付API请求处理
@@ -25,8 +26,8 @@ public class WxPayClientService {
     private final WxPayClients clients;
 
     @Autowired
-    public WxPayClientService(@Qualifier("wxPayConnector") ClientHttpConnector connector){
-        this.clients = new WxPayClients(connector);
+    public WxPayClientService(RestTemplate restTemplate){
+        this.clients = new WxPayClients(restTemplate);
     }
 
     public UnifiedOrderResponse unifiedOrder(UnifiedOrderRequest request){

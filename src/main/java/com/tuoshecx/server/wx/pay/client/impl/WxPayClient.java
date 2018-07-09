@@ -11,10 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,14 +24,14 @@ import java.util.Map;
  * @param <T> 请求参数类型
  * @param <R> 输出参数类型
  */
-abstract class WxPayBaseClient<T extends WxPayRequest, R> implements HttpClient<T, R> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WxPayBaseClient.class);
+abstract class WxPayClient<T extends WxPayRequest, R> implements HttpClient<T, R> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WxPayClient.class);
     private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
 
     private final RestTemplate restTemplate;
     private final String clientName;
 
-    WxPayBaseClient(RestTemplate restTemplate, String clientName){
+    WxPayClient(RestTemplate restTemplate, String clientName){
         this.restTemplate = restTemplate;
         this.clientName = clientName;
     }
@@ -42,8 +43,8 @@ abstract class WxPayBaseClient<T extends WxPayRequest, R> implements HttpClient<
             HttpEntity<byte[]> requestEntity = buildRequestEntity(i);
             return parseResponse(restTemplate.postForEntity(buildUri(),requestEntity, byte[].class));
         }catch (ResponseParseException e){
-            logger.error("Wx pay {} parse fail, error is {}", clientName, e.getMessage());
-            throw new BaseException(parseErrorMessage(e));
+            LOGGER.error("Wx pay {} parse fail, error is {}", clientName, e.getMessage());
+            throw new BaseException("解析微信返回信息错误");
         }
     }
 
@@ -54,14 +55,12 @@ abstract class WxPayBaseClient<T extends WxPayRequest, R> implements HttpClient<
      * @return {@link HttpEntity}
      */
     private HttpEntity<byte[]> buildRequestEntity(T i){
-        String body = buildBody(i);
+        String body = i.body();
         LOGGER.debug("Wx pay client name {} request body {}", clientName, body);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         return new HttpEntity<>(body.getBytes(UTF_8_CHARSET), headers);
     }
-
-    protected abstract String buildBody(T i);
 
     /**
      * 构建请求URI
@@ -70,23 +69,23 @@ abstract class WxPayBaseClient<T extends WxPayRequest, R> implements HttpClient<
      */
     protected abstract String buildUri();
 
-
-    /**
-     * http请求
-     *
-     * @param client {@link WebClient}
-     * @param t 请求参数
-     * @return 输出数据
-     */
-    protected abstract byte[] doRequest(WebClient client, T t);
-
     /**
      * 解析返回信息
      *
-     * @param data 返回数据
+     * @param response {@link ResponseEntity}
      * @return
      */
-    R parseResponse(String data)throws ResponseParseException{
+    private R parseResponse(ResponseEntity<byte[]> response)throws ResponseParseException{
+        if(!response.getStatusCode().is2xxSuccessful()){
+            LOGGER.error("Wx small {} http request fail, status code {}", clientName, response.getStatusCodeValue());
+            Map<String, String> map = new HashMap<>();
+            map.put("err_code", "-2000");
+            map.put("err_code_des", "Http state code is " + response.getStatusCodeValue());
+            return buildResponse(map);
+        }
+
+        String data = new String(response.getBody(), UTF_8_CHARSET);
+        LOGGER.debug("Wx pay {} response {}", clientName, data);
         ResponseParse parse = ResponseParseFactory.xmlParse();
         return parse.parse(data, this::buildResponse);
     }
@@ -102,7 +101,7 @@ abstract class WxPayBaseClient<T extends WxPayRequest, R> implements HttpClient<
     /**
      * 解析微信支付返回信息错误信息
      *
-     * @throws e 异常
+     * @param  e 异常
      * @return 错误
      */
     private String parseErrorMessage(Exception e){

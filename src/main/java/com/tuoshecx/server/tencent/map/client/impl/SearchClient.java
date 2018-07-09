@@ -1,41 +1,29 @@
 package com.tuoshecx.server.tencent.map.client.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.tencent.map.client.request.SearchRequest;
 import com.tuoshecx.server.tencent.map.client.response.SearchResponse;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.net.URLEncoder;
-import java.time.Duration;
 import java.util.Map;
 
-class SearchClient extends BaseMapClient<SearchRequest, SearchResponse> {
+class SearchClient extends TcMapClient<SearchRequest, SearchResponse> {
 
-    SearchClient() {
-        super("Search");
+    SearchClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        super(restTemplate, objectMapper, "Search");
     }
 
     @Override
-    protected byte[] doRequest(WebClient client, SearchRequest request) {
-        return client.get().uri(builder -> buildURI(builder, request))
-                .retrieve()
-                .bodyToMono(byte[].class)
-                .block(Duration.ofSeconds(30));
+    protected String buildUri(SearchRequest searchRequest) {
+        return "https://apis.map.qq.com//ws/place/v1/search?key={key}&output={output}" +
+                "&keyword={keyword}&boundary={boundary}&page_size={pageSize}&page_index={pageIndex}";
     }
 
-    private URI buildURI(UriBuilder builder, SearchRequest request){
-        builder.scheme("http")
-                .host("apis.map.qq.com")
-                .path("/ws/place/v1/search")
-                .queryParam("key", request.getKey())
-                .queryParam("output", request.getOutput())
-                .queryParam("keyword", encoderURL(request.getKeyword()))
-                .queryParam("boundary", String.format("region(%s,0)", encoderURL(request.getDistrict())))
-                .queryParam("page_size", request.getPageSize())
-                .queryParam("page_index", request.getPageIndex());
-
-        return builder.build();
+    @Override
+    protected Object[] uriParams(SearchRequest request) {
+        return new Object[]{request.getKey(), request.getOutput(), request.getKeyword(),
+                String.format("region(%s,0)", encoderURL(request.getDistrict())), request.getPageSize(), request.getPageIndex()};
     }
 
     private String encoderURL(String v){

@@ -2,7 +2,7 @@ package com.tuoshecx.server.tencent.map;
 
 import com.tuoshecx.server.tencent.configure.properties.TencentProperties;
 import com.tuoshecx.server.tencent.map.client.cache.DistrictCache;
-import com.tuoshecx.server.tencent.map.client.impl.QqMapClients;
+import com.tuoshecx.server.tencent.map.client.impl.TcMapClients;
 import com.tuoshecx.server.tencent.map.client.request.DistrictRequest;
 import com.tuoshecx.server.tencent.map.client.request.IpRequest;
 import com.tuoshecx.server.tencent.map.client.request.SearchRequest;
@@ -12,6 +12,7 @@ import com.tuoshecx.server.tencent.map.client.response.SearchResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -23,13 +24,13 @@ import java.util.function.Function;
  */
 @Service
 public class QqMapService {
-    private QqMapClients clients;
+    private TcMapClients clients;
     private TencentProperties properties;
     private DistrictCache cache;
 
     @Autowired
-    public QqMapService(TencentProperties properties, DistrictCache cache){
-        this.clients = new QqMapClients();
+    public QqMapService(TencentProperties properties, RestTemplate restTemplate, DistrictCache cache){
+        this.clients = new TcMapClients(restTemplate);
         this.properties = properties;
         this.cache = cache;
     }

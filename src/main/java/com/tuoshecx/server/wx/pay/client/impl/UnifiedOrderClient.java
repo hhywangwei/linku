@@ -2,11 +2,8 @@ package com.tuoshecx.server.wx.pay.client.impl;
 
 import com.tuoshecx.server.wx.pay.client.request.UnifiedOrderRequest;
 import com.tuoshecx.server.wx.pay.client.response.UnifiedOrderResponse;
-import org.springframework.http.client.reactive.ClientHttpConnector;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
 
-import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -14,25 +11,19 @@ import java.util.Map;
  *
  * @author WangWei
  */
-class UnifiedOrderClient extends WxPayBaseClient<UnifiedOrderRequest, UnifiedOrderResponse> {
+class UnifiedOrderClient extends WxPayClient<UnifiedOrderRequest, UnifiedOrderResponse> {
 
-    UnifiedOrderClient(ClientHttpConnector connector) {
-        super(connector, "/pay/unifiedorder");
+    UnifiedOrderClient(RestTemplate restTemplate) {
+        super(restTemplate, "unifiedOrder");
     }
 
     @Override
-    protected byte[] doRequest(WebClient client, UnifiedOrderRequest request) {
-        return client.post()
-                .uri("https://api.mch.weixin.qq.com/pay/unifiedorder")
-                .body(BodyInserters.fromObject(request.body()))
-                .retrieve()
-                .bodyToMono(byte[].class)
-                .block(Duration.ofSeconds(30));
+    protected String buildUri() {
+        return "https://api.mch.weixin.qq.com/pay/unifiedorder";
     }
 
     @Override
     protected UnifiedOrderResponse buildResponse(Map<String, String> data) {
         return new UnifiedOrderResponse(data);
     }
-
 }

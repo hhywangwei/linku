@@ -2,11 +2,8 @@ package com.tuoshecx.server.wx.pay.client.impl;
 
 import com.tuoshecx.server.wx.pay.client.request.RefundQueryRequest;
 import com.tuoshecx.server.wx.pay.client.response.RefundQueryResponse;
-import org.springframework.http.client.reactive.ClientHttpConnector;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestTemplate;
 
-import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -14,20 +11,15 @@ import java.util.Map;
  *
  * @author WangWei
  */
-class RefundQueryClient extends WxPayBaseClient<RefundQueryRequest, RefundQueryResponse> {
+class RefundQueryClient extends WxPayClient<RefundQueryRequest, RefundQueryResponse> {
 
-    RefundQueryClient(ClientHttpConnector connector) {
-        super(connector, "/pay/refundquery");
+    RefundQueryClient(RestTemplate restTemplate) {
+        super(restTemplate, "refundQuery");
     }
 
     @Override
-    protected byte[] doRequest(WebClient client, RefundQueryRequest request) {
-        return client.post()
-                .uri("https://api.mch.weixin.qq.com/pay/refundquery")
-                .body(BodyInserters.fromObject(request.body()))
-                .retrieve()
-                .bodyToMono(byte[].class)
-                .block(Duration.ofSeconds(30));
+    protected String buildUri() {
+        return "https://api.mch.weixin.qq.com/pay/refundquery";
     }
 
     @Override

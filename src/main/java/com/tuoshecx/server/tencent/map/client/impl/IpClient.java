@@ -1,37 +1,39 @@
 package com.tuoshecx.server.tencent.map.client.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.tencent.map.client.request.IpRequest;
 import com.tuoshecx.server.tencent.map.client.response.IpResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-class IpClient extends BaseMapClient<IpRequest, IpResponse> {
+class IpClient extends TcMapClient<IpRequest, IpResponse> {
 
-    IpClient() {
-        super("ip");
+    IpClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        super(restTemplate, objectMapper, "ip");
     }
 
     @Override
-    protected byte[] doRequest(WebClient client, IpRequest ipRequest) {
-        return new byte[0];
+    protected String buildUri(IpRequest request) {
+        String uri =  "https://apis.map.qq.com/ws/location/v1/ip?key={key}&output={output}";
+        if(StringUtils.isNotBlank(request.getIp())){
+            uri = uri + "&ip={ip}";
+        }
+        return uri;
     }
 
-    private URI buildURI(UriBuilder builder, IpRequest request){
-        builder.scheme("http")
-                .host("apis.map.qq.com")
-                .path("/ws/location/v1/ip")
-                .queryParam("key", request.getKey())
-                .queryParam("output", request.getOutput());
-
+    @Override
+    protected Object[] uriParams(IpRequest request) {
+        List<Object> params = new ArrayList<>();
+        params.add(request.getKey());
+        params.add(request.getOutput());
         if(StringUtils.isNotBlank(request.getIp())){
-            builder.queryParam("ip", request.getIp());
+            params.add(request.getIp());
         }
-
-        return builder.build();
+        return params.toArray();
     }
 
     @Override

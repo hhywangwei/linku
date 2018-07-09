@@ -10,6 +10,7 @@ import com.tuoshecx.server.wx.pay.client.response.RefundResponse;
 import com.tuoshecx.server.wx.pay.client.response.TransferResponse;
 import com.tuoshecx.server.wx.pay.client.response.UnifiedOrderResponse;
 import org.springframework.http.client.reactive.ClientHttpConnector;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * 微信支付API访问
@@ -25,11 +26,11 @@ public class WxPayClients {
 
     private final HttpClient<RefundQueryRequest, RefundQueryResponse> refundQueryClient;
 
-    public WxPayClients(ClientHttpConnector connector){
-        this.unifiedOrderClient = new UnifiedOrderClient(connector);
-        this.transferClient = new TransferClient(connector);
-        this.refundClient = new RefundClient(connector);
-        this.refundQueryClient = new RefundQueryClient(connector);
+    public WxPayClients(RestTemplate restTemplate){
+        this.unifiedOrderClient = new UnifiedOrderClient(restTemplate);
+        this.transferClient = new TransferClient(restTemplate);
+        this.refundClient = new RefundClient(restTemplate);
+        this.refundQueryClient = new RefundQueryClient(restTemplate);
     }
 
     public HttpClient<UnifiedOrderRequest, UnifiedOrderResponse> getUnifiedOrderClient() {

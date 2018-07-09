@@ -1,51 +1,52 @@
 package com.tuoshecx.server.tencent.map.client.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.tencent.map.client.request.DistrictRequest;
 import com.tuoshecx.server.tencent.map.client.response.DistrictResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-class DistrictClient extends BaseMapClient<DistrictRequest, DistrictResponse> {
+class DistrictClient extends TcMapClient<DistrictRequest, DistrictResponse> {
 
-    DistrictClient() {
-        super("District");
+    DistrictClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        super(restTemplate, objectMapper, "district");
     }
 
     @Override
-    protected byte[] doRequest(WebClient client, DistrictRequest request) {
-        return client.get().uri(builder -> buildURI(builder, request))
-                .retrieve()
-                .bodyToMono(byte[].class)
-                .block(Duration.ofSeconds(30));
+    protected String buildUri(DistrictRequest request) {
+        String uri = "https://apis.map.qq.com" + path(request) + "?key={key}&output={key}";
+        if (StringUtils.isNotBlank(request.getId())) {
+            uri = uri + "&id={id}";
+        }
+        if (StringUtils.isNotBlank(request.getKeyword())) {
+            uri = uri + "&keyword={keyword}";
+        }
+        return uri;
     }
 
-    private URI buildURI(UriBuilder builder, DistrictRequest request){
-
-        builder.scheme("http")
-                .host("apis.map.qq.com")
-                .path(path(request))
-                .queryParam("key", request.getKey())
-                .queryParam("output", request.getOutput());
-
-        if(StringUtils.isNotBlank(request.getId())){
-            builder.queryParam("id", request.getId());
-        }
-        if(StringUtils.isNotBlank(request.getKeyword())){
-            builder.queryParam("keyword", request.getKeyword());
-        }
-        return builder.build();
-    }
-
-    private String path(DistrictRequest request){
-        if(StringUtils.isNotBlank(request.getKeyword())){
+    private String path(DistrictRequest request) {
+        if (StringUtils.isNotBlank(request.getKeyword())) {
             return "/ws/district/v1/search";
         }
         return "/ws/district/v1/getchildren";
+    }
+
+    @Override
+    protected Object[] uriParams(DistrictRequest request) {
+        List<Object> params = new ArrayList<>();
+        params.add(request.getKey());
+        params.add(request.getOutput());
+        if (StringUtils.isNotBlank(request.getId())) {
+            params.add(request.getId());
+        }
+        if (StringUtils.isNotBlank(request.getKeyword())) {
+            params.add(request.getKeyword());
+        }
+        return params.toArray();
     }
 
     @Override
