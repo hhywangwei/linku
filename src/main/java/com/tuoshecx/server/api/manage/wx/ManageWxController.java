@@ -32,8 +32,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
  */
 @RestController
 @RequestMapping("/manage/wx")
-@Api(value = "/manage/wx", tags = "店铺托管微信小程序信息")
-public class ShopWxController {
+@Api(value = "/manage/wx", tags = "M-店铺托管微信小程序信息")
+public class ManageWxController {
 
     @Autowired
     private ShopWxService service;
@@ -53,9 +53,9 @@ public class ShopWxController {
 
     @GetMapping(value = "messageTemplate", produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("查询微信消息模板信息")
-    public ResultPageVo<SmallTemplate> queryMessageTemplate(@RequestParam @ApiParam(value = "调用") String callKey,
-                                                            @RequestParam @ApiParam(value = "标题") String title,
-                                                            @RequestParam @ApiParam(value = "备注") String remark,
+    public ResultPageVo<SmallTemplate> queryMessageTemplate(@RequestParam(required = false) @ApiParam(value = "调用") String callKey,
+                                                            @RequestParam(required = false) @ApiParam(value = "标题") String title,
+                                                            @RequestParam(required = false) @ApiParam(value = "备注") String remark,
                                                             @RequestParam(defaultValue = "0") @ApiParam(value = "查询页数") int page,
                                                             @RequestParam(defaultValue = "15") @ApiParam(value = "查询每页记录数") int rows){
 
@@ -70,14 +70,14 @@ public class ShopWxController {
 
     @GetMapping(value = "sendMessage", produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("查询发送消息日志")
-    public ResultPageVo<SendMessage> querySendMessage(@RequestParam @ApiParam("消息标题") String title,
-                                                  @RequestParam @ApiParam("调用关键字") String callKey,
-                                                  @RequestParam @ApiParam("接收用户openid") String openid,
-                                                  @RequestParam @ApiParam("消息状态") String status,
-                                                  @RequestParam @ApiParam("查询数据开始日期") Date fromTime,
-                                                  @RequestParam @ApiParam("查询数据结束日期") Date toTime,
-                                                  @RequestParam(defaultValue = "0") @ApiParam(value = "查询页数") int page,
-                                                  @RequestParam(defaultValue = "15") @ApiParam(value = "查询每页记录数") int rows){
+    public ResultPageVo<SendMessage> querySendMessage(@RequestParam(required = false) @ApiParam("消息标题") String title,
+                                                      @RequestParam(required = false) @ApiParam("调用关键字") String callKey,
+                                                      @RequestParam(required = false) @ApiParam("接收用户openid") String openid,
+                                                      @RequestParam(required = false) @ApiParam("消息状态") String status,
+                                                      @RequestParam(required = false) @ApiParam("查询数据开始日期") Date fromTime,
+                                                      @RequestParam(required = false) @ApiParam("查询数据结束日期") Date toTime,
+                                                      @RequestParam(defaultValue = "0") @ApiParam(value = "查询页数") int page,
+                                                      @RequestParam(defaultValue = "15") @ApiParam(value = "查询每页记录数") int rows){
 
         List<ShopWxAuthorized> authorizeds = service.queryAuthorized(currentShopId());
         List<SendMessage> data = authorizeds.isEmpty()?

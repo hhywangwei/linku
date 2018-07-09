@@ -27,7 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 @RequestMapping("/upload")
 @Api(value = "/upload", tags = "P-上传文件API接口")
 public class UploadController {
-    private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadController.class);
 
     @Autowired
     private UploadFileService service;
@@ -39,7 +39,7 @@ public class UploadController {
             @RequestHeader(value = "x-thumb", defaultValue = "false") @ApiParam(value = "是否生产缩略图") boolean thumb,
             @RequestHeader(value = "x-max-size", defaultValue = "640") @ApiParam(value = "图片最大尺寸") int maxSize) {
 
-        logger.debug("Upload file is {}, content type {} length {}",
+        LOGGER.debug("Upload file is {}, content type {} length {}",
                 file.getOriginalFilename(), file.getContentType(), file.getSize());
 
         if (file.isEmpty()) {
