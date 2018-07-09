@@ -1,13 +1,9 @@
 package com.tuoshecx.server.wx.component.client.impl;
 
-import com.tuoshecx.server.wx.component.client.ComponentHttpClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.wx.component.client.request.ObtainAccessTokenRequest;
 import com.tuoshecx.server.wx.component.client.response.ObtainAccessTokenResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
@@ -16,31 +12,28 @@ import java.util.Map;
  *
  * @author <a href="hhywangwei@gmail.com">WangWei</a>
  */
-class ObtainAccessTokenClient extends ComponentHttpClient<ObtainAccessTokenRequest, ObtainAccessTokenResponse> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObtainAccessTokenClient.class);
+class ObtainAccessTokenClient extends WxComponentClient<ObtainAccessTokenRequest, ObtainAccessTokenResponse> {
 
-    ObtainAccessTokenClient() {
-        super("obtain_access_token");
+    ObtainAccessTokenClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        super(restTemplate, objectMapper, "obtainAccessToken");
     }
 
     @Override
-    protected Mono<byte[]> doRequest(WebClient client, ObtainAccessTokenRequest obtainAccessTokenRequest) {
-        byte[] body = buildBody(obtainAccessTokenRequest).getBytes(charsetUTF8);
-        int contentLength = body.length;
-        return client.post()
-                .uri(buildUri(builder -> builder.path("/cgi-bin/component/api_component_token").build()))
-                .contentLength(contentLength)
-                .body(BodyInserters.fromObject(body))
-                .retrieve()
-                .bodyToMono(byte[].class);
+    protected String buildUri(ObtainAccessTokenRequest obtainAccessTokenRequest) {
+        return "https://api.weixin.qq.com/cgi-bin/component/api_component_token";
     }
 
-    private String buildBody(ObtainAccessTokenRequest request){
-        String body = String.format("{\"component_appid\": \"%s\", \"component_appsecret\": \"%s\", \"component_verify_ticket\": \"%s\"}",
-                request.getComponentAppid(), request.getComponentSecret(), request.getVerifyTicket());
-        LOGGER.debug("Obtain component access token request body is {}", body);
-        return body;
+    @Override
+    protected Object[] uriParams(ObtainAccessTokenRequest obtainAccessTokenRequest) {
+        return new Object[0];
     }
+
+    @Override
+    protected String buildBody(ObtainAccessTokenRequest request){
+        return String.format("{\"component_appid\": \"%s\", \"component_appsecret\": \"%s\", \"component_verify_ticket\": \"%s\"}",
+                request.getComponentAppid(), request.getComponentSecret(), request.getVerifyTicket());
+    }
+
     @Override
     protected ObtainAccessTokenResponse buildResponse(Map<String, Object> data) {
         return new ObtainAccessTokenResponse(data);

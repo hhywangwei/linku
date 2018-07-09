@@ -4,6 +4,7 @@ import com.tuoshecx.server.shop.domain.ShopWxToken;
 import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.shop.service.ShopWxService;
 import com.tuoshecx.server.wx.component.client.ComponentClientService;
+import com.tuoshecx.server.wx.component.client.response.ObtainAuthorizerTokenResponse;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,21 +56,20 @@ public class ShopSchedule {
 
     private void refreshToken(ShopWxToken t){
         try{
-            clientService.obtainAuthorizerToken(t.getAppid(), t.getRefreshToken()).subscribe(e -> {
-                if(e.getCode() == 0){
-                    ShopWxToken o = new ShopWxToken();
-                    o.setAppid(t.getAppid());
-                    o.setAccessToken(e.getAuthorizerAccessToken());
-                    o.setRefreshToken(e.getAuthorizerRefreshToken());
-                    Date now = new Date();
-                    o.setExpiresTime(DateUtils.addSeconds(now, (e.getExpiresIn() - 6 * 60)));
-                    o.setUpdateTime(now);
+            ObtainAuthorizerTokenResponse response = clientService.obtainAuthorizerToken(t.getAppid(), t.getRefreshToken());
+            if(response.getCode() == 0){
+                ShopWxToken o = new ShopWxToken();
+                o.setAppid(t.getAppid());
+                o.setAccessToken(response.getAuthorizerAccessToken());
+                o.setRefreshToken(response.getAuthorizerRefreshToken());
+                Date now = new Date();
+                o.setExpiresTime(DateUtils.addSeconds(now, (response.getExpiresIn() - 6 * 60)));
+                o.setUpdateTime(now);
 
-                    wxService.saveToken(o);
-                }else{
-                    LOGGER.error("Refresh {} token fail, code {} message {}", t.getAppid(), e.getCode(), e.getMessage());
-                }
-            });
+                wxService.saveToken(o);
+            }else{
+                LOGGER.error("Refresh {} token fail, code {} message {}", t.getAppid(), response.getCode(), response.getMessage());
+            }
         }catch (Exception e){
             LOGGER.error("Refresh token fail, appid {} error {}", t.getAppid(), e.getMessage());
         }

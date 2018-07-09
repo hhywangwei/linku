@@ -1,42 +1,37 @@
 package com.tuoshecx.server.wx.component.client.impl;
 
-import com.tuoshecx.server.wx.component.client.ComponentHttpClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.wx.component.client.request.ObtainQueryAuthRequest;
 import com.tuoshecx.server.wx.component.client.response.ObtainQueryAuthResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-class ObtainQueryAuthClient extends ComponentHttpClient<ObtainQueryAuthRequest, ObtainQueryAuthResponse> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ObtainQueryAuthClient.class);
+/**
+ * 查询托管公众号信息
+ *
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
+ */
+class ObtainQueryAuthClient extends WxComponentClient<ObtainQueryAuthRequest, ObtainQueryAuthResponse> {
 
-    ObtainQueryAuthClient() {
-        super("obtain_query_auth");
+    ObtainQueryAuthClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        super(restTemplate, objectMapper, "obtainQueryAuth");
     }
 
     @Override
-    protected Mono<byte[]> doRequest(WebClient client, ObtainQueryAuthRequest request) {
-        byte[] body= buildBody(request).getBytes(charsetUTF8);
-
-        return client.post()
-                .uri(buildUri(builder -> builder.path("/cgi-bin/component/api_query_auth")
-                        .queryParam("component_access_token", request.getToken()).build()))
-                .contentLength(body.length)
-                .body(BodyInserters.fromObject(body))
-                .retrieve()
-                .bodyToMono(byte[].class);
+    protected String buildUri(ObtainQueryAuthRequest request) {
+        return "https://api.weixin.qq.com/cgi-bin/component/api_query_auth?component_access_token={token}";
     }
 
-    private String buildBody(ObtainQueryAuthRequest request){
-        String body = String.format("{\"component_appid\": \"%s\", \"authorization_code\": \"%s\"}",
-                request.getComponentAppid(), request.getAuthorizationCode());
+    @Override
+    protected Object[] uriParams(ObtainQueryAuthRequest request) {
+        return new Object[]{request.getToken()};
+    }
 
-        LOGGER.debug("Obtain query auth request body is {}", body);
-        return body;
+    @Override
+    protected String buildBody(ObtainQueryAuthRequest request){
+        return String.format("{\"component_appid\": \"%s\", \"authorization_code\": \"%s\"}",
+                request.getComponentAppid(), request.getAuthorizationCode());
     }
 
     @Override

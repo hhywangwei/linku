@@ -1,16 +1,14 @@
-package com.tuoshecx.server.wx.small.client.impl;
+package com.tuoshecx.server.wx.component.client.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeBase;
 import com.tuoshecx.server.BaseException;
 import com.tuoshecx.server.common.client.HttpClient;
-import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
+import com.tuoshecx.server.wx.component.client.request.ComponentRequest;
+import com.tuoshecx.server.wx.component.client.response.ComponentResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
@@ -18,18 +16,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 实现微信小程序请求
+ * 实现微信开放平台API调用
  *
- * @param <T> 输出参数类型
- * @param <R> 输出数据类型
+ * @param <I> 请求类型
+ * @param <O> 请求输出类型
  */
-abstract class WxSmallClient<I, O extends WxSmallResponse> implements HttpClient<I, O> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WxSmallClient.class);
+abstract class WxComponentClient<I extends ComponentRequest, O extends ComponentResponse> implements HttpClient<I, O> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WxComponentClient.class);
     private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
 
-    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final TypeBase mapType;
+    private final RestTemplate restTemplate;
     private final String clientName;
 
     /**
@@ -39,17 +37,17 @@ abstract class WxSmallClient<I, O extends WxSmallResponse> implements HttpClient
      * @param objectMapper {@link ObjectMapper}
      * @param clientName 调用API名称
      */
-    public WxSmallClient(RestTemplate restTemplate, ObjectMapper objectMapper, String clientName){
-        this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
-        this.clientName = clientName;
-        this.mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
+	public WxComponentClient(RestTemplate restTemplate, ObjectMapper objectMapper, String clientName){
+	    this.restTemplate = restTemplate;
+	    this.objectMapper = objectMapper;
+	    this.clientName = clientName;
+	    this.mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
     }
 
     @Override
     public O request(I i) {
         HttpEntity<byte[]> requestEntity = buildRequestEntity(i);
-        return doResponse(restTemplate.postForEntity(buildUri(i),requestEntity, byte[].class, uriParams(i)));
+	    return doResponse(restTemplate.postForEntity(buildUri(i),requestEntity, byte[].class, uriParams(i)));
     }
 
     /**
@@ -59,8 +57,8 @@ abstract class WxSmallClient<I, O extends WxSmallResponse> implements HttpClient
      * @return {@link HttpEntity}
      */
     private HttpEntity<byte[]> buildRequestEntity(I i){
-        String body = buildBody(i);
-        LOGGER.debug("Wx small client name {} request body {}", clientName, body);
+	    String body = buildBody(i);
+	    LOGGER.debug("Wx component client name {} request body {}", clientName, body);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         return new HttpEntity<>(body.getBytes(UTF_8_CHARSET), headers);
@@ -91,10 +89,10 @@ abstract class WxSmallClient<I, O extends WxSmallResponse> implements HttpClient
      * @param response 输出对象
      * @return 输出对象
      */
-    protected O doResponse(ResponseEntity<byte[]> response){
+    private O doResponse(ResponseEntity<byte[]> response){
 
         if(!response.getStatusCode().is2xxSuccessful()){
-            LOGGER.error("Wx small {} http request fail, status code {}", clientName, response.getStatusCodeValue());
+            LOGGER.error("Wx component {} http request fail, status code {}", clientName, response.getStatusCodeValue());
             Map<String, Object> map = new HashMap<>();
             map.put("errcode", -1000);
             map.put("errmsg", "Http state code is " + response.getStatusCodeValue());
@@ -117,4 +115,5 @@ abstract class WxSmallClient<I, O extends WxSmallResponse> implements HttpClient
      * @return 输出对象
      */
     protected abstract O buildResponse(Map<String, Object> data);
+
 }

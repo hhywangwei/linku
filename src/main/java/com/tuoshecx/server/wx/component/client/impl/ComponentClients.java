@@ -1,8 +1,11 @@
 package com.tuoshecx.server.wx.component.client.impl;
 
-import com.tuoshecx.server.wx.component.client.ComponentHttpClient;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tuoshecx.server.common.client.HttpClient;
 import com.tuoshecx.server.wx.component.client.request.*;
 import com.tuoshecx.server.wx.component.client.response.*;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * 微信第三方平台客户端
@@ -11,37 +14,46 @@ import com.tuoshecx.server.wx.component.client.response.*;
  */
 public class ComponentClients {
 
-    private final ComponentHttpClient<ObtainAccessTokenRequest, ObtainAccessTokenResponse> obtainAccessTokenClient;
-    private final ComponentHttpClient<ObtainAuthorizerInfoRequest, ObtainAuthorizerInfoResponse> obtainAuthorizerInfoClient;
-    private final ComponentHttpClient<ObtainAuthorizerTokenRequest, ObtainAuthorizerTokenResponse> obtainAuthorizerTokenClient;
-    private final ComponentHttpClient<ObtainPreAuthCodeRequest, ObtainPreAuthCodeResponse> obtainPreAuthCodeClient;
-    private final ComponentHttpClient<ObtainQueryAuthRequest, ObtainQueryAuthResponse> obtainQueryAuthClient;
+    private final HttpClient<ObtainAccessTokenRequest, ObtainAccessTokenResponse> obtainAccessTokenClient;
+    private final HttpClient<ObtainAuthorizerInfoRequest, ObtainAuthorizerInfoResponse> obtainAuthorizerInfoClient;
+    private final HttpClient<ObtainAuthorizerTokenRequest, ObtainAuthorizerTokenResponse> obtainAuthorizerTokenClient;
+    private final HttpClient<ObtainPreAuthCodeRequest, ObtainPreAuthCodeResponse> obtainPreAuthCodeClient;
+    private final HttpClient<ObtainQueryAuthRequest, ObtainQueryAuthResponse> obtainQueryAuthClient;
 
-    public ComponentClients(){
-        this.obtainAccessTokenClient = new ObtainAccessTokenClient();
-        this.obtainAuthorizerInfoClient = new ObtainAuthorizerInfoClient();
-        this.obtainAuthorizerTokenClient = new ObtainAuthorizerTokenClient();
-        this.obtainPreAuthCodeClient = new ObtainPreAuthCodeClient();
-        this.obtainQueryAuthClient = new ObtainQueryAuthClient();
+    public ComponentClients(RestTemplate restTemplate){
+        ObjectMapper objectMapper = initObjectMapper();
+        this.obtainAccessTokenClient = new ObtainAccessTokenClient(restTemplate, objectMapper);
+        this.obtainAuthorizerInfoClient = new ObtainAuthorizerInfoClient(restTemplate, objectMapper);
+        this.obtainAuthorizerTokenClient = new ObtainAuthorizerTokenClient(restTemplate, objectMapper);
+        this.obtainPreAuthCodeClient = new ObtainPreAuthCodeClient(restTemplate, objectMapper);
+        this.obtainQueryAuthClient = new ObtainQueryAuthClient(restTemplate, objectMapper);
     }
 
-    public ComponentHttpClient<ObtainAccessTokenRequest, ObtainAccessTokenResponse> getObtainAccessTokenClient() {
+    private ObjectMapper initObjectMapper(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        return mapper;
+    }
+
+    public HttpClient<ObtainAccessTokenRequest, ObtainAccessTokenResponse> getObtainAccessTokenClient() {
         return obtainAccessTokenClient;
     }
 
-    public ComponentHttpClient<ObtainAuthorizerInfoRequest, ObtainAuthorizerInfoResponse> getObtainAuthorizerInfoClient() {
+    public HttpClient<ObtainAuthorizerInfoRequest, ObtainAuthorizerInfoResponse> getObtainAuthorizerInfoClient() {
         return obtainAuthorizerInfoClient;
     }
 
-    public ComponentHttpClient<ObtainAuthorizerTokenRequest, ObtainAuthorizerTokenResponse> getObtainAuthorizerTokenClient() {
+    public HttpClient<ObtainAuthorizerTokenRequest, ObtainAuthorizerTokenResponse> getObtainAuthorizerTokenClient() {
         return obtainAuthorizerTokenClient;
     }
 
-    public ComponentHttpClient<ObtainPreAuthCodeRequest, ObtainPreAuthCodeResponse> getObtainPreAuthCodeClient() {
+    public HttpClient<ObtainPreAuthCodeRequest, ObtainPreAuthCodeResponse> getObtainPreAuthCodeClient() {
         return obtainPreAuthCodeClient;
     }
 
-    public ComponentHttpClient<ObtainQueryAuthRequest, ObtainQueryAuthResponse> getObtainQueryAuthClient() {
+    public HttpClient<ObtainQueryAuthRequest, ObtainQueryAuthResponse> getObtainQueryAuthClient() {
         return obtainQueryAuthClient;
     }
+
+
 }

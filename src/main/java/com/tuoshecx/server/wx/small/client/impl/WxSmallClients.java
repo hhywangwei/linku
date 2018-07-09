@@ -1,8 +1,11 @@
 package com.tuoshecx.server.wx.small.client.impl;
 
-import com.tuoshecx.server.common.client.AsyncHttpClient;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tuoshecx.server.common.client.HttpClient;
 import com.tuoshecx.server.wx.small.client.request.*;
 import com.tuoshecx.server.wx.small.client.response.*;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * 微信小程序API接口请求处理
@@ -10,34 +13,41 @@ import com.tuoshecx.server.wx.small.client.response.*;
  * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 public class WxSmallClients {
-    private final AsyncHttpClient<LoginRequest, LoginResponse> loginClient;
-    private final AsyncHttpClient<SendTemplateMsgRequest, WxSmallResponse> sendTmpMsgClient;
-    private final AsyncHttpClient<SendCustomMsgRequest, WxSmallResponse> sendCustomMsgClient;
-    private final AsyncHttpClient<GetAuditStatusRequest, GetAuditStatusResponse> getAuditStatusClient;
-    private final AsyncHttpClient<WxSmallRequest, GetCategoryResponse> getCategoryClient;
-    private final AsyncHttpClient<ProgramCommitRequest, WxSmallResponse> programCommitClient;
-    private final AsyncHttpClient<WxSmallRequest, WxSmallResponse> programReleaseClient;
-    private final AsyncHttpClient<SetWebViewDomainRequest, WxSmallResponse> setWebViewDomainClient;
-    private final AsyncHttpClient<SubmitAuditRequest, SubmitAuditResponse> submitAuditClient;
-    private final AsyncHttpClient<UpdateDomainRequest, WxSmallResponse> updateDomainClient;
-    private final AsyncHttpClient<MessageTemplateAddRequest, MessageTemplateAddResponse> messageTemplateAddClient;
-    private final AsyncHttpClient<MessageTemplateDelRequest, WxSmallResponse> messageTemplateDelClient;
-    private final AsyncHttpClient<MessageTemplateQueryRequest, MessageTemplateQueryResponse> messageTemplateQueryClient;
+    private final HttpClient<LoginRequest, LoginResponse> loginClient;
+    private final HttpClient<SendTemplateMsgRequest, WxSmallResponse> sendTmpMsgClient;
+    private final HttpClient<SendCustomMsgRequest, WxSmallResponse> sendCustomMsgClient;
+    private final HttpClient<GetAuditStatusRequest, GetAuditStatusResponse> getAuditStatusClient;
+    private final HttpClient<WxSmallRequest, GetCategoryResponse> getCategoryClient;
+    private final HttpClient<ProgramCommitRequest, WxSmallResponse> programCommitClient;
+    private final HttpClient<WxSmallRequest, WxSmallResponse> programReleaseClient;
+    private final HttpClient<SetWebViewDomainRequest, WxSmallResponse> setWebViewDomainClient;
+    private final HttpClient<SubmitAuditRequest, SubmitAuditResponse> submitAuditClient;
+    private final HttpClient<UpdateDomainRequest, WxSmallResponse> updateDomainClient;
+    private final HttpClient<MessageTemplateAddRequest, MessageTemplateAddResponse> messageTemplateAddClient;
+    private final HttpClient<MessageTemplateDelRequest, WxSmallResponse> messageTemplateDelClient;
+    private final HttpClient<MessageTemplateQueryRequest, MessageTemplateQueryResponse> messageTemplateQueryClient;
 
-    public WxSmallClients() {
-        this.loginClient = new LoginClient();
-        this.sendTmpMsgClient = new SendTemplateMsgClient();
-        this.sendCustomMsgClient = new SendCustomMsgClient();
-        this.getAuditStatusClient = new GetAuditStatusClient();
-        this.getCategoryClient = new GetCategoryClient();
-        this.programCommitClient = new ProgramCommitClient();
-        this.programReleaseClient = new ProgramReleaseClient();
-        this.setWebViewDomainClient = new SetWebViewDomainClinet();
-        this.submitAuditClient = new SubmitAuditClient();
-        this.updateDomainClient = new UpdateDomainClient();
-        this.messageTemplateAddClient = new MessageTemplateAddClient();
-        this.messageTemplateDelClient = new MessageTemplateDelClient();
-        this.messageTemplateQueryClient = new MessageTemplateQueryClient();
+    public WxSmallClients(RestTemplate restTemplate) {
+        ObjectMapper objectMapper = initObjectMapper();
+        this.loginClient = new LoginClient(restTemplate, objectMapper);
+        this.sendTmpMsgClient = new SendTemplateMsgClient(restTemplate, objectMapper);
+        this.sendCustomMsgClient = new SendCustomMsgClient(restTemplate, objectMapper);
+        this.getAuditStatusClient = new GetAuditStatusClient(restTemplate, objectMapper);
+        this.getCategoryClient = new GetCategoryClient(restTemplate, objectMapper);
+        this.programCommitClient = new ProgramCommitClient(restTemplate, objectMapper);
+        this.programReleaseClient = new ProgramReleaseClient(restTemplate, objectMapper);
+        this.setWebViewDomainClient = new SetWebViewDomainClient(restTemplate, objectMapper);
+        this.submitAuditClient = new SubmitAuditClient(restTemplate, objectMapper);
+        this.updateDomainClient = new UpdateDomainClient(restTemplate, objectMapper);
+        this.messageTemplateAddClient = new MessageTemplateAddClient(restTemplate, objectMapper);
+        this.messageTemplateDelClient = new MessageTemplateDelClient(restTemplate, objectMapper);
+        this.messageTemplateQueryClient = new MessageTemplateQueryClient(restTemplate, objectMapper);
+    }
+
+    private ObjectMapper initObjectMapper(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        return mapper;
     }
 
     /**
@@ -45,7 +55,7 @@ public class WxSmallClients {
      *
      * @return {@link LoginClient}
      */
-    public AsyncHttpClient<LoginRequest, LoginResponse> loginClient(){
+    public HttpClient<LoginRequest, LoginResponse> loginClient(){
         return loginClient;
     }
 
@@ -54,7 +64,7 @@ public class WxSmallClients {
      *
      * @return {@link SendTemplateMsgClient}
      */
-    public AsyncHttpClient<SendTemplateMsgRequest, WxSmallResponse> sendTmpMsgClient(){
+    public HttpClient<SendTemplateMsgRequest, WxSmallResponse> sendTmpMsgClient(){
         return sendTmpMsgClient;
     }
 
@@ -63,47 +73,47 @@ public class WxSmallClients {
      *
      * @return {@link SendCustomMsgClient}
      */
-    public AsyncHttpClient<SendCustomMsgRequest, WxSmallResponse> sendCustomMsgClient() {
+    public HttpClient<SendCustomMsgRequest, WxSmallResponse> sendCustomMsgClient() {
         return sendCustomMsgClient;
     }
 
-    public AsyncHttpClient<GetAuditStatusRequest, GetAuditStatusResponse> getAuditStatusClient() {
+    public HttpClient<GetAuditStatusRequest, GetAuditStatusResponse> getAuditStatusClient() {
         return getAuditStatusClient;
     }
 
-    public AsyncHttpClient<WxSmallRequest, GetCategoryResponse> getCategoryClient() {
+    public HttpClient<WxSmallRequest, GetCategoryResponse> getCategoryClient() {
         return getCategoryClient;
     }
 
-    public AsyncHttpClient<ProgramCommitRequest, WxSmallResponse> programCommitClient() {
+    public HttpClient<ProgramCommitRequest, WxSmallResponse> programCommitClient() {
         return programCommitClient;
     }
 
-    public AsyncHttpClient<WxSmallRequest, WxSmallResponse> programReleaseClient() {
+    public HttpClient<WxSmallRequest, WxSmallResponse> programReleaseClient() {
         return programReleaseClient;
     }
 
-    public AsyncHttpClient<SetWebViewDomainRequest, WxSmallResponse> setWebViewDomainClient() {
+    public HttpClient<SetWebViewDomainRequest, WxSmallResponse> setWebViewDomainClient() {
         return setWebViewDomainClient;
     }
 
-    public AsyncHttpClient<SubmitAuditRequest, SubmitAuditResponse> submitAuditClient() {
+    public HttpClient<SubmitAuditRequest, SubmitAuditResponse> submitAuditClient() {
         return submitAuditClient;
     }
 
-    public AsyncHttpClient<UpdateDomainRequest, WxSmallResponse> updateDomainClient() {
+    public HttpClient<UpdateDomainRequest, WxSmallResponse> updateDomainClient() {
         return updateDomainClient;
     }
 
-    public AsyncHttpClient<MessageTemplateAddRequest, MessageTemplateAddResponse> messageTemplateAddClient(){
+    public HttpClient<MessageTemplateAddRequest, MessageTemplateAddResponse> messageTemplateAddClient(){
         return messageTemplateAddClient;
     }
 
-    public AsyncHttpClient<MessageTemplateDelRequest, WxSmallResponse> messageTemplateDelClient(){
+    public HttpClient<MessageTemplateDelRequest, WxSmallResponse> messageTemplateDelClient(){
         return messageTemplateDelClient;
     }
 
-    public AsyncHttpClient<MessageTemplateQueryRequest, MessageTemplateQueryResponse> messageTemplateQueryClient(){
+    public HttpClient<MessageTemplateQueryRequest, MessageTemplateQueryResponse> messageTemplateQueryClient(){
         return messageTemplateQueryClient;
     }
 }

@@ -1,37 +1,42 @@
 package com.tuoshecx.server.wx.small.client.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tuoshecx.server.wx.small.client.request.LoginRequest;
 import com.tuoshecx.server.wx.small.client.request.WxSmallRequest;
 import com.tuoshecx.server.wx.small.client.response.GetCategoryResponse;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
-import reactor.core.publisher.Mono;
 
-import java.net.URI;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Map;
 
 
 class GetCategoryClient extends WxSmallClient <WxSmallRequest, GetCategoryResponse> {
+    private final RestTemplate restTemplate;
 
-    GetCategoryClient() {
-        super("getCategory");
+    GetCategoryClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        super(restTemplate, objectMapper, "getCategory");
+        this.restTemplate = restTemplate;
     }
 
     @Override
-    protected Mono<byte[]> doRequest(WebClient client, WxSmallRequest request) {
-        return client.get()
-                .uri(builder -> buildUri(builder, request))
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                .retrieve()
-                .bodyToMono(byte[].class);
+    public GetCategoryResponse request(WxSmallRequest request) {
+        return doResponse(restTemplate.getForEntity(buildUri(request), byte[].class, uriParams(request)));
     }
 
-    private URI buildUri(UriBuilder builder, WxSmallRequest request){
-        return builder.scheme("https")
-                .host("api.weixin.qq.com")
-                .path("/wxa/get_category")
-                .queryParam("access_token", request.getToken())
-                .build();
+    @Override
+    protected String buildUri(WxSmallRequest wxSmallRequest) {
+        return "https://api.weixin.qq.com/wxa/get_category?access_token={token}";
+    }
+
+    @Override
+    protected Object[] uriParams(WxSmallRequest request) {
+        return new Object[]{request.getToken()};
+    }
+
+    @Override
+    protected String buildBody(WxSmallRequest wxSmallRequest) {
+        //not instance
+        return null;
     }
 
     @Override

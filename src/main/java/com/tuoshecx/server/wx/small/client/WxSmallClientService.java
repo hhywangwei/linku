@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,14 +38,15 @@ public class WxSmallClientService {
     private final ComponentTokenService componentTokenService;
 
     @Autowired
-    public WxSmallClientService(ShopWxService wxService,
+    public WxSmallClientService(RestTemplate restTemplate,
+                                ShopWxService wxService,
                                 StringRedisTemplate redisTemplate,
                                 WxComponentProperties properties,
                                 ComponentTokenService componentTokenService) {
 
         this.wxService = wxService;
         this.sessionDao = new RedisSessionDao(redisTemplate);
-        this.clients = new WxSmallClients();
+        this.clients = new WxSmallClients(restTemplate);
         this.properties = properties;
         this.componentTokenService = componentTokenService;
     }
@@ -57,20 +58,18 @@ public class WxSmallClientService {
      * @param code 登陆code
      * @return
      */
-    public Mono<Optional<String>> login(String appid, String code){
+    public Optional<String> login(String appid, String code){
         String token = componentTokenService.get(properties.getAppid()).orElseThrow(() -> new BaseException("微信Token不存在"));
         LoginRequest request = new LoginRequest(appid, properties.getAppid(), token, code);
-        return clients.loginClient().request(request).map(e -> {
+        LoginResponse response =  clients.loginClient().request(request);
 
-            if(!e.isOk()){
-                return Optional.empty();
-            }
+        if(!response.isOk()){
+            return Optional.empty();
+        }
 
-            LOGGER.debug("Login openid {} sessionKey {}", e.getOpenid(), e.getSessionKey());
-
-            boolean ok = sessionDao.saveKey(e.getOpenid(), e.getSessionKey());
-            return ok? Optional.of(e.getOpenid()): Optional.empty();
-        });
+        LOGGER.debug("Login openid {} sessionKey {}", response.getOpenid(), response.getSessionKey());
+        boolean ok = sessionDao.saveKey(response.getOpenid(), response.getSessionKey());
+        return ok? Optional.of(response.getOpenid()): Optional.empty();
     }
 
     /**
@@ -80,10 +79,9 @@ public class WxSmallClientService {
      * @param func 构建模板消息请求对象
      * @return {@link WxSmallResponse}
      */
-    public Mono<WxSmallResponse> sendTmpMsg(String appid, Function<String, SendTemplateMsgRequest> func){
+    public WxSmallResponse sendTmpMsg(String appid, Function<String, SendTemplateMsgRequest> func){
         String token = getAccessToken(appid);
-        return clients.sendTmpMsgClient()
-                .request(func.apply(token));
+        return clients.sendTmpMsgClient().request(func.apply(token));
     }
 
     /**
@@ -93,7 +91,7 @@ public class WxSmallClientService {
      * @param func  构造客服消息请求
      * @return {@link WxSmallResponse}
      */
-    public Mono<WxSmallResponse> sendCustomMsg(String appid, Function<String, SendCustomMsgRequest> func){
+    public WxSmallResponse sendCustomMsg(String appid, Function<String, SendCustomMsgRequest> func){
         String token = getAccessToken(appid);
         SendCustomMsgRequest request = func.apply(token);
 
@@ -140,7 +138,7 @@ public class WxSmallClientService {
      * @param auditId 审核编号
      * @return 小程序认证输出
      */
-    public Mono<GetAuditStatusResponse> getAuditStatus(String appid, String auditId){
+    public GetAuditStatusResponse getAuditStatus(String appid, String auditId){
         String token = getAccessToken(appid);
         GetAuditStatusRequest request = new GetAuditStatusRequest(token, auditId);
 
@@ -153,7 +151,7 @@ public class WxSmallClientService {
      * @param appid 小程序appid
      * @return 小程序目录输出
      */
-    public Mono<GetCategoryResponse> getCategory(String appid){
+    public GetCategoryResponse getCategory(String appid){
         String token = getAccessToken(appid);
         WxSmallRequest request = new WxSmallRequest(token);
 
@@ -170,7 +168,7 @@ public class WxSmallClientService {
      * @param extJson     模板配置
      * @return {@link WxSmallResponse}
      */
-     public Mono<WxSmallResponse> promgramCommit(String appid, String templateId,
+     public WxSmallResponse promgramCommit(String appid, String templateId,
                                                  String userVersion, String userDesc, String extJson){
         String token = getAccessToken(appid);
          ProgramCommitRequest request  = new ProgramCommitRequest(token, templateId, userVersion, userDesc, extJson);
@@ -184,7 +182,7 @@ public class WxSmallClientService {
      * @param appid 微信appid
      * @return {@link WxSmallResponse}
      */
-     public Mono<WxSmallResponse> promgramRelease(String appid){
+     public WxSmallResponse promgramRelease(String appid){
          String token = getAccessToken(appid);
          WxSmallRequest request = new WxSmallRequest(token);
 
@@ -198,7 +196,7 @@ public class WxSmallClientService {
      * @param webViewDomain 小程序业务域
      * @return {@link WxSmallResponse}
      */
-     public Mono<WxSmallResponse> setWebViewDomain(String appid, String webViewDomain){
+     public WxSmallResponse setWebViewDomain(String appid, String webViewDomain){
          String token = getAccessToken(appid);
          SetWebViewDomainRequest request = new SetWebViewDomainRequest(token, "add", webViewDomain);
 
@@ -212,7 +210,7 @@ public class WxSmallClientService {
      * @param func  构建请求方法
      * @return {@link SubmitAuditResponse}
      */
-     public Mono<SubmitAuditResponse>  submitAudit(String appid, Function<SubmitAuditRequest, SubmitAuditRequest> func){
+     public SubmitAuditResponse  submitAudit(String appid, Function<SubmitAuditRequest, SubmitAuditRequest> func){
          String token = getAccessToken(appid);
          SubmitAuditRequest request = new SubmitAuditRequest(token);
 
@@ -229,7 +227,7 @@ public class WxSmallClientService {
      * @param downlandDomain   下载域
      * @return {@link WxSmallResponse}
      */
-     public Mono<WxSmallResponse> updateDomain(String appid, String requestDomain,
+     public WxSmallResponse updateDomain(String appid, String requestDomain,
                                                String wsRequestDomain, String uploadDomain, String downlandDomain){
 
          String token = getAccessToken(appid);
@@ -247,7 +245,7 @@ public class WxSmallClientService {
      * @param keywordIds 关键字编号
      * @return {@link MessageTemplateAddResponse}
      */
-     public Mono<MessageTemplateAddResponse> addMessageTemplate(String appid, String id, List<Integer> keywordIds){
+     public MessageTemplateAddResponse addMessageTemplate(String appid, String id, List<Integer> keywordIds){
 
          String token = getAccessToken(appid);
          MessageTemplateAddRequest request = new MessageTemplateAddRequest(token, id, keywordIds);
@@ -262,7 +260,7 @@ public class WxSmallClientService {
      * @param templateId  微信模板编号
      * @return {@link WxSmallResponse}
      */
-     public Mono<WxSmallResponse> delMessageTemplate(String appid, String templateId){
+     public WxSmallResponse delMessageTemplate(String appid, String templateId){
          String token = getAccessToken(appid);
          MessageTemplateDelRequest request = new MessageTemplateDelRequest(token, templateId);
 
@@ -277,7 +275,7 @@ public class WxSmallClientService {
      * @param count   offset和count用于分页，表示从offset开始，拉取count条记录，offset从0开始，count最大为20
      * @return {@link MessageTemplateQueryResponse}
      */
-     public Mono<MessageTemplateQueryResponse> queryMessageTemplate(String appid, int offset, int count){
+     public MessageTemplateQueryResponse queryMessageTemplate(String appid, int offset, int count){
          String token = getAccessToken(appid);
          MessageTemplateQueryRequest request = new MessageTemplateQueryRequest(token, offset, count);
 

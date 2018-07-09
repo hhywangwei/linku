@@ -1,12 +1,14 @@
 package com.tuoshecx.server.wx.small.event;
 
 import com.tuoshecx.server.wx.component.client.ComponentClientService;
-import com.tuoshecx.server.wx.component.encrypt.WxEncrypt;
+import com.tuoshecx.server.wx.component.client.response.ObtainQueryAuthResponse;
 import com.tuoshecx.server.wx.small.client.impl.WxSmallClients;
 import com.tuoshecx.server.wx.small.client.request.SendCustomMsgRequest;
+import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
@@ -15,9 +17,9 @@ class WxMessageTestHandler extends SmallBaseEventHandler {
     private final ComponentClientService componentClientService;
     private final WxSmallClients clients;
 
-    WxMessageTestHandler( ComponentClientService clientService) {
+    WxMessageTestHandler(RestTemplate restTemplate, ComponentClientService clientService) {
         this.componentClientService = clientService;
-        this.clients = new WxSmallClients();
+        this.clients = new WxSmallClients(restTemplate);
     }
 
     @Override
@@ -36,23 +38,22 @@ class WxMessageTestHandler extends SmallBaseEventHandler {
         String authCode = StringUtils.remove(content, "QUERY_AUTH_CODE:");
 
         LOGGER.debug("WeiXin send message test, auth code is {}", authCode);
-        componentClientService.obtainQueryAuth(authCode).subscribe(e -> {
-            if(e.getCode() != 0){
-                LOGGER.error("Query auth fail, error code {} message", e.getCode(), e.getMessage());
-                return ;
-            }
+        ObtainQueryAuthResponse response = componentClientService.obtainQueryAuth(authCode);
+        if(response.getCode() != 0){
+            LOGGER.error("Query auth fail, error code {} message", response.getCode(), response.getMessage());
+            return "fail";
+        }
 
-            SendCustomMsgRequest request =  SendCustomMsgRequest.buildText(
-                    e.getAuthorizerAccessToken(), toUser, buildContent(authCode));
+        SendCustomMsgRequest request =  SendCustomMsgRequest.buildText(
+                response.getAuthorizerAccessToken(), toUser, buildContent(authCode));
 
-            clients.sendCustomMsgClient().request(request).subscribe(o -> {
-                if(o.getCode() == 0){
-                    LOGGER.info("Send custom test message success");
-                }else{
-                    LOGGER.error("Send custom test message fail, code {} message {}", o.getCode(), o.getMessage());
-                }
-            });
-        });
+        WxSmallResponse customResponse = clients.sendCustomMsgClient().request(request);
+        if(customResponse.getCode() == 0){
+            LOGGER.info("Send custom test message success");
+        }else{
+            LOGGER.error("Send custom test message fail, code {} message {}",
+                    customResponse.getCode(), customResponse.getMessage());
+        }
 
         return "success";
     }

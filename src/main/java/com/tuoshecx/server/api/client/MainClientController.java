@@ -10,6 +10,7 @@ import com.tuoshecx.server.security.token.TokenService;
 import com.tuoshecx.server.user.domain.User;
 import com.tuoshecx.server.user.service.UserService;
 import com.tuoshecx.server.wx.small.client.WxSmallClientService;
+import com.tuoshecx.server.wx.small.client.response.LoginResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
@@ -49,13 +51,13 @@ public class MainClientController {
 
     @PostMapping(value = "wxLogin", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation(value = "微信小程序用户登陆")
-    public Mono<ResultVo<LoginVo<User>>> wxLogin(@Validated @RequestBody WxLoginForm form, BindingResult result){
+    public ResultVo<LoginVo<User>> wxLogin(@Validated @RequestBody WxLoginForm form, BindingResult result){
         if(result.hasErrors()){
-            return Mono.create(e -> ResultVo.error(result.getAllErrors()));
+            return ResultVo.error(result.getAllErrors());
         }
 
-        return wxService.login(form.getAppid(), form.getCode())
-                .map(e -> e.map(this::loginOpenid).orElseGet(()-> ResultVo.error(100, "用登陆失败")));
+        Optional<String> optional = wxService.login(form.getAppid(), form.getCode());
+        return optional.map(this::loginOpenid).orElseGet(() -> ResultVo.error(100, "用登陆失败"));
     }
 
     private ResultVo<LoginVo<User>> loginOpenid(String openid){

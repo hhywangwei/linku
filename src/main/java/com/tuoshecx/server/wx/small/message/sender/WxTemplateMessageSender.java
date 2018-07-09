@@ -3,6 +3,7 @@ package com.tuoshecx.server.wx.small.message.sender;
 import com.tuoshecx.server.common.id.IdGenerators;
 import com.tuoshecx.server.wx.small.client.WxSmallClientService;
 import com.tuoshecx.server.wx.small.client.request.SendTemplateMsgRequest;
+import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
 import com.tuoshecx.server.wx.small.message.domain.SmallTemplate;
 import com.tuoshecx.server.wx.small.message.domain.SendMessage;
 import com.tuoshecx.server.wx.small.message.service.SendMessageService;
@@ -46,14 +47,12 @@ public class WxTemplateMessageSender {
         }
 
         SmallTemplate template = optional.get();
-        clientService.sendTmpMsg(message.getAppid(), e -> buildRequest(e, template.getTemplateId(),t))
-                .subscribe(e -> {
-                    if(e.getCode() == 0){
-                        service.success(t.getId());
-                    }else{
-                        service.fail(t.getId(), e.getMessage());
-                    }
-                });
+        WxSmallResponse response = clientService.sendTmpMsg(message.getAppid(), e -> buildRequest(e, template.getTemplateId(),t));
+        if(response.getCode() == 0){
+            service.success(t.getId());
+        }else{
+            service.fail(t.getId(), response.getMessage());
+        }
     }
 
     private SendMessage saveMessage(SmallTemplateMessage message){

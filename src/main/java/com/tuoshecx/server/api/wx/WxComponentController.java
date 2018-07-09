@@ -10,6 +10,8 @@ import com.tuoshecx.server.shop.domain.ShopWxToken;
 import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.shop.service.ShopWxService;
 import com.tuoshecx.server.wx.component.client.ComponentClientService;
+import com.tuoshecx.server.wx.component.client.response.ObtainAuthorizerInfoResponse;
+import com.tuoshecx.server.wx.component.client.response.ObtainPreAuthCodeResponse;
 import com.tuoshecx.server.wx.component.client.response.ObtainQueryAuthResponse;
 import com.tuoshecx.server.wx.component.encrypt.WxEncrypt;
 import com.tuoshecx.server.wx.component.encrypt.WxEncryptException;
@@ -28,7 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.DeferredResult;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -100,25 +101,21 @@ public class WxComponentController {
     }
 
     @GetMapping(value = "preAuthorizer", produces = APPLICATION_JSON_UTF8_VALUE)
-    public DeferredResult<ResultVo<String>> preAuthorizer(@RequestParam(required = false) String shopId){
-        DeferredResult<ResultVo<String>> result = new DeferredResult<>();
-
+    public ResultVo<String> preAuthorizer(@RequestParam(required = false) String shopId){
         String redirectUri = properties.getRedirectUri() +
                 "?shop_id=" + (StringUtils.isBlank(shopId)? "wx10000001" : shopId);
 
-        clientService.obtainPreAuthCode().subscribe(e ->{
-            if(e.getCode() == 0){
-                String c = String.format("https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid=%s&pre_auth_code=%s&" +
-                        "redirect_uri=%s&auth_type=%d", properties.getAppid(), e.getPreAuthCode(), urlEncoder(redirectUri), 2);
-                LOGGER.debug("Wx authorizer url is {}", c);
-                result.setResult(ResultVo.success(c));
-            }else {
-                LOGGER.error("Obtain pre auth code fail, code {} message {}", e.getCode(), e.getMessage());
-                result.setResult(ResultVo.error(150, "得到预授权码失败"));
-            }
-        });
+        ObtainPreAuthCodeResponse response =clientService.obtainPreAuthCode();
 
-        return result;
+        if(response.getCode() == 0){
+            String c = String.format("https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid=%s&pre_auth_code=%s&" +
+                    "redirect_uri=%s&auth_type=%d", properties.getAppid(), response.getPreAuthCode(), urlEncoder(redirectUri), 2);
+            LOGGER.debug("Wx authorizer url is {}", c);
+            return ResultVo.success(c);
+        }else {
+            LOGGER.error("Obtain pre auth code fail, code {} message {}", response.getCode(), response.getMessage());
+            return ResultVo.error(150, "得到预授权码失败");
+        }
     }
 
     private String urlEncoder(String v){
@@ -130,45 +127,44 @@ public class WxComponentController {
     }
 
     @GetMapping(value = "authorizer", produces = MediaType.TEXT_HTML_VALUE)
-    public DeferredResult<ResponseEntity<String>> authorizer(
+    public ResponseEntity<String> authorizer(
             @RequestParam(value="auth_code") String authCode,
             @RequestParam(value="expires_in") Integer expiresIn,
             @RequestParam(value = "shop_id", required = false)String shopId){
 
         LOGGER.info("Start shop {} authorizer auth code {} expire in {}", shopId, authCode, expiresIn);
 
-        DeferredResult<ResponseEntity<String>> result = new DeferredResult<>();
         Shop s = shopService.get(shopId);
         if(isClose(s.getState())){
             throw new BaseException("店铺已经关闭");
         }
 
-        clientService.obtainQueryAuth(authCode).subscribe(e -> {
-            int validateCode = validateAppid(shopId, e.getAuthorizerAppid());
-            if(validateCode != 0){
-                String uri = properties.getFailUri() + "?code=" + validateCode;
-                redirectUri(result, uri);
-                return ;
-            }
-            LOGGER.debug("Validate appid {} code is {}", e.getAuthorizerAppid(), validateCode);
+        ObtainQueryAuthResponse response = clientService.obtainQueryAuth(authCode);
+        int validateCode = validateAppid(shopId, response.getAuthorizerAppid());
+        if(validateCode != 0){
+            String uri = properties.getFailUri() + "?code=" + validateCode;
+            return redirectUri(uri);
+        }
 
-            if(!isSuccess(e.getCode())){
-                LOGGER.error("Obtain token fail, shopId {} code {} message {}", shopId, e.getCode(), e.getMessage());
-                String uri = properties.getFailUri() + "?code=" + 20000;
-                redirectUri(result, uri);
-            }
+        LOGGER.debug("Validate appid {} code is {}", response.getAuthorizerAppid(), validateCode);
 
-            try {
-                saveAuthorizerToken(shopId, e);
-                noticeInitMessageTemplate(e.getAuthorizerAppid());
-                saveAuthorizerConfigure(shopId, e.getAuthorizerAppid(), result);
-            }catch (Exception ex){
-                LOGGER.error("Init {} authorizer info fail, error is {}", ex.getMessage());
-                String uri = properties.getFailUri() + "?code=" + 20000;
-                redirectUri(result, uri);
-            }
-        });
-        return result;
+        if(!isSuccess(response.getCode())){
+            LOGGER.error("Obtain token fail, shopId {} code {} message {}", shopId, response.getCode(), response.getMessage());
+            String uri = properties.getFailUri() + "?code=" + 20000;
+            return redirectUri(uri);
+        }
+
+        try {
+            saveAuthorizerToken(shopId, response);
+            saveAuthorizerConfigure(shopId, response.getAuthorizerAppid());
+            noticeInitMessageTemplate(response.getAuthorizerAppid());
+            String uri = properties.getSuccessUri() + "?appid=" + response.getAuthorizerAppid();
+            return redirectUri(uri);
+        }catch (Exception ex){
+            LOGGER.error("Init {} authorizer info fail, error is {}", ex.getMessage());
+            String uri = properties.getFailUri() + "?code=" + 20000;
+            return redirectUri(uri);
+        }
     }
 
     private boolean isClose(Shop.State state){
@@ -208,38 +204,31 @@ public class WxComponentController {
         return 0;
     }
 
-    private void saveAuthorizerConfigure(String shopId, String authorizerAppid, DeferredResult<ResponseEntity<String>> result){
-        clientService.obtainAuthorizerInfo(authorizerAppid).subscribe(e -> {
-            if(isSuccess(e.getCode())){
-                ShopWxAuthorized t = new ShopWxAuthorized();
-                t.setAppid(authorizerAppid);
-                t.setShopId(shopId);
-                t.setAuthorization(true);
-                t.setQrcodeUrl(e.getQrcodeUrl());
-                t.setName(e.getPrincipalName());
-                t.setNickname(e.getNickname());
-                t.setUsername(e.getUsername());
-                t.setHeadImg(e.getHeadImg());
-                t.setVerifyTypeInfo(e.getVerifyTypeInfo());
-                t.setServiceTypeInfo(e.getServiceTypeInfo());
-                t.setAuthorizationInfo(toJson(e.getAuthorizationInfo()));
-                t.setMiniProgramInfo(toJson(e.getMiniProgramInfo()));
-                t.setBusinessInfo(toJson(e.getBusinessInfo()));
-
-                shopWxService.saveAuthorized(t);
-
-                String uri = properties.getSuccessUri() + "?appid=" + authorizerAppid;
-                redirectUri(result, uri);
-            }else {
-                LOGGER.error("Save authorizer info fail, appid {} errCode {}", authorizerAppid, e.getCode());
-                String uri = properties.getFailUri() + "?code=" + 20000;
-                redirectUri(result, uri);
-            }
-        });
+    private void saveAuthorizerConfigure(String shopId, String authorizerAppid){
+        ObtainAuthorizerInfoResponse response = clientService.obtainAuthorizerInfo(authorizerAppid);
+        if(isSuccess(response.getCode())){
+            ShopWxAuthorized t = new ShopWxAuthorized();
+            t.setAppid(authorizerAppid);
+            t.setShopId(shopId);
+            t.setAuthorization(true);
+            t.setQrcodeUrl(response.getQrcodeUrl());
+            t.setName(response.getPrincipalName());
+            t.setNickname(response.getNickname());
+            t.setUsername(response.getUsername());
+            t.setHeadImg(response.getHeadImg());
+            t.setVerifyTypeInfo(response.getVerifyTypeInfo());
+            t.setServiceTypeInfo(response.getServiceTypeInfo());
+            t.setAuthorizationInfo(toJson(response.getAuthorizationInfo()));
+            t.setMiniProgramInfo(toJson(response.getMiniProgramInfo()));
+            t.setBusinessInfo(toJson(response.getBusinessInfo()));
+            shopWxService.saveAuthorized(t);
+        }else {
+            LOGGER.error("Save authorizer info fail, appid {} errCode {}", authorizerAppid, response.getCode());
+        }
     }
 
-    private void redirectUri(DeferredResult<ResponseEntity<String>> result, String uri){
-        result.setResult(ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).header(HttpHeaders.LOCATION, uri).build());
+    private ResponseEntity<String> redirectUri(String uri){
+        return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT).header(HttpHeaders.LOCATION, uri).build();
     }
 
     private String toJson(Map<String,Object> data){

@@ -13,6 +13,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * 微信支付配置
@@ -22,7 +26,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 @Configuration
 @EnableConfigurationProperties({WxPayProperties.class, TokenProperties.class, UploadProperties.class})
 public class LinkuConfigure {
-    private static final Logger logger = LoggerFactory.getLogger(LinkuConfigure.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkuConfigure.class);
 
     @Autowired
     @Bean
@@ -30,4 +34,9 @@ public class LinkuConfigure {
         return new SimpleTokenService(new RedisTokenRepository(redisTemplate, 60));
     }
 
+    @Bean
+    public RestTemplate restTemplate(){
+        ClientHttpRequestFactory clientHttpRequestFactory = new OkHttp3ClientHttpRequestFactory();
+        return new RestTemplate(clientHttpRequestFactory);
+    }
 }

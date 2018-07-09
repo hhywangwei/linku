@@ -10,6 +10,7 @@ buildscript {
         swaggerVersion= '1.5.12'
         springfoxVersion = '2.7.0'
         bcprovVersion = '1.46'
+        okhttpVersion= '3.10.0'
         thumbnailatorVersion = '0.4.8'
     }
     repositories {
@@ -44,11 +45,11 @@ tasks.withType(JavaCompile) {
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile "org.springframework.boot:spring-boot-starter-jdbc"
-    compile "org.springframework.boot:spring-boot-starter-webflux"
     compile 'org.springframework.boot:spring-boot-starter-data-redis'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'mysql:mysql-connector-java'
     compile 'org.flywaydb:flyway-core'
+    compile "com.squareup.okhttp3:okhttp:${okhttpVersion}"
     compile "org.bouncycastle:bcprov-jdk15:${bcprovVersion}"
     compile "org.apache.commons:commons-lang3:${lang3Version}"
     compile "commons-codec:commons-codec:${commonsCodecVersion}"

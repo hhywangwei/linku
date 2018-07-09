@@ -1,17 +1,11 @@
 package com.tuoshecx.server.wx.small.client.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.wx.small.client.request.SendCustomMsgRequest;
 import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
-import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.nio.charset.Charset;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -21,36 +15,19 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 class SendCustomMsgClient extends WxSmallClient<SendCustomMsgRequest, WxSmallResponse> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SendCustomMsgClient.class);
-    private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
 
-    SendCustomMsgClient() {
-        super("sendCustomMsg");
+    SendCustomMsgClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        super(restTemplate, objectMapper, "sendCustomMsg");
     }
 
     @Override
-    protected Mono<byte[]> doRequest(WebClient client, SendCustomMsgRequest request) {
-        String body = body(request);
-        LOGGER.debug("Request send custom body is {}", body);
-
-        byte[] bytes = body.getBytes(UTF_8_CHARSET);
-
-        return client.post()
-                .uri(e -> buildUrl(e, request))
-                .headers(e -> e.setContentLength(bytes.length))
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(bytes))
-                .retrieve()
-                .bodyToMono(byte[].class);
+    protected String buildUri(SendCustomMsgRequest request) {
+        return "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={token}";
     }
 
-    private URI buildUrl(UriBuilder builder, SendCustomMsgRequest request){
-        return builder
-                .scheme("https")
-                .host("api.weixin.qq.com")
-                .path("/cgi-bin/message/custom/send")
-                .queryParam("access_token", request.getToken())
-                .build();
+    @Override
+    protected Object[] uriParams(SendCustomMsgRequest request) {
+        return new Object[]{request.getToken()};
     }
 
     @Override
@@ -58,7 +35,8 @@ class SendCustomMsgClient extends WxSmallClient<SendCustomMsgRequest, WxSmallRes
         return new WxSmallResponse(data);
     }
 
-    private String body(SendCustomMsgRequest request){
+    @Override
+    protected String buildBody(SendCustomMsgRequest request){
         StringBuilder builder = new StringBuilder(200);
 
         builder.append("{\"touser\":\"").append(request.getOpenid()).append("\",");

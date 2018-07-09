@@ -1,17 +1,11 @@
 package com.tuoshecx.server.wx.small.client.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.wx.small.client.request.UpdateDomainRequest;
 import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
-import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.nio.charset.Charset;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Map;
 
 /**
@@ -20,39 +14,23 @@ import java.util.Map;
  * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 class UpdateDomainClient extends WxSmallClient<UpdateDomainRequest, WxSmallResponse> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateDomainClient.class);
-    private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
 
-    UpdateDomainClient() {
-        super("updateDomain");
+    UpdateDomainClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+        super(restTemplate, objectMapper, "updateDomain");
     }
 
     @Override
-    protected Mono<byte[]> doRequest(WebClient client, UpdateDomainRequest request) {
-        String body = body(request);
-        LOGGER.debug("Request Update domain body is {}", body);
-
-        byte[] bytes = body.getBytes(UTF_8_CHARSET);
-
-        return client.post()
-                .uri(e -> buildUrl(e, request))
-                .headers(e -> e.setContentLength(bytes.length))
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(bytes))
-                .retrieve()
-                .bodyToMono(byte[].class);
+    protected String buildUri(UpdateDomainRequest request) {
+        return "https://api.weixin.qq.com/wxa/modify_domain?access_token={token}";
     }
 
-    private URI buildUrl(UriBuilder builder, UpdateDomainRequest request){
-        return builder
-                .scheme("https")
-                .host("api.weixin.qq.com")
-                .path("/wxa/modify_domain")
-                .queryParam("access_token", request.getToken())
-                .build();
+    @Override
+    protected Object[] uriParams(UpdateDomainRequest request) {
+        return new Object[]{request.getToken()};
     }
 
-    private String body(UpdateDomainRequest request){
+    @Override
+    protected String buildBody(UpdateDomainRequest request){
         StringBuilder builder = new StringBuilder(200);
 
         builder.append("{\"action\":\"").append(request.getAction()).append("\",");

@@ -9,8 +9,13 @@ import com.tuoshecx.server.wx.component.token.ComponentVerifyTicketService;
 import com.tuoshecx.server.wx.configure.properties.WxComponentProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
 
+/**
+ * 微信第三方平台客户端业务服务
+ *
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
+ */
 @Service
 public class ComponentClientService {
     private final WxComponentProperties properties;
@@ -19,40 +24,40 @@ public class ComponentClientService {
     private final ComponentVerifyTicketService verifyTicketService;
 
     @Autowired
-    public ComponentClientService(WxComponentProperties properties, ComponentTokenService tokenService,
-                                  ComponentVerifyTicketService verifyTicketService){
+    public ComponentClientService(WxComponentProperties properties, RestTemplate restTemplate,
+                                  ComponentTokenService tokenService, ComponentVerifyTicketService verifyTicketService){
 
         this.properties = properties;
         this.tokenService = tokenService;
         this.verifyTicketService = verifyTicketService;
-        this.clients = new ComponentClients();
+        this.clients = new ComponentClients(restTemplate);
     }
 
-    public Mono<ObtainAccessTokenResponse> obtainAccessToken(){
+    public ObtainAccessTokenResponse obtainAccessToken(){
         ObtainAccessTokenRequest request = new ObtainAccessTokenRequest(properties.getAppid(),
                 properties.getSecret(), verifyTicketService.get(properties.getAppid()));
         return clients.getObtainAccessTokenClient().request(request);
     }
 
-    public Mono<ObtainAuthorizerInfoResponse> obtainAuthorizerInfo(String authorizerAppid){
+    public ObtainAuthorizerInfoResponse obtainAuthorizerInfo(String authorizerAppid){
         ObtainAuthorizerInfoRequest request = new ObtainAuthorizerInfoRequest(getComponentToken(properties.getAppid()),
                 properties.getAppid(), authorizerAppid);
         return clients.getObtainAuthorizerInfoClient().request(request);
     }
 
-    public Mono<ObtainAuthorizerTokenResponse> obtainAuthorizerToken(String authorizerAppid, String authorizerRefreshToken){
+    public ObtainAuthorizerTokenResponse obtainAuthorizerToken(String authorizerAppid, String authorizerRefreshToken){
         ObtainAuthorizerTokenRequest request = new ObtainAuthorizerTokenRequest(getComponentToken(properties.getAppid()),
                 properties.getAppid(), authorizerAppid, authorizerRefreshToken);
         return clients.getObtainAuthorizerTokenClient().request(request);
     }
 
-    public Mono<ObtainPreAuthCodeResponse> obtainPreAuthCode(){
+    public ObtainPreAuthCodeResponse obtainPreAuthCode(){
         ObtainPreAuthCodeRequest request = new ObtainPreAuthCodeRequest(
                 getComponentToken(properties.getAppid()), properties.getAppid());
         return clients.getObtainPreAuthCodeClient().request(request);
     }
 
-    public Mono<ObtainQueryAuthResponse> obtainQueryAuth(String authorizationCode){
+    public ObtainQueryAuthResponse obtainQueryAuth(String authorizationCode){
         ObtainQueryAuthRequest request = new ObtainQueryAuthRequest(
                 getComponentToken(properties.getAppid()), properties.getAppid(), authorizationCode);
         return clients.getObtainQueryAuthClient().request(request);

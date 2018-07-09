@@ -1,6 +1,7 @@
 package com.tuoshecx.server.wx.component.token;
 
 import com.tuoshecx.server.wx.component.client.ComponentClientService;
+import com.tuoshecx.server.wx.component.client.response.ObtainAccessTokenResponse;
 import com.tuoshecx.server.wx.configure.properties.WxComponentProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +31,13 @@ public class ComponentTokenSchedule {
     public void refreshComponentToken(){
         if(tokenService.isExpired(properties.getAppid())){
             try{
-                clientService.obtainAccessToken().subscribe(e -> {
-                    if(e.getCode() == 0) {
-                        LOGGER.debug("Refresh component token success ...");
-                        tokenService.save(properties.getAppid(), e.getComponentAccessToken(), e.getExpiresIn());
-                    }else{
-                        LOGGER.error("Refresh component token fail, code is {}", e.getCode());
-                    }
-                });
+                ObtainAccessTokenResponse response = clientService.obtainAccessToken();
+                if(response.getCode() == 0) {
+                    LOGGER.debug("Refresh component token success ...");
+                    tokenService.save(properties.getAppid(), response.getComponentAccessToken(), response.getExpiresIn());
+                }else{
+                    LOGGER.error("Refresh component token fail, code is {}", response.getCode());
+                }
             }catch (Exception e){
                 LOGGER.error("refresh component token fail, error is {}", e.getMessage());
             }

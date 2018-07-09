@@ -29,40 +29,40 @@ import java.security.KeyStore;
 public class WxConfigure {
     private static final Logger logger = LoggerFactory.getLogger(WxConfigure.class);
 
-    @Autowired
-    @Bean(name = "wxPayConnector")
-    public ClientHttpConnector wxPayConnector(ResourceLoader resourceLoader, WxPayProperties properties){
-        final char[] password = properties.getKeystore().getPassword().toCharArray();
-
-        final KeyStore keyStore;
-        try(InputStream in = resourceLoader.getResource(properties.getKeystore().getUri()).getInputStream()) {
-            keyStore  = KeyStore.getInstance("PKCS12");
-            keyStore.load(in, password);
-        }catch (Exception e){
-            logger.error("Local keystore fail, error is {}", e.getMessage());
-            throw new RuntimeException("Local keystore fail, error is " + e.getMessage());
-        }
-
-        return new ReactorClientHttpConnector(
-                builder -> builder.compression(true).sslSupport(e -> setSslContext(e, keyStore, password)));
-    }
-
-    private void setSslContext(SslContextBuilder builder, KeyStore keyStore, char[] password){
-        try{
-            String alg = KeyManagerFactory.getDefaultAlgorithm();
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(alg);
-            kmf.init(keyStore, password);
-            builder.keyManager(kmf)
-                    .protocols("TLSv1");
-        }catch (Exception e){
-            logger.error("Set ssl context fail, error is {}", e.getMessage());
-            throw new RuntimeException("Set ssl context fail, error is " + e.getMessage());
-        }
-    }
-
-    @Bean
-    @Autowired
-    public WxEncrypt initWxEncrypt(WxComponentProperties properties){
-        return new WxEncrypt(properties.getValidateToken(), properties.getEncodingAesKey(), properties.getAppid());
-    }
+//    @Autowired
+//    @Bean(name = "wxPayConnector")
+//    public ClientHttpConnector wxPayConnector(ResourceLoader resourceLoader, WxPayProperties properties){
+//        final char[] password = properties.getKeystore().getPassword().toCharArray();
+//
+//        final KeyStore keyStore;
+//        try(InputStream in = resourceLoader.getResource(properties.getKeystore().getUri()).getInputStream()) {
+//            keyStore  = KeyStore.getInstance("PKCS12");
+//            keyStore.load(in, password);
+//        }catch (Exception e){
+//            logger.error("Local keystore fail, error is {}", e.getMessage());
+//            throw new RuntimeException("Local keystore fail, error is " + e.getMessage());
+//        }
+//
+//        return new ReactorClientHttpConnector(
+//                builder -> builder.compression(true).sslSupport(e -> setSslContext(e, keyStore, password)));
+//    }
+//
+//    private void setSslContext(SslContextBuilder builder, KeyStore keyStore, char[] password){
+//        try{
+//            String alg = KeyManagerFactory.getDefaultAlgorithm();
+//            KeyManagerFactory kmf = KeyManagerFactory.getInstance(alg);
+//            kmf.init(keyStore, password);
+//            builder.keyManager(kmf)
+//                    .protocols("TLSv1");
+//        }catch (Exception e){
+//            logger.error("Set ssl context fail, error is {}", e.getMessage());
+//            throw new RuntimeException("Set ssl context fail, error is " + e.getMessage());
+//        }
+//    }
+//
+//    @Bean
+//    @Autowired
+//    public WxEncrypt initWxEncrypt(WxComponentProperties properties){
+//        return new WxEncrypt(properties.getValidateToken(), properties.getEncodingAesKey(), properties.getAppid());
+//    }
 }

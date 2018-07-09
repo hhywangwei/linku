@@ -1,15 +1,11 @@
 package com.tuoshecx.server.wx.small.client.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.wx.small.client.request.WxSmallRequest;
 import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
-import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.nio.charset.Charset;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Map;
 
 /**
@@ -18,34 +14,24 @@ import java.util.Map;
  * author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 class ProgramReleaseClient extends WxSmallClient<WxSmallRequest, WxSmallResponse> {
-    private static final Charset UTF_8_CHARSET = Charset.forName("UTF-8");
 
-    ProgramReleaseClient(){
-        super("programRelease");
+    ProgramReleaseClient(RestTemplate restTemplate, ObjectMapper objectMapper){
+        super(restTemplate, objectMapper, "programRelease");
     }
 
     @Override
-    protected Mono<byte[]> doRequest(WebClient client, WxSmallRequest request) {
-        String body = "{}";
-
-        byte[] bytes = body.getBytes(UTF_8_CHARSET);
-
-        return client.post()
-                .uri(e -> buildUrl(e, request))
-                .headers(e -> e.setContentLength(bytes.length))
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                .body(BodyInserters.fromObject(bytes))
-                .retrieve()
-                .bodyToMono(byte[].class);
+    protected String buildBody(WxSmallRequest request) {
+        return "{}";
     }
 
-    private URI buildUrl(UriBuilder builder, WxSmallRequest request){
-        return builder
-                .scheme("https")
-                .host("api.weixin.qq.com")
-                .path("/wxa/release")
-                .queryParam("access_token", request.getToken())
-                .build();
+    @Override
+    protected String buildUri(WxSmallRequest request) {
+        return "https://api.weixin.qq.com/wxa/release?access_token={token}";
+    }
+
+    @Override
+    protected Object[] uriParams(WxSmallRequest request) {
+        return new Object[]{request.getToken()};
     }
 
     @Override

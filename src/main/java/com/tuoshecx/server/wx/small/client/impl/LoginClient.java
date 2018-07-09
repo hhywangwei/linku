@@ -1,15 +1,10 @@
 package com.tuoshecx.server.wx.small.client.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuoshecx.server.wx.small.client.request.LoginRequest;
 import com.tuoshecx.server.wx.small.client.response.LoginResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
 import java.util.Map;
 
 /**
@@ -18,35 +13,34 @@ import java.util.Map;
  * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 class LoginClient extends WxSmallClient<LoginRequest, LoginResponse> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginClient.class);
+    private final RestTemplate restTemplate;
 
-    LoginClient(){
-        super("loginClient");
+    LoginClient(RestTemplate restTemplate, ObjectMapper objectMapper){
+        super(restTemplate, objectMapper, "loginClient");
+        this.restTemplate = restTemplate;
     }
 
     @Override
-    protected Mono<byte[]> doRequest(WebClient client, LoginRequest request) {
-        return client.get()
-                .uri(builder ->buildURI(builder, request))
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                .retrieve()
-                .bodyToMono(byte[].class);
+    public LoginResponse request(LoginRequest request) {
+        return doResponse(restTemplate.getForEntity(buildUri(request), byte[].class, uriParams(request)));
     }
 
-    private URI buildURI(UriBuilder builder, LoginRequest request){
-        URI uri = builder.scheme("https")
-                .host("api.weixin.qq.com")
-                .path("/sns/component/jscode2session")
-                .queryParam("appid", request.getAppid() )
-                .queryParam("js_code", request.getCode())
-                .queryParam("grant_type", "authorization_code")
-                .queryParam("component_appid", request.getComponentAppid())
-                .queryParam("component_access_token", request.getComponentToken())
-                .build();
+    @Override
+    protected String buildUri(LoginRequest loginRequest) {
+        return "https://api.weixin.qq.com/sns/component/jscode2session?" +
+                "appid={appid}&js_code={jsCode}&grant_type=authorization_code&" +
+                "component_appid={componentAppid}&component_access_token={componentAccessToken}";
+    }
 
-        LOGGER.debug("Wx small login uri is {}", uri.toString());
+    @Override
+    protected Object[] uriParams(LoginRequest request) {
+        return new Object[]{request.getAppid(), request.getCode(), request.getComponentAppid(), request.getComponentToken()};
+    }
 
-        return uri;
+    @Override
+    protected String buildBody(LoginRequest loginRequest) {
+        //not instance
+        return "";
     }
 
     @Override

@@ -27,10 +27,6 @@ public class InitSmallTemplateListener implements ApplicationListener<InitSmallT
     @Override
     public void onApplicationEvent(InitSmallTemplateEvent event) {
         LOGGER.info("Init {} message template...", event.getAppid());
-        try{
-            service.refresh(event.getAppid());
-        }catch (InterruptedException e){
-            LOGGER.error("Init {} message template fail, error is {}", event.getAppid(), e.getMessage());
-        }
+        service.refresh(event.getAppid());
     }
 }

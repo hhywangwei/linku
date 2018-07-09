@@ -4,6 +4,7 @@ import com.tuoshecx.server.common.mime.MimeConverters;
 import com.tuoshecx.server.wx.component.client.ComponentClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,8 @@ public class SmallEventHandlers {
     private final List<SmallEventHandler> handlers  = new ArrayList<>();
 
     @Autowired
-    public SmallEventHandlers(ComponentClientService clientService) {
-        handlers.add(new WxMessageTestHandler(clientService));
+    public SmallEventHandlers(RestTemplate restTemplate, ComponentClientService clientService) {
+        handlers.add(new WxMessageTestHandler(restTemplate, clientService));
         handlers.add(new NoneSmallEventHandler());
     }
 
