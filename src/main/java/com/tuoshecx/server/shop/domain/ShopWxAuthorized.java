@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * 店铺托管小程序信息
  *
- * @author <a href="hhywangwei@gmail.com">WangWei</a>
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 public class ShopWxAuthorized {
     @ApiModelProperty(value = "编号")

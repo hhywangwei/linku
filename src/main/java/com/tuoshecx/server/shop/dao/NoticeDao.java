@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 店铺通知数据操作
  *
- * @author <a href="hhywangwei@gmail.com">WangWei</a>
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 @Repository
 public class NoticeDao {

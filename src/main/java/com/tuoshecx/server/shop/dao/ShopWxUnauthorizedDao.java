@@ -9,6 +9,11 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.Date;
 
+/**
+ * 取消认证公众号信息数据操作
+ *
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
+ */
 @Repository
 public class ShopWxUnauthorizedDao {
     private final JdbcTemplate jdbcTemplate;

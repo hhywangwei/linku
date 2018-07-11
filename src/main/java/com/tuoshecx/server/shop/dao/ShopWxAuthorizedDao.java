@@ -11,6 +11,11 @@ import javax.sql.DataSource;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 微信公众号认证数据操作
+ *
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
+ */
 @Repository
 public class ShopWxAuthorizedDao {
     private final JdbcTemplate jdbcTemplate;

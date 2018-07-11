@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * 店铺微信托管Token信息
  *
- * @author <a href="hhywangwei@gmail.com">WangWei</a>
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 @ApiModel("店铺微信托管Token信息")
 public class ShopWxToken {
