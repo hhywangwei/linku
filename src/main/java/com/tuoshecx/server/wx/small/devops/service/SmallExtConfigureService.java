@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 小程序配置业务服务
@@ -64,8 +65,9 @@ public class SmallExtConfigureService {
         return dao.delete(id);
     }
 
-    public List<SmallExtConfigure> queryByTemplateId(Integer templateId){
-        return dao.findByTemplateId(templateId);
+    public Optional<SmallExtConfigure> getTemplateId(Integer templateId){
+        List<SmallExtConfigure> list =  dao.findByTemplateId(templateId);
+        return list.isEmpty()? Optional.empty() : Optional.of(list.get(0));
     }
 
     public long count(Integer templateId){

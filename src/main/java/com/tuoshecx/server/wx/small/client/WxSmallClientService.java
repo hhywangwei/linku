@@ -20,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -168,7 +169,7 @@ public class WxSmallClientService {
      * @param extJson     模板配置
      * @return {@link WxSmallResponse}
      */
-     public WxSmallResponse promgramCommit(String appid, String templateId,
+     public WxSmallResponse promgramCommit(String appid, Integer templateId,
                                                  String userVersion, String userDesc, String extJson){
         String token = getAccessToken(appid);
          ProgramCommitRequest request  = new ProgramCommitRequest(token, templateId, userVersion, userDesc, extJson);
@@ -196,7 +197,7 @@ public class WxSmallClientService {
      * @param webViewDomain 小程序业务域
      * @return {@link WxSmallResponse}
      */
-     public WxSmallResponse setWebViewDomain(String appid, String webViewDomain){
+     public WxSmallResponse setWebViewDomain(String appid, String[] webViewDomain){
          String token = getAccessToken(appid);
          SetWebViewDomainRequest request = new SetWebViewDomainRequest(token, "add", webViewDomain);
 
@@ -210,11 +211,11 @@ public class WxSmallClientService {
      * @param func  构建请求方法
      * @return {@link SubmitAuditResponse}
      */
-     public SubmitAuditResponse  submitAudit(String appid, Function<SubmitAuditRequest, SubmitAuditRequest> func){
+     public SubmitAuditResponse  submitAudit(String appid, Consumer<SubmitAuditRequest> consumer){
          String token = getAccessToken(appid);
          SubmitAuditRequest request = new SubmitAuditRequest(token);
-
-         return clients.submitAuditClient().request(func.apply(request));
+         consumer.accept(request);
+         return clients.submitAuditClient().request(request);
      }
 
     /**
@@ -227,8 +228,8 @@ public class WxSmallClientService {
      * @param downlandDomain   下载域
      * @return {@link WxSmallResponse}
      */
-     public WxSmallResponse updateDomain(String appid, String requestDomain,
-                                               String wsRequestDomain, String uploadDomain, String downlandDomain){
+     public WxSmallResponse updateDomain(String appid, String[] requestDomain, String[] wsRequestDomain,
+                                         String[] uploadDomain, String[] downlandDomain){
 
          String token = getAccessToken(appid);
          UpdateDomainRequest request = new UpdateDomainRequest(token, "add",

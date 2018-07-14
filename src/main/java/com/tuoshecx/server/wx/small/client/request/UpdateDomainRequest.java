@@ -7,12 +7,13 @@ package com.tuoshecx.server.wx.small.client.request;
  */
 public class UpdateDomainRequest extends WxSmallRequest{
     private final String action;
-    private final String requestDomain;
-    private final String wsRequestDomain;
-    private final String uploadDomain;
-    private final String downloadDomain;
+    private final String[] requestDomain;
+    private final String[] wsRequestDomain;
+    private final String[] uploadDomain;
+    private final String[] downloadDomain;
 
-    public UpdateDomainRequest(String token, String action, String requestDomain, String wsRequestDomain, String uploadDomain, String downloadDomain) {
+    public UpdateDomainRequest(String token, String action, String[] requestDomain,
+                               String[] wsRequestDomain, String[] uploadDomain, String[] downloadDomain) {
         super(token);
         this.action = action;
         this.requestDomain = requestDomain;
@@ -25,19 +26,19 @@ public class UpdateDomainRequest extends WxSmallRequest{
         return action;
     }
 
-    public String getRequestDomain() {
+    public String[] getRequestDomain() {
         return requestDomain;
     }
 
-    public String getWsRequestDomain() {
+    public String[] getWsRequestDomain() {
         return wsRequestDomain;
     }
 
-    public String getUploadDomain() {
+    public String[] getUploadDomain() {
         return uploadDomain;
     }
 
-    public String getDownloadDomain() {
+    public String[] getDownloadDomain() {
         return downloadDomain;
     }
 }

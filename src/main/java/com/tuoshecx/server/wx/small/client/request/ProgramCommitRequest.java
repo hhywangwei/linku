@@ -1,12 +1,12 @@
 package com.tuoshecx.server.wx.small.client.request;
 
 public class ProgramCommitRequest extends WxSmallRequest {
-    private final String templateId;
+    private final Integer templateId;
     private final String userVersion;
     private final String userDesc;
     private final String extJson;
 
-    public ProgramCommitRequest(String token, String templateId, String userVersion, String userDesc, String extJson) {
+    public ProgramCommitRequest(String token, Integer templateId, String userVersion, String userDesc, String extJson) {
         super(token);
         this.templateId = templateId;
         this.userVersion = userVersion;
@@ -14,7 +14,7 @@ public class ProgramCommitRequest extends WxSmallRequest {
         this.extJson = extJson;
     }
 
-    public String getTemplateId() {
+    public Integer getTemplateId() {
         return templateId;
     }
 

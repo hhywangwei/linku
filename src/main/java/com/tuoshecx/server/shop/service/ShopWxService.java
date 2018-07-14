@@ -78,6 +78,10 @@ public class ShopWxService {
         }
     }
 
+    public Optional<String> getAppid(String shopId){
+        return queryAuthorized(shopId).stream().map(ShopWxAuthorized::getAppid).findFirst();
+    }
+
     public List<ShopWxAuthorized> queryAuthorized(String shopId){
         return authorizedDao.findByShopId(shopId);
     }

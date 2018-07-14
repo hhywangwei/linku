@@ -24,8 +24,10 @@ public class SmallDeploy {
     private Boolean setDomain;
     @ApiModelProperty(value = "发布小程序模板编号")
     private Integer templateId;
-    @ApiModelProperty(value = "部署状态", allowableValues = "wait, audit, pass, refuse")
+    @ApiModelProperty(value = "部署状态", allowableValues = "WAIT, COMMIT, AUDIT, PASS, REFUSE, RELEASE")
     private String state;
+    @ApiModelProperty(value = "审核编号")
+    private String auditId;
     @ApiModelProperty(value = "发布备注")
     private String remark;
     @ApiModelProperty(value = "更新时间")
@@ -81,6 +83,14 @@ public class SmallDeploy {
         this.state = state;
     }
 
+    public String getAuditId() {
+        return auditId;
+    }
+
+    public void setAuditId(String auditId) {
+        this.auditId = auditId;
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -116,6 +126,7 @@ public class SmallDeploy {
                 Objects.equals(setDomain, that.setDomain) &&
                 Objects.equals(templateId, that.templateId) &&
                 Objects.equals(state, that.state) &&
+                Objects.equals(auditId, that.auditId) &&
                 Objects.equals(remark, that.remark) &&
                 Objects.equals(updateTime, that.updateTime) &&
                 Objects.equals(createTime, that.createTime);
@@ -124,7 +135,7 @@ public class SmallDeploy {
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, shopId, appid, setDomain, templateId, state, remark, updateTime, createTime);
+        return Objects.hash(id, shopId, appid, setDomain, templateId, state, auditId, remark, updateTime, createTime);
     }
 
     @Override
@@ -136,6 +147,7 @@ public class SmallDeploy {
                 .append("setDomain", setDomain)
                 .append("templateId", templateId)
                 .append("state", state)
+                .append("auditId", auditId)
                 .append("remark", remark)
                 .append("updateTime", updateTime)
                 .append("createTime", createTime)

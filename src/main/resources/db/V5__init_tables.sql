@@ -72,9 +72,64 @@ CREATE TABLE wx_small_deploy (
   appid VARCHAR(128) COLLATE utf8_bin NOT NULL,
   is_set_domain TINYINT DEFAULT 0 NOT NULL,
   template_id INTEGER NOT NULL,
-  state ENUM('WAIT', 'AUDIT', 'PASS', 'REFUSE', 'RELEASE') COLLATE utf8_bin NOT NULL,
+  state ENUM('WAIT', 'COMMIT', 'AUDIT', 'PASS', 'REFUSE', 'RELEASE') COLLATE utf8_bin NOT NULL,
   remark VARCHAR(500) COLLATE utf8_bin DEFAULT '' NOT NULL,
   update_time DATETIME NOT NULL,
+  create_time DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  INDEX idx_shop_id (shop_id),
+  INDEX idx_appid (appid),
+  UNIQUE KEY uniq_appid_template_id(appid, template_id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--===========================================================================
+--微信小程序发布日志
+
+--id:编号
+--deploy_id:发布编号
+--action:发布动作
+--message:消息
+--create_time:创建时间
+--============================================================================
+CREATE TABLE wx_small_deploy_log (
+  id CHAR(32) COLLATE utf8_bin NOT NULL,
+  deploy_id CHAR(32) COLLATE utf8_bin NOT NULL,
+  action ENUM('SET_DOMAIN', 'COMMIT', 'AUDIT', 'AUDIT_REFUSE', 'AUDIT_PASS', 'RELEASE' ) COLLATE utf8_bin NOT NULL,
+  message VARCHAR(800) COLLATE utf8_bin NOT NULL,
+  create_time DATETIME NOT NULL,
+  PRIMARY KEY (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--===========================================================================
+--微信小程序审核配置
+--
+--id:编号
+--shop_id:店铺编号
+--appid:微信appid
+--title:标题
+--address:
+--tag:
+--first_id:第一分类编号
+--first-class;第一分类
+--second_id:第二分类编号
+--second_class:第二分类
+--third_id:第三分类编号
+--third_class:第三分类
+--create_time:创建时间
+--===========================================================================
+CREATE TABLE wx_small_audit_configure (
+  id CHAR(32) COLLATE utf8_bin NOT NULL,
+  shop_id CHAR(32) COLLATE utf8_bin NOT NULL,
+  appid VARCHAR(128) COLLATE utf8_bin NOT NULL,
+  title VARCHAR(50) COLLATE utf8_bin  NOT NULL,
+  adddress VARCHAR(200) COLLATE utf8_bin,
+  tag VARCHAR(50) COLLATE utf8_bin,
+  first_id INTEGER,
+  first_class VARCHAR(50) COLLATE utf8_bin,
+  second_id INTEGER,
+  second_class VARCHAR(50) COLLATE utf8_bin,
+  third_id INTEGER,
+  third_class VARCHAR(50) COLLATE utf8_bin,
   create_time DATETIME NOT NULL,
   PRIMARY KEY (id),
   INDEX idx_shop_id (shop_id),

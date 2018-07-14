@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 小程序发布信息数据操作
@@ -31,6 +32,7 @@ public class SmallDeployDao {
         t.setSetDomain(r.getBoolean("set_domain"));
         t.setTemplateId(r.getInt("template_id"));
         t.setState(r.getString("state"));
+        t.setAuditId(r.getString("audit_id"));
         t.setRemark(r.getString("remark"));
         t.setUpdateTime(r.getTimestamp("update_time"));
         t.setCreateTime(r.getTimestamp("create_time"));
@@ -61,9 +63,24 @@ public class SmallDeployDao {
         return jdbcTemplate.update(sql, state, remark, id) > 0;
     }
 
+    public boolean updateAuditId(String id, String auditId){
+        final String sql = "UPDATE wx_small_deploy SET audit_id = ? WHERE id = ?";
+        return jdbcTemplate.update(sql, auditId, id) > 0;
+    }
+
     public SmallDeploy findOne(String id){
         final String sql = "SELECT * FROM wx_small_deploy WHERE id = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, mapper);
+    }
+
+    public boolean hasTemplateId(String appid, Integer templateId){
+        final String sql = "SELECT COUNT(id) FROM wx_small_deploy WHERE appid = ? AND template_id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{appid, templateId}, Integer.class) > 0;
+    }
+
+    public SmallDeploy findOneTemplateId(String appid, Integer templateId){
+        final String sql = "SELECT * FROM wx_small_deploy WHERE appid = ? AND template_id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{appid, templateId}, mapper);
     }
 
     public long count(String shopId, String appid, Integer templateId, String state){

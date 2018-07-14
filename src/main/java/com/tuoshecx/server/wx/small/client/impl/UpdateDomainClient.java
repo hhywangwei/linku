@@ -6,7 +6,9 @@ import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
 
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 设置小程序服务器域名客户端
@@ -34,12 +36,16 @@ class UpdateDomainClient extends WxSmallClient<UpdateDomainRequest, WxSmallRespo
         StringBuilder builder = new StringBuilder(200);
 
         builder.append("{\"action\":\"").append(request.getAction()).append("\",");
-        builder.append("\"requestdomain\":[\"").append(request.getRequestDomain()).append("\",\"").append(request.getRequestDomain()).append("\"],");
-        builder.append("\"wsrequestdomain\":[\"").append(request.getWsRequestDomain()).append("\",\"").append(request.getWsRequestDomain()).append("\"],");
-        builder.append("\"uploaddomain\":[\"").append(request.getUploadDomain()).append("\",\"").append(request.getUploadDomain()).append("\"],");
-        builder.append("\"downloaddomain\":[\"").append(request.getDownloadDomain()).append("\",\"").append(request.getDownloadDomain()).append("\"]}");
+        builder.append("\"requestdomain\":").append(buildArray(request.getRequestDomain())).append(",");
+        builder.append("\"wsrequestdomain\":").append(buildArray(request.getWsRequestDomain())).append(",");
+        builder.append("\"uploaddomain\":").append(buildArray(request.getUploadDomain())).append(",");
+        builder.append("\"downloaddomain\":").append(buildArray(request.getDownloadDomain())).append("}");
 
         return builder.toString();
+    }
+
+    private String buildArray(String[] array){
+        return "[" + Arrays.stream(array).map(e -> "\"" + e + "\"").collect(Collectors.joining(",")) + "]";
     }
 
     @Override
