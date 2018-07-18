@@ -32,7 +32,7 @@ public class SmallAuditConfigureDao {
         t.setAppid(r.getString("appid"));
         t.setTitle(r.getString("title"));
         t.setTag(r.getString("tag"));
-        t.setTag(r.getString("address"));
+        t.setAddress(r.getString("address"));
         t.setFirstId(r.getInt("first_id"));
         t.setFirstClass(r.getString("first_class"));
         t.setSecondId(r.getInt("second_id"));
@@ -78,10 +78,9 @@ public class SmallAuditConfigureDao {
         return jdbcTemplate.queryForObject(sql, new Object[]{id}, mapper);
     }
 
-    public List<SmallAuditConfigure> findByAppids(String[] appids){
-        final String sql = "SELECT * FROM wx_small_audit_configure WHERE appid IN (?)";
-        String p = Arrays.stream(appids).map(e -> String.format("'%s'", e)).collect(Collectors.joining(","));
-        return jdbcTemplate.query(sql, new Object[]{p}, mapper);
+    public List<SmallAuditConfigure> findByAppid(String appid){
+        final String sql = "SELECT * FROM wx_small_audit_configure WHERE appid = ?";
+        return jdbcTemplate.query(sql, new Object[]{appid}, mapper);
     }
 
     public long count(String shopId, String appid, String title, String tag){

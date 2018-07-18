@@ -67,7 +67,7 @@ public class SmallDeployService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean apply(String id, String auditId){
+    public boolean apply(String id, Integer auditId){
         SmallDeploy t = get(id);
         if(!isWait(t.getState())){
             LOGGER.warn("Deploy {} already audit, state {}", id, t.getState());

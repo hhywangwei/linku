@@ -45,7 +45,7 @@ public class SmallAuditConfigureService {
         return get(t.getId());
     }
 
-    private SmallAuditConfigure get(String id){
+    public SmallAuditConfigure get(String id){
         try{
             return dao.findOne(id);
         }catch (DataAccessException e){
@@ -59,8 +59,11 @@ public class SmallAuditConfigureService {
     }
 
     public List<SmallAuditConfigure> queryAppid(String appid){
-        String[] appids = new String[]{appid, "*"};
-        return dao.findByAppids(appids);
+        List<SmallAuditConfigure> configures =  dao.findByAppid(appid);
+        if(!configures.isEmpty()){
+            return configures;
+        }
+        return dao.findByAppid("*");
     }
 
     public long count(String shopId, String appid, String title, String tag){

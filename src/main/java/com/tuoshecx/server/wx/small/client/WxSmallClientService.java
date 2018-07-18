@@ -139,7 +139,7 @@ public class WxSmallClientService {
      * @param auditId 审核编号
      * @return 小程序认证输出
      */
-    public GetAuditStatusResponse getAuditStatus(String appid, String auditId){
+    public GetAuditStatusResponse getAuditStatus(String appid, Integer auditId){
         String token = getAccessToken(appid);
         GetAuditStatusRequest request = new GetAuditStatusRequest(token, auditId);
 
@@ -169,8 +169,8 @@ public class WxSmallClientService {
      * @param extJson     模板配置
      * @return {@link WxSmallResponse}
      */
-     public WxSmallResponse promgramCommit(String appid, Integer templateId,
-                                                 String userVersion, String userDesc, String extJson){
+     public WxSmallResponse programCommit(String appid, Integer templateId,
+                                          String userVersion, String userDesc, String extJson){
         String token = getAccessToken(appid);
          ProgramCommitRequest request  = new ProgramCommitRequest(token, templateId, userVersion, userDesc, extJson);
 
@@ -199,7 +199,7 @@ public class WxSmallClientService {
      */
      public WxSmallResponse setWebViewDomain(String appid, String[] webViewDomain){
          String token = getAccessToken(appid);
-         SetWebViewDomainRequest request = new SetWebViewDomainRequest(token, "add", webViewDomain);
+         SetWebViewDomainRequest request = new SetWebViewDomainRequest(token, "set", webViewDomain);
 
          return clients.setWebViewDomainClient().request(request);
      }

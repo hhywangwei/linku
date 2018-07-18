@@ -35,8 +35,8 @@ public class ShopSchedule {
         this.clientService = clientService;
     }
 
-    @Scheduled(cron = "25 * * * * *")
-    public void closeTryTimeout(){
+    @Scheduled(cron = "0 5 0 * * *")
+    public void closeTryExpired(){
         Date now = new Date();
         int row;
         do{

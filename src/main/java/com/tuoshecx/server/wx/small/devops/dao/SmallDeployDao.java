@@ -12,7 +12,6 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 小程序发布信息数据操作
@@ -29,10 +28,10 @@ public class SmallDeployDao {
         t.setId(r.getString("id"));
         t.setShopId(r.getString("shop_id"));
         t.setAppid(r.getString("appid"));
-        t.setSetDomain(r.getBoolean("set_domain"));
+        t.setSetDomain(r.getBoolean("is_set_domain"));
         t.setTemplateId(r.getInt("template_id"));
         t.setState(r.getString("state"));
-        t.setAuditId(r.getString("audit_id"));
+        t.setAuditId(r.getInt("audit_id"));
         t.setRemark(r.getString("remark"));
         t.setUpdateTime(r.getTimestamp("update_time"));
         t.setCreateTime(r.getTimestamp("create_time"));
@@ -49,8 +48,8 @@ public class SmallDeployDao {
         final String sql = "INSERT INTO wx_small_deploy (id, shop_id, appid, is_set_domain, template_id, state, remark, update_time, create_time) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Date now = new Date();
-        jdbcTemplate.update(sql, t.getId(), t.getShopId(), t.getAppid(), t.getSetDomain(), t.getTemplateId(), t.getState(), t.getRemark(),
-                DaoUtils.timestamp(now), DaoUtils.timestamp(now));
+        jdbcTemplate.update(sql, t.getId(), t.getShopId(), t.getAppid(), t.getSetDomain(), t.getTemplateId(), t.getState(),
+                StringUtils.defaultString(t.getRemark(), ""), DaoUtils.timestamp(now), DaoUtils.timestamp(now));
     }
 
     public boolean setDomain(String id, boolean isSetting){
@@ -63,7 +62,7 @@ public class SmallDeployDao {
         return jdbcTemplate.update(sql, state, remark, id) > 0;
     }
 
-    public boolean updateAuditId(String id, String auditId){
+    public boolean updateAuditId(String id, Integer auditId){
         final String sql = "UPDATE wx_small_deploy SET audit_id = ? WHERE id = ?";
         return jdbcTemplate.update(sql, auditId, id) > 0;
     }

@@ -1,14 +1,14 @@
 package com.tuoshecx.server.wx.small.client.request;
 
 public class GetAuditStatusRequest extends WxSmallRequest {
-    private final String auditId;
+    private final Integer auditId;
 
-    public GetAuditStatusRequest(String token, String auditId) {
+    public GetAuditStatusRequest(String token, Integer auditId) {
         super(token);
         this.auditId = auditId;
     }
 
-    public String getAuditId() {
+    public Integer getAuditId() {
         return auditId;
     }
 }

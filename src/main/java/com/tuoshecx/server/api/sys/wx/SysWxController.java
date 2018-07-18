@@ -1,7 +1,7 @@
 package com.tuoshecx.server.api.sys.wx;
 
 import com.tuoshecx.server.BaseException;
-import com.tuoshecx.server.api.sys.wx.vo.ShopWxInfoVo;
+import com.tuoshecx.server.api.vo.HasVo;
 import com.tuoshecx.server.api.vo.ResultPageVo;
 import com.tuoshecx.server.api.vo.ResultVo;
 import com.tuoshecx.server.shop.domain.ShopWxAuthorized;
@@ -41,9 +41,9 @@ public class SysWxController {
 
     @GetMapping(value = "{shopId}/info", produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("得到店铺托管微信小程序公众号信息")
-    public ResultVo<ShopWxInfoVo> getInfo(@PathVariable("shopId")String shopId){
+    public ResultVo<HasVo<ShopWxAuthorized>> getInfo(@PathVariable("shopId")String shopId){
         List<ShopWxAuthorized> list = service.queryAuthorized(shopId);
-        return ResultVo.success(list.isEmpty()? ShopWxInfoVo.noHas(): ShopWxInfoVo.has(list.get(0)));
+        return ResultVo.success(list.isEmpty()? HasVo.notHas(): HasVo.has(list.get(0)));
     }
 
     @PutMapping(value = "{shopId}/refreshMessageTemplate")

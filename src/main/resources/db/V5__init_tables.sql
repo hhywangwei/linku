@@ -20,7 +20,7 @@ CREATE TABLE wx_small_domain (
 
 --初始配置信息
 INSERT INTO wx_small_domain (id, request_domain, wsrequest_domain, upload_domain, download_domain, web_view_domain)
-VALUES ('10000', 'https://api.tuoshecx.com', 'https://api.tuoshecx.com', 'https://api.tuoshecx.com', 'https://api.tuoshecx.com', 'https://tuoshecx.com');
+VALUES ('10000', 'https://api.tuoshecx.com', 'wss://api.tuoshecx.com', 'https://api.tuoshecx.com', 'https://api.tuoshecx.com', 'https://tuoshecx.com');
 
 --=========================================================================
 --微信小程序配置
@@ -63,6 +63,7 @@ VALUES ('1000', -1, '', '', '', '', '', 0, now());
 --template_id:配置版本号
 --state:发布状态
 --remark:备注
+--audit_id:审核编号
 --update_time:修改时间
 --create_time: 创建时间
 --=========================================================================
@@ -74,6 +75,7 @@ CREATE TABLE wx_small_deploy (
   template_id INTEGER NOT NULL,
   state ENUM('WAIT', 'COMMIT', 'AUDIT', 'PASS', 'REFUSE', 'RELEASE') COLLATE utf8_bin NOT NULL,
   remark VARCHAR(500) COLLATE utf8_bin DEFAULT '' NOT NULL,
+  audit_id INTEGER DEFAULT -1,
   update_time DATETIME NOT NULL,
   create_time DATETIME NOT NULL,
   PRIMARY KEY (id),
@@ -110,7 +112,7 @@ CREATE TABLE wx_small_deploy_log (
 --address:
 --tag:
 --first_id:第一分类编号
---first-class;第一分类
+--first_class;第一分类
 --second_id:第二分类编号
 --second_class:第二分类
 --third_id:第三分类编号
@@ -122,7 +124,7 @@ CREATE TABLE wx_small_audit_configure (
   shop_id CHAR(32) COLLATE utf8_bin NOT NULL,
   appid VARCHAR(128) COLLATE utf8_bin NOT NULL,
   title VARCHAR(50) COLLATE utf8_bin  NOT NULL,
-  adddress VARCHAR(200) COLLATE utf8_bin,
+  address VARCHAR(200) COLLATE utf8_bin,
   tag VARCHAR(50) COLLATE utf8_bin,
   first_id INTEGER,
   first_class VARCHAR(50) COLLATE utf8_bin,
@@ -135,3 +137,7 @@ CREATE TABLE wx_small_audit_configure (
   INDEX idx_shop_id (shop_id),
   INDEX idx_appid (appid)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--初始审核缺省信息
+INSERT INTO wx_small_audit_configure (id, shop_id, appid, title, address, tag, first_id, first_class, second_id, second_class, create_time)
+VALUES ('1', '*', '*', '首页', 'pages/index/index', '营销', 150, '生活服务', '666', '休闲娱乐', now());

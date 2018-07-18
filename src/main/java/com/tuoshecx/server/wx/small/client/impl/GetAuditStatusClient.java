@@ -30,7 +30,7 @@ class GetAuditStatusClient extends WxSmallClient<GetAuditStatusRequest, GetAudit
 
     @Override
     protected String buildBody(GetAuditStatusRequest request){
-        return String.format("{\"auditid\":\"%s\"}", request.getAuditId());
+        return String.format("{\"auditid\":\"%d\"}", request.getAuditId());
     }
 
     @Override

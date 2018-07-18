@@ -1,8 +1,12 @@
 package com.tuoshecx.server.wx.small.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import reactor.core.publisher.Flux;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ReactiveTest {
@@ -41,5 +45,16 @@ public class ReactiveTest {
         }
         int letterIndexAscii = 'A' + letterNumber -1;
         return "" + (char)letterIndexAscii;
+    }
+
+    @Test
+    public void testToJson()throws IOException {
+        Map<String, String> map = new HashMap<>();
+
+        map.put("ext","{extAppid: \"33243232324\"}");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        System.out.println(objectMapper.writeValueAsString(map));
     }
 }

@@ -35,7 +35,7 @@
         <!--<appender-ref ref="file"/>-->
     </root>
 
-    <logger name="com.linku" level="DEBUG"/>
+    <logger name="com.tuoshecx" level="DEBUG"/>
     <logger name="org.springframework.jdbc" level="DEBUG"/>
     <logger name="org.springframework.transaction" level="DEBUG"/>
 

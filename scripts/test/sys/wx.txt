@@ -1,0 +1,7 @@
+--新增店铺
+http://localhost:8080/sys/wx/deploy
+method:post
+{
+"shopId":"393e82297b514996beba689bcc1dc61c",
+"templateIs":1
+}

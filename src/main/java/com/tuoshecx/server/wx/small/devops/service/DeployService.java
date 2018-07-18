@@ -1,6 +1,7 @@
 package com.tuoshecx.server.wx.small.devops.service;
 
 import com.tuoshecx.server.BaseException;
+import com.tuoshecx.server.shop.domain.ShopWxAuthorized;
 import com.tuoshecx.server.shop.service.ShopWxService;
 import com.tuoshecx.server.wx.small.client.WxSmallClientService;
 import com.tuoshecx.server.wx.small.client.request.SubmitAuditRequest;
@@ -53,7 +54,11 @@ public class DeployService {
     }
 
     public SmallDeploy deploy(String shopId, Integer templateId){
-        String appid = shopWxService.getAppid(shopId).orElseThrow(() -> new BaseException("店铺还未托管小程序公众号"));
+        List<ShopWxAuthorized> authorizeds = shopWxService.queryAuthorized(shopId);
+        if(authorizeds.isEmpty()){
+            throw new BaseException("店铺还未托管小程序公众号");
+        }
+        String appid = authorizeds.get(0).getAppid();
 
         SmallDeploy t = new SmallDeploy();
         t.setShopId(shopId);
@@ -72,20 +77,27 @@ public class DeployService {
             saveDeployLog(id, "SET_DOMAIN", "Domain配置不存在");
             throw new BaseException("Domain配置不存在");
         }
-        DomainConfigure configure = optional.get();
-        WxSmallResponse domainResponse = smallClientService.updateDomain(t.getAppid(), configure.getRequestDomain(),
-                configure.getWsrequestDomain(), configure.getUploadDomain(), configure.getDownloadDomain());
-        WxSmallResponse viewResponse = smallClientService.setWebViewDomain(t.getAppid(), configure.getWebViewDomain());
-        boolean ok = domainResponse.isOk() && viewResponse.isOk();
-        if(ok){
-            smallDeployService.setDomain(id);
-            saveDeployLog(id, "SET_DOMAIN", "成功设置Domain");
-        }else{
-            saveDeployLog(id, "SET_DOMAIN", String.format("%d-%s, %d-%s",
-                    domainResponse.getCode(), domainResponse.getMessage(),
-                    viewResponse.getCode(), viewResponse.getMessage()));
+        if(t.getSetDomain()){
+            return t;
         }
 
+        DomainConfigure configure = optional.get();
+        WxSmallResponse viewResponse = smallClientService.setWebViewDomain(t.getAppid(), configure.getWebViewDomain());
+        if(!viewResponse.isOk()){
+            LOGGER.error("Set view domain fail, error {}-{}", viewResponse.getCode(), viewResponse.getMessage());
+            saveDeployLog(id, "SET_DOMAIN", String.format("%d-%s", viewResponse.getCode(), viewResponse.getMessage()));
+            throw new BaseException("设置业务域失败");
+        }
+
+        WxSmallResponse domainResponse = smallClientService.updateDomain(t.getAppid(), configure.getRequestDomain(),
+                configure.getWsrequestDomain(), configure.getUploadDomain(), configure.getDownloadDomain());
+        if(!domainResponse.isOk() && domainResponse.getCode() != 85017){
+            saveDeployLog(id, "SET_DOMAIN", String.format("%d-%s", domainResponse.getCode(), domainResponse.getMessage()));
+            throw new BaseException("设置服务器域名失败");
+        }
+
+        smallDeployService.setDomain(id);
+        saveDeployLog(id, "SET_DOMAIN", "成功设置Domain");
         return smallDeployService.get(id);
     }
 
@@ -93,9 +105,9 @@ public class DeployService {
         smallDeployLogService.save(id, action, message);
     }
 
-    public SmallDeploy promgramCommit(String id){
+    public SmallDeploy programCommit(String id){
         SmallDeploy t = smallDeployService.get(id);
-        WxSmallResponse  response =smallClientService.promgramCommit(t.getAppid(), t.getTemplateId(),
+        WxSmallResponse  response =smallClientService.programCommit(t.getAppid(), t.getTemplateId(),
                 "V1.0", "tuoshecx.com", buildExtJson(t.getAppid(), t.getTemplateId()));
 
         if(response.isOk()){
@@ -110,26 +122,23 @@ public class DeployService {
 
     private String buildExtJson(String appid, Integer templateId){
         Optional<SmallExtConfigure> optional = smallExtConfigureService.getTemplateId(templateId);
-        if(!optional.isPresent()){
-            return  String.format("{\"extAppid\":\"%s\"}",  appid);
-        }
-
-        SmallExtConfigure configure = optional.get();
-        StringBuilder builder = new StringBuilder(200);
-        builder.append("{\"extAppid\":\"").append(appid).append("\"");
-        appendNotBlank(builder, "ext", configure.getExt());
-        appendNotBlank(builder, "extPages", configure.getExtPages());
-        appendNotBlank(builder, "pages", configure.getPages());
-        appendNotBlank(builder, "window", configure.getWindow());
-        appendNotBlank(builder, "tabBar", configure.getTabBar());
-        builder.append("}");
-
-        return builder.toString();
+        String m = optional.map(configure -> {
+            StringBuilder builder = new StringBuilder(200);
+            builder.append("{extAppid:\"").append(appid).append("\"");
+            appendNotBlank(builder, "ext", configure.getExt());
+            appendNotBlank(builder, "extPages", configure.getExtPages());
+            appendNotBlank(builder, "pages", configure.getPages());
+            appendNotBlank(builder, "window", configure.getWindow());
+            appendNotBlank(builder, "tabBar", configure.getTabBar());
+            builder.append("}");
+            return builder.toString();
+        }).orElseGet(() ->  String.format("{\"extAppid\":\"%s\"}",  appid));
+        return StringUtils.replace(m, "\"", "\\\"");
     }
 
     private void appendNotBlank(StringBuilder builder, String key, String value){
         if(StringUtils.isNotBlank(value)){
-            builder.append(String.format(",\"%s\":%s", key, value));
+            builder.append(String.format(",%s:%s", key, value));
         }
     }
 

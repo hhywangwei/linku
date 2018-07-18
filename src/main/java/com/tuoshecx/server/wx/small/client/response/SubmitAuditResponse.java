@@ -3,14 +3,14 @@ package com.tuoshecx.server.wx.small.client.response;
 import java.util.Map;
 
 public class SubmitAuditResponse extends WxSmallResponse {
-    private final String auditId;
+    private final Integer auditId;
 
     public SubmitAuditResponse(Map<String, Object> data) {
         super(data);
-        this.auditId = (String)data.getOrDefault("auditid", "");
+        this.auditId = (Integer)data.getOrDefault("auditid", -1);
     }
 
-    public String getAuditId() {
+    public Integer getAuditId() {
         return auditId;
     }
 }

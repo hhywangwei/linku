@@ -6,7 +6,9 @@ import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
 
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 设置小程序业务域名（仅供第三方代小程序调用）
@@ -34,9 +36,13 @@ class SetWebViewDomainClient extends WxSmallClient<SetWebViewDomainRequest, WxSm
         StringBuilder builder = new StringBuilder(50);
 
         builder.append("{\"action\":\"").append(request.getAction()).append("\",");
-        builder.append("\"webviewdomain\":[\"").append(request.getWebViewDomain()).append("\",\"").append(request.getWebViewDomain()).append("\"]}");
+        builder.append("\"webviewdomain\":").append(buildArray(request.getWebViewDomain())).append("}");
 
         return builder.toString();
+    }
+
+    private String buildArray(String[] array){
+        return "[" + Arrays.stream(array).map(e -> "\"" + e + "\"").collect(Collectors.joining(",")) + "]";
     }
 
     @Override

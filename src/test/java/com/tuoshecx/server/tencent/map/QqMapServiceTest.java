@@ -17,23 +17,4 @@ public class QqMapServiceTest {
         properties.setMapKey("L2XBZ-L7LWD-GAV46-H23SI-KAGJF-KRFUN");
     }
 
-    @Test
-    public void testDistrict(){
-        QqMapService service = new QqMapService(properties, null);
-
-        DistrictResponse response = service.district(DistrictRequest.Builder::build);
-        Assert.assertTrue(response.getStatus() == 0);
-        Assert.assertFalse(response.getDistricts().isEmpty());
-    }
-
-    @Test
-    public void testSearch(){
-        QqMapService service = new QqMapService(properties, null);
-
-        SearchResponse response = service.search(e ->
-                e.setDistrict("上海").setKeyword("银都").build());
-        Assert.assertTrue(response.getStatus() == 0);
-        Assert.assertFalse(response.getAddresses().isEmpty());
-    }
-
 }

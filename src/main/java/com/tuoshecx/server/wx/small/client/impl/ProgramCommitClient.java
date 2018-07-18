@@ -33,7 +33,7 @@ class ProgramCommitClient extends WxSmallClient<ProgramCommitRequest, WxSmallRes
     protected String buildBody(ProgramCommitRequest request){
         StringBuilder builder = new StringBuilder(200);
 
-        builder.append("{\"template_id\":").append(request.getTemplateId()).append(",");
+        builder.append("{\"template_id\":\"").append(request.getTemplateId()).append("\",");
         builder.append("\"ext_json\":\"").append(request.getExtJson()).append("\",");
         builder.append("\"user_version\":\"").append(request.getUserVersion()).append("\",");
         builder.append("\"user_desc\":\"").append(request.getUserDesc()).append("\"}");

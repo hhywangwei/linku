@@ -1,6 +1,5 @@
 package com.tuoshecx.server.wx.small.devops.service;
 
-import com.tuoshecx.server.BaseException;
 import com.tuoshecx.server.wx.small.devops.dao.DomainConfigureDao;
 import com.tuoshecx.server.wx.small.devops.domain.DomainConfigure;
 import org.slf4j.Logger;

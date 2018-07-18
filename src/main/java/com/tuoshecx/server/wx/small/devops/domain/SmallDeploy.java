@@ -27,7 +27,7 @@ public class SmallDeploy {
     @ApiModelProperty(value = "部署状态", allowableValues = "WAIT, COMMIT, AUDIT, PASS, REFUSE, RELEASE")
     private String state;
     @ApiModelProperty(value = "审核编号")
-    private String auditId;
+    private Integer auditId;
     @ApiModelProperty(value = "发布备注")
     private String remark;
     @ApiModelProperty(value = "更新时间")
@@ -83,11 +83,11 @@ public class SmallDeploy {
         this.state = state;
     }
 
-    public String getAuditId() {
+    public Integer getAuditId() {
         return auditId;
     }
 
-    public void setAuditId(String auditId) {
+    public void setAuditId(Integer auditId) {
         this.auditId = auditId;
     }
 
