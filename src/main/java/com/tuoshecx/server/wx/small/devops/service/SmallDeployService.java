@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 小程序发布业务服务
  *
@@ -117,6 +119,10 @@ public class SmallDeployService {
 
     private boolean isPass(String state){
         return StringUtils.equals(state, "PASS");
+    }
+
+    public List<String> queryAudit(){
+        return dao.findAudit();
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

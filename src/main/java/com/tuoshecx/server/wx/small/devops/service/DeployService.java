@@ -6,6 +6,7 @@ import com.tuoshecx.server.shop.service.ShopWxService;
 import com.tuoshecx.server.wx.small.client.WxSmallClientService;
 import com.tuoshecx.server.wx.small.client.request.SubmitAuditRequest;
 import com.tuoshecx.server.wx.small.client.response.GetAuditStatusResponse;
+import com.tuoshecx.server.wx.small.client.response.GetCategoryResponse;
 import com.tuoshecx.server.wx.small.client.response.SubmitAuditResponse;
 import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
 import com.tuoshecx.server.wx.small.devops.domain.DomainConfigure;
@@ -215,6 +216,41 @@ public class DeployService {
 
     private boolean isAuditPass(String state){
         return StringUtils.equals(state, "PASS");
+    }
+
+    public void getAuditStatus(){
+        List<String> ids = smallDeployService.queryAudit();
+        for(String id: ids){
+            SmallDeploy t = smallDeployService.get(id);
+            GetAuditStatusResponse response = smallClientService.getAuditStatus(t.getAppid(), t.getAuditId());
+
+            if(!response.isOk()){
+                LOGGER.error("Get {} audit status fail, error {}-{}",
+                        t.getAuditId(), response.getCode(), response.getMessage());
+                continue;
+            }
+
+            if(response.getStatus() == 2){
+                LOGGER.info("Auditing...");
+                continue;
+            }
+
+            if(response.getStatus() == 0){
+                smallDeployService.auditPass(id);
+            }else{
+                smallDeployService.auditRefuse(id, response.getReason());
+            }
+        }
+    }
+
+    public GetCategoryResponse getCategory(String shopId){
+        List<ShopWxAuthorized> authorizeds = shopWxService.queryAuthorized(shopId);
+        if(authorizeds.isEmpty()){
+            throw new BaseException("店铺还未托管小程序公众号");
+        }
+        String appid = authorizeds.get(0).getAppid();
+
+        return smallClientService.getCategory(appid);
     }
 
 }

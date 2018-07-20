@@ -77,9 +77,9 @@ public class SmallDeployDao {
         return jdbcTemplate.queryForObject(sql, new Object[]{appid, templateId}, Integer.class) > 0;
     }
 
-    public SmallDeploy findOneTemplateId(String appid, Integer templateId){
-        final String sql = "SELECT * FROM wx_small_deploy WHERE appid = ? AND template_id = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{appid, templateId}, mapper);
+    public List<String> findAudit(){
+        final String sql = "SELECT id FROM wx_small_deploy WHERE state = ?";
+        return jdbcTemplate.queryForList(sql, new Object[]{"AUDIT"}, String.class);
     }
 
     public long count(String shopId, String appid, Integer templateId, String state){
