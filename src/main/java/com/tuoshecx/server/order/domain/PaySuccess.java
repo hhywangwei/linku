@@ -10,7 +10,7 @@ import java.util.Objects;
  *
  * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
-public class MarketingPay {
+public class PaySuccess {
     private String id;
     private String marketingId;
     private String marketingType;
@@ -82,8 +82,8 @@ public class MarketingPay {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MarketingPay)) return false;
-        MarketingPay that = (MarketingPay) o;
+        if (!(o instanceof PaySuccess)) return false;
+        PaySuccess that = (PaySuccess) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(marketingId, that.marketingId) &&
                 Objects.equals(marketingType, that.marketingType) &&

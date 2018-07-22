@@ -8,8 +8,8 @@ import com.tuoshecx.server.order.dao.OrderDao;
 import com.tuoshecx.server.order.dao.OrderItemDao;
 import com.tuoshecx.server.order.domain.Order;
 import com.tuoshecx.server.order.domain.OrderItem;
-import com.tuoshecx.server.order.event.MarketingPayEvent;
-import com.tuoshecx.server.order.event.MarketingPayPublisher;
+import com.tuoshecx.server.order.event.PaySuccessEvent;
+import com.tuoshecx.server.order.event.PaySuccessPublisher;
 import com.tuoshecx.server.shop.domain.Shop;
 import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.user.domain.User;
@@ -43,12 +43,12 @@ public class OrderService {
     private final UserService userService;
     private final ShopService shopService;
     private final GoodsService goodsService;
-    private final MarketingPayPublisher publisher;
+    private final PaySuccessPublisher publisher;
 
     @Autowired
     public OrderService(OrderDao dao, OrderItemDao itemDao,
                         UserService userService, ShopService shopService,
-                        GoodsService goodsService, MarketingPayPublisher publisher){
+                        GoodsService goodsService, PaySuccessPublisher publisher){
 
         this.dao = dao;
         this.itemDao = itemDao;
@@ -179,8 +179,10 @@ public class OrderService {
             }
 
             if(dao.pay(t.getId(), t.getVersion())){
-                if(isMarketing(t)){
-                    publisher.publishEvent(new MarketingPayEvent(t.getId(), t.getMarketingId(), t.getMarketingId()));
+                if(StringUtils.isNotBlank(t.getMarketingId())){
+                    publisher.publishEvent(new PaySuccessEvent(t.getId(), t.getMarketingId(), t.getMarketingType()));
+                }else{
+                    publisher.publishEvent(new PaySuccessEvent(t.getId(), t.getId(), "GOODS"));
                 }
             }
         }

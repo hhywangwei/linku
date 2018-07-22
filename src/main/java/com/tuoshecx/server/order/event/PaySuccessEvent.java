@@ -5,12 +5,12 @@ package com.tuoshecx.server.order.event;
  *
  * @author WangWei
  */
-public class MarketingPayEvent {
+public class PaySuccessEvent {
     private final String id;
     private final String marketingId;
     private final String marketingType;
 
-    public MarketingPayEvent(String id, String marketingId, String marketingType) {
+    public PaySuccessEvent(String id, String marketingId, String marketingType) {
         this.id = id;
         this.marketingId = marketingId;
         this.marketingType = marketingType;

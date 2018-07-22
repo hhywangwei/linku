@@ -5,6 +5,8 @@ import com.tuoshecx.server.common.id.IdGenerators;
 import com.tuoshecx.server.common.utils.SecurityUtils;
 import com.tuoshecx.server.order.domain.Order;
 import com.tuoshecx.server.order.service.OrderService;
+import com.tuoshecx.server.shop.domain.Shop;
+import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.user.domain.User;
 import com.tuoshecx.server.user.service.UserService;
 import com.tuoshecx.server.wx.pay.client.TradeType;
@@ -35,13 +37,15 @@ public class WxUnifiedOrderService {
     private final WxUnifiedOrderDao dao;
     private final OrderService orderService;
     private final UserService userService;
+    private final ShopService shopService;
 
     @Autowired
-    public WxUnifiedOrderService(WxUnifiedOrderDao dao,
-                                 OrderService orderService, UserService userService) {
+    public WxUnifiedOrderService(WxUnifiedOrderDao dao, OrderService orderService,
+                                 UserService userService, ShopService shopService) {
         this.dao = dao;
         this.orderService = orderService;
         this.userService = userService;
+        this.shopService = shopService;
     }
 
     public WxUnifiedOrder get(String id){
@@ -102,7 +106,12 @@ public class WxUnifiedOrderService {
     }
 
     private String buildBody(Order o){
-        return StringUtils.left(o.getDetail(), 6000);
+        Shop shop = shopService.get(o.getShopId());
+        return shop.getName() + "消费";
+    }
+
+    public WxUnifiedOrder getOutTradeNo(String outTradeNo){
+        return dao.findOneByOutTradeNo(outTradeNo);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

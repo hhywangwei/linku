@@ -1,6 +1,7 @@
 package com.tuoshecx.server.wx.small.message.sender;
 
 import com.tuoshecx.server.common.id.IdGenerators;
+import com.tuoshecx.server.common.utils.DateUtils;
 import com.tuoshecx.server.wx.small.client.WxSmallClientService;
 import com.tuoshecx.server.wx.small.client.request.SendTemplateMsgRequest;
 import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
@@ -8,11 +9,13 @@ import com.tuoshecx.server.wx.small.message.domain.SmallTemplate;
 import com.tuoshecx.server.wx.small.message.domain.SendMessage;
 import com.tuoshecx.server.wx.small.message.service.SendMessageService;
 import com.tuoshecx.server.wx.small.message.service.WxSmallTemplateService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,12 +49,16 @@ public class WxTemplateMessageSender {
             return;
         }
 
-        SmallTemplate template = optional.get();
-        WxSmallResponse response = clientService.sendTmpMsg(message.getAppid(), e -> buildRequest(e, template.getTemplateId(),t));
-        if(response.getCode() == 0){
-            service.success(t.getId());
-        }else{
-            service.fail(t.getId(), response.getMessage());
+        try{
+            SmallTemplate template = optional.get();
+            WxSmallResponse response = clientService.sendTmpMsg(message.getAppid(), e -> buildRequest(e, template.getTemplateId(),t));
+            if(response.getCode() == 0){
+                service.success(t.getId());
+            }else{
+                service.fail(t.getId(), response.getMessage());
+            }
+        }catch (Exception e){
+            LOGGER.error("Send mall template message fail, error is {}", e.getMessage());
         }
     }
 
@@ -81,8 +88,52 @@ public class WxTemplateMessageSender {
     private String buildData(List<SmallTemplateMessage.ContentItem> items){
         return "{" +
                 items.stream().
-                map(e -> String.format("\"%s\": {\"value\":\"%s\", \"color\":\"%s\"}", e.getKeyword(), e.getValue(), e.getColor())).
+                map(e ->StringUtils.isNotBlank(e.getColor())?
+                        String.format("\"%s\": {\"value\":\"%s\", \"color\":\"%s\"}", e.getKeyword(), e.getValue(), e.getColor()):
+                        String.format("\"%s\": {\"value\":\"%s\"}", e.getKeyword(), e.getValue())).
                 collect(Collectors.joining(","))
                 + "}";
     }
+
+    public void sendOrderPaySuccess(String openid, String appid, String formId, String shopName, String orderContent, Integer totalFee, Date payTime){
+        int fen = totalFee % 100;
+        int yuan = totalFee / 100;
+
+        SmallTemplateMessage message = new SmallTemplateMessage
+                .Builder(openid, appid, SmallTemplateMessageKeys.ORDER_PAY_SUCCESS.getKey(), formId)
+                .addContentItem("keyword1", shopName)
+                .addContentItem("keyword2", orderContent)
+                .addContentItem("keyword3", String.format("%d.%02d元", yuan, fen))
+                .addContentItem("keyword4", DateUtils.formatTimestamp(payTime))
+                .setPage("/pages/index/index")
+                .build();
+
+        send(message);
+    }
+
+    public void sendGroupSuccess(String openid, String appid, String formId, String name, Date openTime){
+        SmallTemplateMessage message = new SmallTemplateMessage
+                .Builder(openid, appid, SmallTemplateMessageKeys.ORDER_PAY_SUCCESS.getKey(), formId)
+                .addContentItem("keyword1", name)
+                .addContentItem("keyword2", "电子券以生成")
+                .addContentItem("keyword3", DateUtils.formatTimestamp(openTime))
+                .setPage("/pages/index/index")
+                .build();
+
+        send(message);
+    }
+
+    public void sendGroupFail(String openid, String appid, String formId, String name, int number){
+        SmallTemplateMessage message = new SmallTemplateMessage
+                .Builder(openid, appid, SmallTemplateMessageKeys.ORDER_PAY_SUCCESS.getKey(), formId)
+                .addContentItem("keyword1", name)
+                .addContentItem("keyword2", String.valueOf(number))
+                .addContentItem("keyword3", "支付金额将在2工作日内全额退还")
+                .setPage("/pages/index/index")
+                .build();
+
+        send(message);
+    }
 }
+
+

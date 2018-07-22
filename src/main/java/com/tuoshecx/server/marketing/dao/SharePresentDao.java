@@ -93,7 +93,7 @@ public class SharePresentDao {
         return jdbcTemplate.update(sql, true, DaoUtils.timestamp(new Date()), id) > 0;
     }
 
-    public long count(String shopId, String name, Boolean isOpen){
+    public Long count(String shopId, String name, Boolean isOpen){
         StringBuilder sql = new StringBuilder(200);
         sql.append("SELECT COUNT(id) FROM marketing_conf_present ");
         buildWhere(sql, shopId, name, isOpen);

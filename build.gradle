@@ -48,7 +48,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-redis'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'mysql:mysql-connector-java'
-    compile 'io.netty:netty-transport-native-epoll'
+//    compile 'io.netty:netty-transport-native-epoll'
     compile 'org.flywaydb:flyway-core'
     compile "com.squareup.okhttp3:okhttp:${okhttpVersion}"
     compile "org.bouncycastle:bcprov-jdk15:${bcprovVersion}"

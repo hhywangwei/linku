@@ -41,6 +41,10 @@ public class SmallTemplateMessage{
             return this;
         }
 
+        public Builder addContentItem(String keyword, String value){
+            return addContentItem(keyword, value, "");
+        }
+
         public Builder addContentItem(String keyword, String value, String color){
             contentItems.add(new ContentItem(keyword, value, color));
             return this;

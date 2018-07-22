@@ -2,7 +2,9 @@ package com.tuoshecx.server.wx.pay.service;
 
 import com.tuoshecx.server.BaseException;
 import com.tuoshecx.server.common.id.IdGenerators;
+import com.tuoshecx.server.shop.domain.Shop;
 import com.tuoshecx.server.shop.domain.ShopWxPay;
+import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.shop.service.ShopWxPayService;
 import com.tuoshecx.server.wx.configure.properties.WxPayProperties;
 import com.tuoshecx.server.wx.pay.client.TradeType;
@@ -14,6 +16,7 @@ import com.tuoshecx.server.wx.pay.client.response.UnifiedOrderResponse;
 import com.tuoshecx.server.wx.pay.domain.WxRefund;
 import com.tuoshecx.server.wx.pay.domain.WxUnifiedOrder;
 import com.tuoshecx.server.wx.pay.domain.WxUnifiedOrderNotify;
+import com.tuoshecx.server.wx.small.message.sender.WxTemplateMessageSender;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +40,14 @@ public class WxPayService {
     private final WxRefundService refundService;
     private final WxPayClientService clientService;
     private final ShopWxPayService shopWxPayService;
+    private final ShopService shopService;
+    private final WxTemplateMessageSender sender;
 
     @Autowired
     public WxPayService(WxPayProperties properties, WxUnifiedOrderService orderService,
                         WxUnifiedOrderNotifyService notifyService, WxRefundService refundService,
-                        WxPayClientService clientService, ShopWxPayService shopWxPayService) {
+                        WxPayClientService clientService, ShopWxPayService shopWxPayService,
+                        ShopService shopService, WxTemplateMessageSender sender) {
 
         this.properties = properties;
         this.orderService = orderService;
@@ -49,6 +55,8 @@ public class WxPayService {
         this.notifyService = notifyService;
         this.refundService = refundService;
         this.shopWxPayService = shopWxPayService;
+        this.shopService = shopService;
+        this.sender = sender;
     }
 
     public WxUnifiedOrder prePay(String userId, String outTradeNo, TradeType tradeType){
@@ -100,7 +108,19 @@ public class WxPayService {
         WxUnifiedOrderNotify t = new WxUnifiedOrderNotify(data);
         t.setId(IdGenerators.uuid());
         notifyService.save(t);
-        return orderService.pay(t.getOutTradeNo(), t.getTransactionId(), t.getTotalFee());
+        boolean ok = orderService.pay(t.getOutTradeNo(), t.getTransactionId(), t.getTotalFee());
+        if(ok){
+            sendOrderPayNotify(t.getOutTradeNo());
+        }
+        return ok;
+    }
+
+    private void sendOrderPayNotify(String outTradeNo){
+        WxUnifiedOrder o = orderService.getOutTradeNo(outTradeNo);
+        Shop shop = shopService.get(o.getShopId());
+
+        sender.sendOrderPaySuccess(o.getOpenid(), o.getAppid(),o.getPrepay(),
+                shop.getName(), o.getBody(), o.getTotalFee(), o.getPayTime());
     }
 
     /**

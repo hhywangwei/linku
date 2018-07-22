@@ -37,7 +37,7 @@ public class GroupRecordDao {
         t.setPrice(r.getInt("price"));
         t.setGoodsId(r.getString("goods_id"));
         t.setState(GroupRecord.State.valueOf(r.getString("state")));
-        t.setFirst(r.getBoolean("first"));
+        t.setFirst(r.getBoolean("is_first"));
         t.setShare(r.getBoolean("is_share"));
         t.setJoinUserDetail(r.getString("join_user_detail"));
         t.setType(r.getString("type"));
@@ -58,7 +58,7 @@ public class GroupRecordDao {
 
     public void insert(GroupRecord t){
         final String sql = "INSERT INTO marketing_record_group (id, shop_id, marketing_id, name, icon, need_person, " +
-                "join_person, price, goods_id, state, first, type, user_id, version, start_time, end_time, create_time) " +
+                "join_person, price, goods_id, state, is_first, type, user_id, version, start_time, end_time, create_time) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         jdbcTemplate.update(sql, t.getId(), t.getShopId(), t.getMarketingId(), t.getName(), t.getIcon(),
@@ -114,7 +114,7 @@ public class GroupRecordDao {
         return jdbcTemplate.queryForObject(sql, new Object[]{marketingId, userId, GroupRecord.State.WAIT.name(), 1}, mapper);
     }
 
-    public long count(String userId, String marketingId, GroupRecord.State state){
+    public Long count(String userId, String marketingId, GroupRecord.State state){
         final StringBuilder builder = new StringBuilder(50);
         builder.append("SELECT COUNT(id) FROM marketing_record_group ");
         builder.append(" WHERE 1 = 1 ");
@@ -155,7 +155,7 @@ public class GroupRecordDao {
         builder.append(" WHERE 1 = 1 ");
         buildWhere(builder, userId, marketingId, state);
         String newOrder = StringUtils.isBlank(order) ? "create_time DESC" : order;
-        builder.append(" ORDER BY ").append(order).append(" LIMIT ? OFFSET ?");
+        builder.append(" ORDER BY ").append(newOrder).append(" LIMIT ? OFFSET ?");
         Object[] params = DaoUtils.appendOffsetLimit(params(userId, marketingId, state), offset, limit);
         return jdbcTemplate.query(builder.toString(), params, mapper);
     }

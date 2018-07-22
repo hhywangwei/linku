@@ -17,6 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 秒杀活动业务服务
+ *
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
+ */
 @Service
 @Transactional(readOnly = true)
 public class SecondKillRecordService {

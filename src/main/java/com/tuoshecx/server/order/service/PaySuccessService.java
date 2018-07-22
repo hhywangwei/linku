@@ -1,7 +1,7 @@
 package com.tuoshecx.server.order.service;
 
-import com.tuoshecx.server.order.dao.MarketingPayDao;
-import com.tuoshecx.server.order.domain.MarketingPay;
+import com.tuoshecx.server.order.dao.PaySuccessDao;
+import com.tuoshecx.server.order.domain.PaySuccess;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,21 +10,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class MarketingPayService {
-    private final MarketingPayDao dao;
+public class PaySuccessService {
+    private final PaySuccessDao dao;
 
     @Autowired
-    public MarketingPayService(MarketingPayDao dao) {
+    public PaySuccessService(PaySuccessDao dao) {
         this.dao = dao;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public MarketingPay save(String id, String marketingId, String marketingType){
-        MarketingPay t = new MarketingPay();
+    public PaySuccess save(String id, String marketingId, String marketingType){
+        PaySuccess t = new PaySuccess();
         t.setId(id);
         t.setMarketingId(marketingId);
         t.setMarketingType(marketingType);
-        t.setState(MarketingPay.State.WAIT);
+        t.setState(PaySuccess.State.WAIT);
         dao.insert(t);
 
         return dao.findOne(t.getId());
@@ -32,11 +32,11 @@ public class MarketingPayService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean success(String id){
-        return dao.updateState(id, MarketingPay.State.SUCCESS, StringUtils.EMPTY);
+        return dao.updateState(id, PaySuccess.State.SUCCESS, StringUtils.EMPTY);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean fail(String id, String message){
-        return dao.updateState(id, MarketingPay.State.FAIL, message);
+        return dao.updateState(id, PaySuccess.State.FAIL, message);
     }
 }

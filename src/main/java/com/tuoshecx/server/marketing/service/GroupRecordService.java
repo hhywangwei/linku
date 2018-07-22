@@ -6,7 +6,8 @@ import com.tuoshecx.server.marketing.dao.GroupRecordDao;
 import com.tuoshecx.server.marketing.dao.GroupRecordItemDao;
 import com.tuoshecx.server.common.id.IdGenerators;
 import com.tuoshecx.server.marketing.domain.*;
-import com.tuoshecx.server.marketing.event.GroupRecordPublisher;
+import com.tuoshecx.server.marketing.event.GroupMessagePublisher;
+import com.tuoshecx.server.order.service.PaySuccessService;
 import com.tuoshecx.server.user.domain.User;
 import com.tuoshecx.server.user.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -41,18 +42,20 @@ public class GroupRecordService {
     private final UserService userService;
     private final GroupBuyService groupBuyService;
     private final SharePresentService presentService;
-    private final GroupRecordPublisher publisher;
+    private final PaySuccessService paySuccessService;
+    private final GroupMessagePublisher publisher;
 
     @Autowired
     public GroupRecordService(GroupRecordDao dao, GroupRecordItemDao itemDao, UserService userService,
                               GroupBuyService groupBuyService, SharePresentService presentService,
-                              GroupRecordPublisher publisher) {
+                              PaySuccessService paySuccessService, GroupMessagePublisher publisher) {
 
         this.dao = dao;
         this.itemDao = itemDao;
         this.userService = userService;
         this.groupBuyService = groupBuyService;
         this.presentService = presentService;
+        this.paySuccessService = paySuccessService;
         this.publisher = publisher;
     }
 
@@ -166,8 +169,11 @@ public class GroupRecordService {
             final boolean isFull = t.getNeedPerson() <= (t.getJoinPerson() + 1);
             saveItem(id, user, orderId, isOwner, isFirst);
             updateJoinUserDetail(id);
+            paySuccessService.success(orderId);
             if(isFull){
-                publisher.publishEvent(id, GroupRecord.State.ACTIVATE);
+                if(dao.active(id)){
+                    publisher.publishEvent(id, GroupRecord.State.ACTIVATE);
+                }
             }
         }
 
@@ -231,28 +237,23 @@ public class GroupRecordService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public boolean active(String id){
-        GroupRecord t = get(id);
-        if(!isWait(t.getState())){
-            throw new BaseException("营销活动已经处理");
-        }
-        return dao.active(id);
-    }
-
-    private boolean isWait(GroupRecord.State state){
-        return state == GroupRecord.State.WAIT;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
     public void share(String id){
         dao.share(id);
+    }
+
+    public Optional<GroupRecord> getPresentOneWait(String marketingId, String userId){
+        try{
+            return Optional.of(dao.findPresentOneWait(marketingId, userId));
+        }catch (Exception e){
+            return Optional.empty();
+        }
     }
 
     public long count(String userId, String activeId, GroupRecord.State state){
         return dao.count(userId, activeId, state);
     }
 
-    public List<GroupRecord> query(String userId, String activeId, GroupRecord.State state, int offset, int limit){
-        return dao.find(userId, activeId, state, StringUtils.EMPTY, offset, limit);
+    public List<GroupRecord> query(String userId, String activeId, GroupRecord.State state, String order, int offset, int limit){
+        return dao.find(userId, activeId, state, order, offset, limit);
     }
 }

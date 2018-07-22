@@ -81,10 +81,18 @@ wx:
     fail_uri: http://manage.tuoshecx.com/wx/auth_fail.html
   small:
     msg_templates:
-    - id: AT0002,
-      call_key: buy_notice
-      keyword_ids: [3, 4, 5]
-      remark: 购买成功通知
+    - id: AT0009,
+      call_key: order_pay_success
+      keyword_ids: [45, 47, 2, 3]
+      remark: 订单支付成功通知
+    - id: AT0357
+      call_key: group_success
+      keyword_ids: [1, 17, 2]
+      remark: 团购成功通知
+    - id: AT0323
+      call_key: group_fail
+      keyword_ids: [1, 4, 5]
+      remark: 团购失败通知
   pay:
     mchid: 1494207272
     key: Hw0Mrm9QAGIn2r9DyxdP6rU1tmXp2CgJ

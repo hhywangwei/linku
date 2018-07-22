@@ -1,6 +1,7 @@
 package com.tuoshecx.server.api.manage.marketing;
 
 import com.tuoshecx.server.api.manage.CredentialContextManageUtils;
+import com.tuoshecx.server.api.manage.marketing.form.SecondKillIncStockForm;
 import com.tuoshecx.server.api.manage.marketing.form.SecondKillSaveForm;
 import com.tuoshecx.server.api.manage.marketing.form.SecondKillUpdateForm;
 import com.tuoshecx.server.api.vo.OkVo;
@@ -73,6 +74,16 @@ public class SecondKillManageController {
     public ResultVo<SecondKill> close(@PathVariable("id") String id){
 
         return ResultVo.success(service.close(id, currentShopId()));
+    }
+
+    @PutMapping(value = "incStock", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("增加秒杀库存")
+    public ResultVo<SecondKill> incStock(@RequestBody SecondKillIncStockForm form, BindingResult result){
+        if(result.hasErrors()){
+            return ResultVo.error(result.getAllErrors());
+        }
+
+        return ResultVo.success(service.incStock(form.getId(), currentShopId(), form.getCount()));
     }
 
     @DeleteMapping(value = "{id}", produces = APPLICATION_JSON_UTF8_VALUE)
