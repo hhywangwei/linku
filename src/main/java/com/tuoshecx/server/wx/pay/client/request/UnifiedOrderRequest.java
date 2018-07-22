@@ -18,6 +18,7 @@ import java.util.Map;
 public class UnifiedOrderRequest extends WxPayRequest {
     private static final String DATE_PATTER = "yyyyMMddHHmmss";
 
+
     private final String deviceInfo;
     private final String body;
     private final String detail;
@@ -35,12 +36,12 @@ public class UnifiedOrderRequest extends WxPayRequest {
     private final String limitPay;
     private final String openid;
 
-    private UnifiedOrderRequest(String appid, String mchid, String key, String deviceInfo, String body,
+    private UnifiedOrderRequest(String appid, String mchid, String subMchId, String key, String deviceInfo, String body,
                                 String detail, String attach, String outTradeNo, String feeType, int totalFee,
                                 String spbillCreateIp, String timeStart, String timeExpire, String goodsTag,
                                 String notifyUrl, TradeType tradeType, String productId, String limitPay, String openid) {
 
-        super(appid, mchid, key);
+        super(appid, mchid, key, subMchId);
 
         this.deviceInfo = deviceInfo;
         this.body = body;
@@ -61,9 +62,14 @@ public class UnifiedOrderRequest extends WxPayRequest {
     }
 
     @Override
-    protected void buildParameters(Map<String, String> parameters, String appid, String mchid) {
+    protected void buildParameters(Map<String, String> parameters, String appid, String mchid, boolean sub, String subMchId) {
         putNotBlank(parameters, "appid", appid);
         putNotBlank(parameters, "mch_id", mchid);
+        if(sub){
+            putNotBlank(parameters,"sub_appid", appid);
+            putNotBlank(parameters, "sub_openid", openid);
+            putNotBlank(parameters, "sub_mch_id", subMchId);
+        }
         putCanBlank(parameters, "device_info", deviceInfo);
         putNotBlank(parameters, "body", body);
         putCanBlank(parameters, "detail", detail);
@@ -86,6 +92,7 @@ public class UnifiedOrderRequest extends WxPayRequest {
         private String key;
         private String appid;
         private String mchid;
+        private String subMchId;
         private String deviceInfo;
         private String body;
         private String detail;
@@ -104,16 +111,23 @@ public class UnifiedOrderRequest extends WxPayRequest {
         private String openid;
 
         public Builder(String appid, String mchid, String key, String body, String outTradeNo,
-                       int totalFee, String notifyUrl, TradeType tradeType, String openid){
+                       int totalFee, String notifyUrl, TradeType tradeType, String openid, String spbillCreateIp){
+
+            this(appid, mchid, "", key, body, outTradeNo, totalFee, notifyUrl, tradeType, openid, spbillCreateIp);
+        }
+
+        public Builder(String appid, String mchid, String subMchId, String key, String body, String outTradeNo,
+                       int totalFee, String notifyUrl, TradeType tradeType, String openid, String spbillCreateIp){
 
             this.appid = appid;
             this.mchid = mchid;
+            this.subMchId = subMchId;
             this.key = key;
             this.body = body;
             this.outTradeNo = outTradeNo;
             this.feeType="CNY";
             this.totalFee = totalFee;
-            this.spbillCreateIp = "8.8.8.8";
+            this.spbillCreateIp = spbillCreateIp;
             this.timeStart = DateUtils.format(DATE_PATTER, new Date());
             this.timeExpire = DateUtils.format(DATE_PATTER, DateUtils.plusMinutes(new Date(), 30));
             this.notifyUrl = notifyUrl;
@@ -179,7 +193,7 @@ public class UnifiedOrderRequest extends WxPayRequest {
         }
 
         public UnifiedOrderRequest build(){
-            return new UnifiedOrderRequest(appid, mchid, key, deviceInfo, body, detail, attach,
+            return new UnifiedOrderRequest(appid, mchid, subMchId, key, deviceInfo, body, detail, attach,
                     outTradeNo, feeType, totalFee, spbillCreateIp, timeStart, timeExpire, goodsTag, notifyUrl, tradeType,
                     productId, limitPay, openid);
         }

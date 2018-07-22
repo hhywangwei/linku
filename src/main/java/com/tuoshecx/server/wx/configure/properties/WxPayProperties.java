@@ -10,22 +10,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "wx.pay")
 public class WxPayProperties {
-    private String appid;
     private String mchid;
     private String key;
-    private String refundKey;
     private String notifyUrl;
     private String billCreateIp;
-    private String sign;
-    private Keystore keystore;
-
-    public String getAppid() {
-        return appid;
-    }
-
-    public void setAppid(String appid) {
-        this.appid = appid;
-    }
+    private String payType;
 
     public String getMchid() {
         return mchid;
@@ -41,14 +30,6 @@ public class WxPayProperties {
 
     public void setKey(String key) {
         this.key = key;
-    }
-
-    public String getRefundKey() {
-        return refundKey;
-    }
-
-    public void setRefundKey(String refundKey) {
-        this.refundKey = refundKey;
     }
 
     public String getNotifyUrl() {
@@ -67,62 +48,22 @@ public class WxPayProperties {
         this.billCreateIp = billCreateIp;
     }
 
-    public String getSign() {
-        return sign;
+    public String getPayType() {
+        return payType;
     }
 
-    public void setSign(String sign) {
-        this.sign = sign;
-    }
-
-    public Keystore getKeystore() {
-        return keystore;
-    }
-
-    public void setKeystore(Keystore keystore) {
-        this.keystore = keystore;
+    public void setPayType(String payType) {
+        this.payType = payType;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("appid", appid)
                 .append("mchid", mchid)
                 .append("key", key)
-                .append("refundKey", refundKey)
                 .append("notifyUrl", notifyUrl)
                 .append("billCreateIp", billCreateIp)
-                .append("sign", sign)
-                .append("keystore", keystore)
+                .append("payType", payType)
                 .toString();
-    }
-
-    public static class Keystore{
-        private String uri;
-        private String password;
-
-        public String getUri() {
-            return uri;
-        }
-
-        public void setUri(String uri) {
-            this.uri = uri;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        @Override
-        public String toString() {
-            return new ToStringBuilder(this)
-                    .append("uri", uri)
-                    .append("password", password)
-                    .toString();
-        }
     }
 }

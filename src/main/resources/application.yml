@@ -86,16 +86,11 @@ wx:
       keyword_ids: [3, 4, 5]
       remark: 购买成功通知
   pay:
-    appid: wx0754c0a5d2c4b67c
     mchid: 1494207272
     key: Hw0Mrm9QAGIn2r9DyxdP6rU1tmXp2CgJ
     bill-create-ip: 8.8.8.8
-    refundKey: 123456789
-    notify-url: https://api.re1001.com/api/client/wx/pay/notify
-    sign: linku pay
-    keystore:
-      uri: classpath:/keystore/apiclient_cert.p12
-      password: 1494207272
+    notify-url: https://api.tuoshecx.com/wx/pay/notify
+    pay_type: shop
 
 tencent:
   map_key: L2XBZ-L7LWD-GAV46-H23SI-KAGJF-KRFUN

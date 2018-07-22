@@ -29,15 +29,14 @@ public class PerPayVo {
     @ApiModelProperty(value = "签名")
     private final String paySign;
 
-    public PerPayVo(WxPayProperties properties, String prePayId){
-        this.appid = properties.getAppid();
+    public PerPayVo(String appid, String key, String prePayId){
+        this.appid = appid;
         this.nonceStr = SecurityUtils.randomStr(6);
         this.payPackage = String.format("prepay_id=%s", prePayId);
         this.signType = "MD5";
         this.timeStamp = String.valueOf(WxPayUtils.timestamp());
-        this.paySign = buildSign(this, properties.getKey());
+        this.paySign = buildSign(this, key);
     }
-
 
     public String getAppid() {
         return appid;

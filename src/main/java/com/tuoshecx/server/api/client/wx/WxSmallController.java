@@ -139,7 +139,7 @@ public class WxSmallController {
 
     @PostMapping(value = "phone", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("通过微信小程序获取用手机号")
-    public ResultVo<OkVo> phone(@Validated @RequestBody PhoneForm form, BindingResult result){
+    public ResultVo<User> phone(@Validated @RequestBody PhoneForm form, BindingResult result){
         if(result.hasErrors()){
             return ResultVo.error(result.getAllErrors());
         }
@@ -154,7 +154,7 @@ public class WxSmallController {
         User t = service.get(credential().getId());
         t.setPhone(phone);
         service.update(t);
-        return ResultVo.success(new OkVo(true));
+        return ResultVo.success(service.get(t.getId()));
     }
 
     private String currentOpenid(){

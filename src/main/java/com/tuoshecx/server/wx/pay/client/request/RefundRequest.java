@@ -17,10 +17,10 @@ public class RefundRequest extends WxPayRequest {
     private final String refundFeeType;
     private final String refundDesc;
 
-    private RefundRequest(String appid, String mchid, String key, String outTradeNo, String outRefundNo,
+    private RefundRequest(String appid, String mchid, String subMchId, String key, String outTradeNo, String outRefundNo,
                           int totalFee, int refundFee, String refundFeeType, String refundDesc) {
 
-        super(appid, mchid, key);
+        super(appid, mchid, key, subMchId);
         this.outTradeNo = outTradeNo;
         this.outRefundNo= outRefundNo;
         this.totalFee= totalFee;
@@ -30,9 +30,13 @@ public class RefundRequest extends WxPayRequest {
     }
 
     @Override
-    protected void buildParameters(Map<String, String> parameters, String appid, String mchid) {
+    protected void buildParameters(Map<String, String> parameters, String appid, String mchid, boolean sub, String subMchId) {
         putNotBlank(parameters, "appid", appid);
         putNotBlank(parameters, "mch_id", mchid);
+        if(sub){
+            putNotBlank(parameters,"sub_appid", appid);
+            putNotBlank(parameters, "sub_mch_id", subMchId);
+        }
         putNotBlank(parameters, "out_trade_no", outTradeNo);
         putNotBlank(parameters, "out_refund_no", outRefundNo);
         putNotBlank(parameters, "total_fee", String.valueOf(totalFee));
@@ -69,6 +73,7 @@ public class RefundRequest extends WxPayRequest {
         private String key;
         private String appid;
         private String mchid;
+        private String subMchId;
         private final String outTradeNo;
         private final String outRefundNo;
         private final int totalFee;
@@ -77,10 +82,16 @@ public class RefundRequest extends WxPayRequest {
         private String refundDesc = "";
 
         public Builder(String appid, String mchid, String key, String outTradeNo,
+                       String outRefundNo, int totalFee, int refundFee) {
+            this(appid, mchid, "", key, outTradeNo, outRefundNo, totalFee, refundFee);
+        }
+
+        public Builder(String appid, String mchid, String subMchId, String key, String outTradeNo,
                        String outRefundNo, int totalFee, int refundFee){
 
             this.appid = appid;
             this.mchid = mchid;
+            this.subMchId = subMchId;
             this.key = key;
             this.outTradeNo = outTradeNo;
             this.outRefundNo = outRefundNo;
@@ -101,7 +112,7 @@ public class RefundRequest extends WxPayRequest {
         }
 
         public RefundRequest build(){
-            return new RefundRequest(appid, mchid, key, outTradeNo,
+            return new RefundRequest(appid, mchid, subMchId, key, outTradeNo,
                     outRefundNo, totalFee, refundFee, refundFeeType, refundDesc);
         }
     }

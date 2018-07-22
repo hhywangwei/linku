@@ -27,9 +27,9 @@ public class TransferRequest extends WxPayRequest {
     private final String desc;
     private final String spbillCreateIp;
 
-    private TransferRequest(String appid, String mchid, String key, String partnerTradeNo, String openid,
+    private TransferRequest(String appid, String mchid, String subMchId, String key, String partnerTradeNo, String openid,
                             CheckName checkName, String reUserName, int amount, String deviceInfo, String desc, String spbillCreateIp) {
-        super(appid, mchid, key);
+        super(appid, mchid, key, subMchId);
 
         this.partnerTradeNo = partnerTradeNo;
         this.openid = openid;
@@ -42,9 +42,14 @@ public class TransferRequest extends WxPayRequest {
     }
 
     @Override
-    protected void buildParameters(Map<String, String> parameters, String appid, String mchid) {
+    protected void buildParameters(Map<String, String> parameters, String appid, String mchid, boolean sub, String subMchId) {
         putNotBlank(parameters, "mch_appid", appid);
         putNotBlank(parameters, "mchid", mchid);
+        if(sub){
+            putNotBlank(parameters,"sub_appid", appid);
+            putNotBlank(parameters, "sub_openid", openid);
+            putNotBlank(parameters, "sub_mch_id", subMchId);
+        }
         putCanBlank(parameters, "device_info", deviceInfo);
         putNotBlank(parameters, "partner_trade_no", partnerTradeNo);
         putNotBlank(parameters, "openid", openid);
@@ -59,6 +64,7 @@ public class TransferRequest extends WxPayRequest {
         private String key;
         private String appid;
         private String mchid;
+        private String subMchId;
         private String partnerTradeNo;
         private String openid;
         private CheckName checkName;
@@ -68,16 +74,21 @@ public class TransferRequest extends WxPayRequest {
         private String desc;
         private String spbillCreateIp;
 
-        public Builder(String appid, String mchid, String key, String partnerTradeNo, String openid, int amount){
+        public Builder(String appid, String mchid, String key, String partnerTradeNo, String openid, int amount, String spbillCreateIp){
+            this(appid, mchid, "", key, partnerTradeNo, openid, amount, spbillCreateIp);
+        }
+
+        public Builder(String appid, String mchid, String subMchId, String key, String partnerTradeNo, String openid, int amount, String spbillCreateIp){
             this.key = key;
             this.appid = appid;
             this.mchid = mchid;
+            this.subMchId = subMchId;
             this.partnerTradeNo = partnerTradeNo;
             this.checkName = CheckName.NO_CHECK;
             this.openid = openid;
             this.amount = amount;
             this.desc = "商铺提现";
-            this.spbillCreateIp = "8.8.8.8";
+            this.spbillCreateIp = spbillCreateIp;
         }
 
         public Builder setDeviceInfo(String deviceInfo){
@@ -116,7 +127,7 @@ public class TransferRequest extends WxPayRequest {
                 throw new BaseException("需要验证用户名,用户名不能为空");
             }
 
-            return new TransferRequest(appid, mchid, key, partnerTradeNo, openid,
+            return new TransferRequest(appid, mchid, subMchId, key, partnerTradeNo, openid,
                     checkName, reUserName, amount, deviceInfo, desc, spbillCreateIp);
         }
     }

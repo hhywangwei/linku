@@ -18,6 +18,8 @@ public class WxUnifiedOrder {
     private String id;
     @ApiModelProperty(value = "所属店铺编号")
     private String shopId;
+    @ApiModelProperty(value = "微信appid")
+    private String appid;
     @ApiModelProperty(value = "支付用户编号")
     private String userId;
     @ApiModelProperty(value = "支付用户openid")
@@ -65,6 +67,14 @@ public class WxUnifiedOrder {
 
     public void setShopId(String shopId) {
         this.shopId = shopId;
+    }
+
+    public String getAppid() {
+        return appid;
+    }
+
+    public void setAppid(String appid) {
+        this.appid = appid;
     }
 
     public String getUserId() {
@@ -199,31 +209,32 @@ public class WxUnifiedOrder {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        WxUnifiedOrder that = (WxUnifiedOrder) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(shopId, that.shopId) &&
-                Objects.equals(userId, that.userId) &&
-                Objects.equals(openid, that.openid) &&
-                Objects.equals(outTradeNo, that.outTradeNo) &&
-                Objects.equals(body, that.body) &&
-                Objects.equals(attach, that.attach) &&
-                Objects.equals(feeType, that.feeType) &&
-                Objects.equals(totalFee, that.totalFee) &&
-                Objects.equals(realTotalFee, that.realTotalFee) &&
-                Objects.equals(tradeType, that.tradeType) &&
-                Objects.equals(transactionNo, that.transactionNo) &&
-                Objects.equals(prepay, that.prepay) &&
-                Objects.equals(state, that.state) &&
-                Objects.equals(refundFee, that.refundFee) &&
-                Objects.equals(createTime, that.createTime) &&
-                Objects.equals(payTime, that.payTime) &&
-                Objects.equals(refundTime, that.refundTime);
+        WxUnifiedOrder order = (WxUnifiedOrder) o;
+        return Objects.equals(id, order.id) &&
+                Objects.equals(shopId, order.shopId) &&
+                Objects.equals(appid, order.appid) &&
+                Objects.equals(userId, order.userId) &&
+                Objects.equals(openid, order.openid) &&
+                Objects.equals(outTradeNo, order.outTradeNo) &&
+                Objects.equals(body, order.body) &&
+                Objects.equals(attach, order.attach) &&
+                Objects.equals(feeType, order.feeType) &&
+                Objects.equals(totalFee, order.totalFee) &&
+                Objects.equals(realTotalFee, order.realTotalFee) &&
+                Objects.equals(tradeType, order.tradeType) &&
+                Objects.equals(transactionNo, order.transactionNo) &&
+                Objects.equals(prepay, order.prepay) &&
+                Objects.equals(state, order.state) &&
+                Objects.equals(refundFee, order.refundFee) &&
+                Objects.equals(createTime, order.createTime) &&
+                Objects.equals(payTime, order.payTime) &&
+                Objects.equals(refundTime, order.refundTime);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, shopId, userId, openid, outTradeNo, body, attach, feeType, totalFee, realTotalFee, tradeType, transactionNo, prepay, state, refundFee, createTime, payTime, refundTime);
+        return Objects.hash(id, shopId, appid, userId, openid, outTradeNo, body, attach, feeType, totalFee, realTotalFee, tradeType, transactionNo, prepay, state, refundFee, createTime, payTime, refundTime);
     }
 
     @Override
@@ -231,6 +242,7 @@ public class WxUnifiedOrder {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("shopId", shopId)
+                .append("appid", appid)
                 .append("userId", userId)
                 .append("openid", openid)
                 .append("outTradeNo", outTradeNo)

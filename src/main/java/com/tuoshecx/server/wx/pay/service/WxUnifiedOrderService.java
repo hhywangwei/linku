@@ -76,6 +76,7 @@ public class WxUnifiedOrderService {
         WxUnifiedOrder t = new WxUnifiedOrder();
         t.setId(IdGenerators.uuid());
         t.setShopId(u.getShopId());
+        t.setAppid(u.getAppid());
         t.setUserId(u.getId());
         t.setOpenid(u.getOpenid());
         t.setFeeType("CN");
@@ -101,8 +102,12 @@ public class WxUnifiedOrderService {
     }
 
     private String buildBody(Order o){
-        //TODO build wx order body
-        return "";
+        return StringUtils.left(o.getDetail(), 6000);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean updatePrePay(String id, String prePay){
+        return dao.updatePrePay(id, prePay);
     }
 
     private Optional<WxUnifiedOrder> getByOutTradeNo(String outTradeNo){

@@ -30,6 +30,7 @@ public class WxUnifiedOrderDao {
 
         t.setId(r.getString("id"));
         t.setShopId(r.getString("shop_Id"));
+        t.setAppid(r.getString("appid"));
         t.setUserId(r.getString("user_id"));
         t.setOpenid(r.getString("openid"));
         t.setOutTradeNo(r.getString("out_trade_no"));
@@ -40,6 +41,7 @@ public class WxUnifiedOrderDao {
         t.setRealTotalFee(r.getInt("real_total_fee"));
         t.setTradeType(r.getString("trade_type"));
         t.setTransactionNo(r.getString("transaction_no"));
+        t.setPrepay(r.getString("pre_pay"));
         t.setState(r.getString("state"));
         t.setRefundFee(r.getInt("refund_fee"));
         t.setCreateTime(r.getTimestamp("create_time"));
@@ -50,15 +52,20 @@ public class WxUnifiedOrderDao {
     };
 
     public void insert(WxUnifiedOrder t){
-        final String sql = "INSERT INTO wx_pay_order (id, shop_id, user_id, openid, out_trade_no, detail, attach, fee_type, " +
-                "total_fee, trade_type, state, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, t.getId(), t.getShopId(), t.getUserId(), t.getOpenid(), t.getOutTradeNo(), t.getBody(),
+        final String sql = "INSERT INTO wx_pay_order (id, shop_id, appid, user_id, openid, out_trade_no, detail, attach, fee_type, " +
+                "total_fee, trade_type, state, create_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, t.getId(), t.getShopId(), t.getAppid(), t.getUserId(), t.getOpenid(), t.getOutTradeNo(), t.getBody(),
                 t.getAttach(), t.getFeeType(), t.getTotalFee(), t.getTradeType(), "wait", new Timestamp(System.currentTimeMillis()));
     }
 
     public boolean hasOutTradeNo(String outTradeNo){
         final String sql = "SELECT COUNT(id) FROM wx_pay_order WHERE out_trade_no = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{outTradeNo}, Integer.class) > 0;
+    }
+
+    public boolean updatePrePay(String id, String prePay){
+        final String sql = "UPDATE wx_pay_order SET pre_pay = ? WHERE id = ?";
+        return jdbcTemplate.update(sql, prePay, id) > 0;
     }
 
     public boolean pay(String id, String transactionNo, int realTotalFee){

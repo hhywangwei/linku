@@ -5,7 +5,6 @@ import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.shop.service.ShopWxService;
 import com.tuoshecx.server.wx.component.client.ComponentClientService;
 import com.tuoshecx.server.wx.component.client.response.ObtainAuthorizerTokenResponse;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +62,8 @@ public class ShopSchedule {
                 o.setAccessToken(response.getAuthorizerAccessToken());
                 o.setRefreshToken(response.getAuthorizerRefreshToken());
                 Date now = new Date();
-                o.setExpiresTime(DateUtils.addSeconds(now, (response.getExpiresIn() - 6 * 60)));
+                Long expireTime = System.currentTimeMillis() + (response.getExpiresIn() - 10 * 60)* 1000L;
+                o.setExpiresTime(new Date(expireTime));
                 o.setUpdateTime(now);
 
                 wxService.saveToken(o);

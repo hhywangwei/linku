@@ -17,13 +17,19 @@ public abstract class WxPayRequest {
 
     private final String appid;
     private final String mchid;
+    private final boolean sub;
+    private final String subMchId;
+    private final String subAppid;
     private final String key;
     private final String nonceStr;
 
-    public WxPayRequest(String appid, String mchid, String key){
+    public WxPayRequest(String appid, String mchid, String key, String subMchId){
         this.appid = appid;
         this.mchid = mchid;
         this.key = key;
+        this.sub = StringUtils.isNotBlank(subMchId);
+        this.subMchId = subMchId;
+        this.subAppid = sub ? appid : "";
         this.nonceStr = WxPayUtils.nonceStr(6);
     }
 
@@ -35,7 +41,7 @@ public abstract class WxPayRequest {
     public String body(){
         Map<String, String> parameters = new LinkedHashMap<>(10,1);
 
-        buildParameters(parameters, appid, mchid);
+        buildParameters(parameters, appid, mchid, sub, subMchId);
         putNotBlank(parameters, "nonce_str", nonceStr);
 
         String sign = sign(parameters, key);
@@ -50,8 +56,12 @@ public abstract class WxPayRequest {
      * parameter.key 参数名(微信给的参数字段), parameter.value 参数值
      *
      * @param parameters 参数容器
+     * @param appid appid
+     * @param mchid mchid
+     * @param sub 是否第三方支付
+     * @param subMchId 第三方mchid
      */
-    protected abstract void buildParameters(Map<String, String> parameters, String appid, String mchid);
+    protected abstract void buildParameters(Map<String, String> parameters, String appid, String mchid, boolean sub, String subMchId);
 
     /**
      * 添加可以为空参数到参数集合中

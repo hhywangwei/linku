@@ -2,6 +2,8 @@ package com.tuoshecx.server.wx.pay.service;
 
 import com.tuoshecx.server.BaseException;
 import com.tuoshecx.server.common.id.IdGenerators;
+import com.tuoshecx.server.shop.domain.ShopWxPay;
+import com.tuoshecx.server.shop.service.ShopWxPayService;
 import com.tuoshecx.server.wx.configure.properties.WxPayProperties;
 import com.tuoshecx.server.wx.pay.client.TradeType;
 import com.tuoshecx.server.wx.pay.client.WxPayClientService;
@@ -34,49 +36,64 @@ public class WxPayService {
     private final WxUnifiedOrderNotifyService notifyService;
     private final WxRefundService refundService;
     private final WxPayClientService clientService;
+    private final ShopWxPayService shopWxPayService;
 
     @Autowired
     public WxPayService(WxPayProperties properties, WxUnifiedOrderService orderService,
                         WxUnifiedOrderNotifyService notifyService, WxRefundService refundService,
-                        WxPayClientService clientService) {
+                        WxPayClientService clientService, ShopWxPayService shopWxPayService) {
 
         this.properties = properties;
         this.orderService = orderService;
         this.clientService = clientService;
         this.notifyService = notifyService;
         this.refundService = refundService;
+        this.shopWxPayService = shopWxPayService;
     }
 
-    public String prePay(String userId, String outTradeNo, TradeType tradeType){
+    public WxUnifiedOrder prePay(String userId, String outTradeNo, TradeType tradeType){
         WxUnifiedOrder o = orderService.save(userId, outTradeNo, tradeType);
+        ShopWxPay shopWxPay = shopWxPayService.getShopId(o.getShopId());
         try{
-            UnifiedOrderRequest request = buildPerPayRequest(properties, o);
+            UnifiedOrderRequest request = buildPerPayRequest(properties, shopWxPay, o);
             UnifiedOrderResponse response = clientService.unifiedOrder(request);
-            return response.getPrepayId();
+            orderService.updatePrePay(o.getId(), response.getPrepayId());
+            return orderService.get(o.getId());
         }catch (Exception e){
             logger.error("Wx prePay fail, error is {}", e.getMessage());
             throw new BaseException("支付失败");
         }
     }
 
-    private UnifiedOrderRequest buildPerPayRequest(WxPayProperties properties, WxUnifiedOrder order){
+    private UnifiedOrderRequest buildPerPayRequest(WxPayProperties properties, ShopWxPay shopWxPay, WxUnifiedOrder order){
 
         TradeType tradeType = TradeType.valueOf(order.getTradeType());
-        String body = StringUtils.isNotBlank(order.getBody()) ? order.getBody() : properties.getSign();
-        UnifiedOrderRequest.Builder builder = new UnifiedOrderRequest.Builder(
-                properties.getAppid(), properties.getMchid(), properties.getKey(), body,
-                order.getOutTradeNo(), order.getTotalFee(), properties.getNotifyUrl(),
-                tradeType, order.getOpenid());
+        UnifiedOrderRequest.Builder builder;
+        if(isShop(properties.getPayType())){
+            builder = new UnifiedOrderRequest.Builder(
+                    shopWxPay.getAppid(), shopWxPay.getMchId(), shopWxPay.getKey(), order.getBody(),
+                    order.getOutTradeNo(), order.getTotalFee(), properties.getNotifyUrl(),
+                    tradeType, order.getOpenid(),properties.getBillCreateIp());
+        }else{
+            builder = new UnifiedOrderRequest.Builder(
+                    shopWxPay.getAppid(), properties.getMchid(), shopWxPay.getMchId(), shopWxPay.getKey(), order.getBody(),
+                    order.getOutTradeNo(), order.getTotalFee(), properties.getNotifyUrl(),
+                    tradeType, order.getOpenid(), properties.getBillCreateIp());
+        }
 
         return tradeType == TradeType.NATIVE ?
                 builder.setAttach(order.getAttach()).setProductId(order.getId()).build() :
                 builder.setAttach(order.getAttach()).build();
     }
 
+    private boolean isShop(String payType){
+        return StringUtils.equals(payType, "shop");
+    }
+
     /**
      * 微信支付通知业务服务
      *
-     * @param data 支付腿上数据
+     * @param data 支付数据
      * @return true:成功
      */
     public boolean payNotify(Map<String, String> data){
@@ -95,12 +112,14 @@ public class WxPayService {
      */
     public WxRefund refund(String outTradeNo, String refundDesc){
         WxRefund t = refundService.refund(outTradeNo, refundDesc);
+
         if(!isWait(t.getState())){
             return t;
         }
 
         try{
-            RefundRequest request = buildRefundRequest(properties, t);
+            ShopWxPay shopWxPay = shopWxPayService.getShopId(t.getShopId());
+            RefundRequest request = buildRefundRequest(properties, shopWxPay, t);
             RefundResponse response = clientService.refund(request);
             if(!response.isSuccess()){
                 throw new BaseException(response.getErrCodeDes());
@@ -117,10 +136,17 @@ public class WxPayService {
         return StringUtils.equals(state, "wait");
     }
 
-    private RefundRequest buildRefundRequest(WxPayProperties properties, WxRefund t){
-        return new RefundRequest.Builder(properties.getAppid(), properties.getMchid(),
-                properties.getKey(), t.getOutTradeNo(), t.getId(), t.getTotalFee(), t.getTotalFee())
+    private RefundRequest buildRefundRequest(WxPayProperties properties, ShopWxPay shopWxPay, WxRefund t){
+        if(isShop(properties.getPayType())){
+            return new RefundRequest.Builder(shopWxPay.getAppid(), shopWxPay.getMchId(),
+                shopWxPay.getKey(), t.getOutTradeNo(), t.getId(), t.getTotalFee(), t.getTotalFee())
                 .setRefundDesc(t.getRefundDesc())
                 .build();
+        }else{
+            return new RefundRequest.Builder(shopWxPay.getAppid(), properties.getMchid(), shopWxPay.getMchId(),
+                    shopWxPay.getKey(), t.getOutTradeNo(), t.getId(), t.getTotalFee(), t.getTotalFee())
+                    .setRefundDesc(t.getRefundDesc())
+                    .build();
+        }
     }
 }
