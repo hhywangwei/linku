@@ -26,6 +26,7 @@ public class WxSmallClients {
     private final HttpClient<MessageTemplateAddRequest, MessageTemplateAddResponse> messageTemplateAddClient;
     private final HttpClient<MessageTemplateDelRequest, WxSmallResponse> messageTemplateDelClient;
     private final HttpClient<MessageTemplateQueryRequest, MessageTemplateQueryResponse> messageTemplateQueryClient;
+    private final HttpClient<GetQrcodeRequest, GetQrcodeResponse> getQrcodeClient;
 
     public WxSmallClients(RestTemplate restTemplate) {
         ObjectMapper objectMapper = initObjectMapper();
@@ -42,6 +43,7 @@ public class WxSmallClients {
         this.messageTemplateAddClient = new MessageTemplateAddClient(restTemplate, objectMapper);
         this.messageTemplateDelClient = new MessageTemplateDelClient(restTemplate, objectMapper);
         this.messageTemplateQueryClient = new MessageTemplateQueryClient(restTemplate, objectMapper);
+        this.getQrcodeClient = new GetQrcodeClient(restTemplate, objectMapper);
     }
 
     private ObjectMapper initObjectMapper(){
@@ -115,5 +117,9 @@ public class WxSmallClients {
 
     public HttpClient<MessageTemplateQueryRequest, MessageTemplateQueryResponse> messageTemplateQueryClient(){
         return messageTemplateQueryClient;
+    }
+
+    public HttpClient<GetQrcodeRequest, GetQrcodeResponse> getQrcodeClient(){
+        return getQrcodeClient;
     }
 }

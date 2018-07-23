@@ -284,6 +284,18 @@ public class WxSmallClientService {
      }
 
     /**
+     * 得到小程序体验二维码
+     *
+     * @param appid appid
+     * @param path  小程序访问页面路径
+     * @return
+     */
+     public GetQrcodeResponse getQrocde(String appid, String path){
+         GetQrcodeRequest request = new GetQrcodeRequest(appid, path);
+         return clients.getQrcodeClient().request(request);
+     }
+
+    /**
      * 删除微信用户登陆session_key
      *
      * @param openid 用户openid

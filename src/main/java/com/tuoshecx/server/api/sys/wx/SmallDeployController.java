@@ -5,14 +5,19 @@ import com.tuoshecx.server.api.sys.wx.form.SmallDeployForm;
 import com.tuoshecx.server.api.sys.wx.vo.ProgramCategoryVo;
 import com.tuoshecx.server.api.vo.ResultVo;
 import com.tuoshecx.server.wx.small.client.response.GetCategoryResponse;
+import com.tuoshecx.server.wx.small.client.response.GetQrcodeResponse;
 import com.tuoshecx.server.wx.small.devops.domain.SmallDeploy;
 import com.tuoshecx.server.wx.small.devops.service.DeployService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -56,5 +61,25 @@ public class SmallDeployController {
                 .map(ProgramCategoryVo::new).collect(Collectors.toList());
 
         return ResultVo.success(data);
+    }
+
+    @GetMapping(value = "{shopId}/getQrcode", produces = APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation(value = "得到小程序体验二维码")
+    public ResponseEntity<byte[]> getQrcode(@PathVariable("shopId")String shopId,
+                                            @RequestParam(value = "path", required = false)String path){
+        GetQrcodeResponse response = service.getQrcode(shopId, "");
+
+        if(response.isOk()){
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .contentLength(response.getContent().length)
+                    .body(response.getContent());
+        }else{
+            byte[] content = String.format("{\"code\":%d, \"message\": \"%s\"}", 1000, "获取体验二维吗失败")
+                    .getBytes(Charset.forName("UTF-8"));
+            return ResponseEntity.status(HttpStatus.OK)
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .body(content);
+        }
     }
 }

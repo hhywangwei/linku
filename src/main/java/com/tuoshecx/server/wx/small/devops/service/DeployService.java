@@ -1,14 +1,10 @@
 package com.tuoshecx.server.wx.small.devops.service;
 
 import com.tuoshecx.server.BaseException;
-import com.tuoshecx.server.shop.domain.ShopWxAuthorized;
 import com.tuoshecx.server.shop.service.ShopWxService;
 import com.tuoshecx.server.wx.small.client.WxSmallClientService;
 import com.tuoshecx.server.wx.small.client.request.SubmitAuditRequest;
-import com.tuoshecx.server.wx.small.client.response.GetAuditStatusResponse;
-import com.tuoshecx.server.wx.small.client.response.GetCategoryResponse;
-import com.tuoshecx.server.wx.small.client.response.SubmitAuditResponse;
-import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
+import com.tuoshecx.server.wx.small.client.response.*;
 import com.tuoshecx.server.wx.small.devops.domain.DomainConfigure;
 import com.tuoshecx.server.wx.small.devops.domain.SmallAuditConfigure;
 import com.tuoshecx.server.wx.small.devops.domain.SmallDeploy;
@@ -55,11 +51,7 @@ public class DeployService {
     }
 
     public SmallDeploy deploy(String shopId, Integer templateId){
-        List<ShopWxAuthorized> authorizeds = shopWxService.queryAuthorized(shopId);
-        if(authorizeds.isEmpty()){
-            throw new BaseException("店铺还未托管小程序公众号");
-        }
-        String appid = authorizeds.get(0).getAppid();
+        String appid = getAppid(shopId);
 
         SmallDeploy t = new SmallDeploy();
         t.setShopId(shopId);
@@ -69,6 +61,14 @@ public class DeployService {
         t.setSetDomain(false);
 
         return smallDeployService.save(t);
+    }
+
+    private String getAppid(String shopId){
+        Optional<String> optional = shopWxService.getAppid(shopId);
+        if(!optional.isPresent()){
+            throw new BaseException("店铺还未托管小程序公众号");
+        }
+        return optional.get();
     }
 
     public SmallDeploy setDomain(String id){
@@ -244,13 +244,12 @@ public class DeployService {
     }
 
     public GetCategoryResponse getCategory(String shopId){
-        List<ShopWxAuthorized> authorizeds = shopWxService.queryAuthorized(shopId);
-        if(authorizeds.isEmpty()){
-            throw new BaseException("店铺还未托管小程序公众号");
-        }
-        String appid = authorizeds.get(0).getAppid();
-
+        String appid = getAppid(shopId);
         return smallClientService.getCategory(appid);
     }
 
+    public GetQrcodeResponse getQrcode(String shopId, String path){
+       String appid = getAppid(shopId);
+       return smallClientService.getQrocde(appid, path);
+    }
 }
