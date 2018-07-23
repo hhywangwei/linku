@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 组团营销结束处理。组团成功发通知信息并生成电子券;不成功发送消息并退款;
  *
- * @author <a href="mailto:hhywangwei@gmail.com">WangWeis</a>
+ * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 @Component
 public class GroupRecordFinishListener {
@@ -84,7 +84,7 @@ public class GroupRecordFinishListener {
     private void sendSuccess(GroupRecord t, String itemId){
         boolean all = StringUtils.equals(itemId, "*");
         List<GroupRecordItem> items = all?
-                recordService.getItems(t.getId()) : Collections.singletonList(recordService.getItem(itemId));
+                recordService.getItems(t.getId()): Collections.singletonList(recordService.getItem(itemId));
 
         items.forEach(e -> {
             WxUnifiedOrder o = wxOrderService.getOutTradeNo(e.getOrderId());

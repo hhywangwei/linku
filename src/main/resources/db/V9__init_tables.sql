@@ -14,12 +14,12 @@ ALTER TABLE marketing_record_group MODIFY COLUMN state ENUM('WAIT', 'ACTIVATE', 
 --message:处理消息
 --create_time:创建时间
 --===========================================================================
-CREATE TABLE marketing_record_group (
+CREATE TABLE marketing_record_finish (
   id CHAR(32) COLLATE utf8_bin NOT NULL,
   record_id CHAR(32) COLLATE utf8_bin NOT NULL,
   item_id CHAR(32) COLLATE utf8_bin NOT NULL,
   action VARCHAR(20) COLLATE utf8_bin NOT NULL,
-  state ENUM('WAIT', 'SUCCESS', 'FAIL') COLLATE utf8_bin NOT NULL;
+  state ENUM('WAIT', 'SUCCESS', 'FAIL') COLLATE utf8_bin NOT NULL,
   message VARCHAR(200) COLLATE utf8_bin,
   create_time DATETIME NOT NULL,
   PRIMARY KEY (id),

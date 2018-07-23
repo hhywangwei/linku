@@ -4,6 +4,7 @@ import com.tuoshecx.server.common.utils.DaoUtils;
 import com.tuoshecx.server.marketing.domain.GroupRecordFinish;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Date;
  *
  * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
+@Repository
 public class GroupRecordFinishDao {
     private final JdbcTemplate jdbcTemplate;
 
