@@ -56,7 +56,7 @@ public class GroupRecord {
     private Date createTime;
 
     public enum State {
-        WAIT, ACTIVATE, CLOSE
+        WAIT, ACTIVATE, CLOSE, SUCCESS
     }
 
     public String getId() {

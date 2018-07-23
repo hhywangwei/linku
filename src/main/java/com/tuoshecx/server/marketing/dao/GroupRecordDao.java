@@ -85,8 +85,13 @@ public class GroupRecordDao {
     }
 
     public boolean active(String id){
-        final String sql = "UPDATE marketing_record_group SET state = ? WHERE id = ? AND state = ? AND join_person >= need_person";
+        final String sql = "UPDATE marketing_record_group SET state = ? WHERE id = ? AND state = ?";
         return jdbcTemplate.update(sql, ACTIVATE.name(), id, WAIT.name()) > 0;
+    }
+
+    public boolean success(String id){
+        final String sql = "UPDATE marketing_record_group SET state = ? WHERE id = ? AND state = ? AND join_person >= need_person";
+        return jdbcTemplate.update(sql, SUCCESS.name(), id, ACTIVATE.name()) > 0;
     }
 
     public boolean close(String id){
@@ -117,13 +122,13 @@ public class GroupRecordDao {
     public Long count(String userId, String marketingId, GroupRecord.State state){
         final StringBuilder builder = new StringBuilder(50);
         builder.append("SELECT COUNT(id) FROM marketing_record_group ");
-        builder.append(" WHERE 1 = 1 ");
         buildWhere(builder, userId, marketingId, state);
 
         return jdbcTemplate.queryForObject(builder.toString(), params(userId, marketingId, state), Long.class);
     }
 
     private void buildWhere(StringBuilder builder, String userId, String marketingId, GroupRecord.State state){
+        builder.append(" WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userId)){
             builder.append(" AND user_id = ? ");
         }
@@ -135,8 +140,8 @@ public class GroupRecordDao {
         }
     }
 
-    private String[] params(String userId, String marketingId, GroupRecord.State state){
-        List<String> params = new ArrayList<>(3);
+    private Object[] params(String userId, String marketingId, GroupRecord.State state){
+        List<Object> params = new ArrayList<>(3);
         if(StringUtils.isNotBlank(userId)){
             params.add(userId);
         }
@@ -146,13 +151,12 @@ public class GroupRecordDao {
         if(state != null){
             params.add(state.name());
         }
-        return params.toArray(new String[0]);
+        return params.toArray();
     }
 
     public List<GroupRecord> find(String userId, String marketingId, GroupRecord.State state, String order, int offset, int limit){
         final StringBuilder builder = new StringBuilder(50);
-        builder.append("SELECT COUNT(id) FROM marketing_record_group ");
-        builder.append(" WHERE 1 = 1 ");
+        builder.append("SELECT * FROM marketing_record_group ");
         buildWhere(builder, userId, marketingId, state);
         String newOrder = StringUtils.isBlank(order) ? "create_time DESC" : order;
         builder.append(" ORDER BY ").append(newOrder).append(" LIMIT ? OFFSET ?");

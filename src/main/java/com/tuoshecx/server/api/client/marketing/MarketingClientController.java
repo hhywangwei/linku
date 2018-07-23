@@ -64,9 +64,9 @@ public class MarketingClientController {
     @GetMapping(value = "group_buy/{marketingId}/record", produces = APPLICATION_JSON_UTF8_VALUE)
     @ApiOperation("查询到还未完成的团购记录")
     public ResultVo<Collection<GroupRecord>> queryGroupRecord(@PathVariable("marketingId")String marketingId,
-                                                             @RequestParam(defaultValue = "3") @ApiParam("查询记录数") Integer limit){
+                                                             @RequestParam(defaultValue = "3") @ApiParam("查询记录数") int limit){
         Collection<GroupRecord> records = groupRecordService.
-                query(StringUtils.EMPTY, marketingId, GroupRecord.State.WAIT, " create_time ASC ", 0, limit);
+                query(StringUtils.EMPTY, marketingId, GroupRecord.State.ACTIVATE, " create_time ASC ", 0, limit);
 
         return ResultVo.success(records);
     }

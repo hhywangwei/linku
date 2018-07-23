@@ -61,6 +61,11 @@ public class GroupRecordItemDao {
         return jdbcTemplate.queryForObject(sql, new Object[]{orderId}, Integer.class) > 0;
     }
 
+    public GroupRecordItem findOne(String id){
+        final String sql = "SELECT * FROM marketing_record_group_item WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, mapper);
+    }
+
     public List<GroupRecordItem> findLimit(String recordId, int limit){
         final String sql = "SELECT * FROM marketing_record_group_item WHERE record_id = ? AND is_cancel = false " +
                 "ORDER BY create_time ASC LIMIT ?";

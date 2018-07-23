@@ -24,9 +24,9 @@ import java.util.Optional;
  * @author WangWei
  */
 @Service
-//@Transactional(readOnly = true)
+@Transactional(readOnly = true)
 public class OrderMarketingService {
-    private static final Logger logger = LoggerFactory.getLogger(OrderMarketingService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderMarketingService.class);
 
     private final GroupRecordService groupRecordService;
     private final SecondKillRecordService secondKillRecordService;

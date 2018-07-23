@@ -1,5 +1,6 @@
 package com.tuoshecx.server.ticket.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -37,6 +38,7 @@ public class Eticket {
     @ApiModelProperty(value = "状态")
     private State state = State.WAIT;
     @ApiModelProperty(value = "版本号", hidden = true)
+    @JsonIgnore
     private Integer version;
     @ApiModelProperty(value = "有效开始时间", required = true)
     private Date fromDate;

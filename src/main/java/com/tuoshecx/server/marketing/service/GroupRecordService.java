@@ -6,7 +6,7 @@ import com.tuoshecx.server.marketing.dao.GroupRecordDao;
 import com.tuoshecx.server.marketing.dao.GroupRecordItemDao;
 import com.tuoshecx.server.common.id.IdGenerators;
 import com.tuoshecx.server.marketing.domain.*;
-import com.tuoshecx.server.marketing.event.GroupMessagePublisher;
+import com.tuoshecx.server.marketing.event.GroupRecordFinishPublisher;
 import com.tuoshecx.server.order.service.PaySuccessService;
 import com.tuoshecx.server.user.domain.User;
 import com.tuoshecx.server.user.service.UserService;
@@ -43,12 +43,14 @@ public class GroupRecordService {
     private final GroupBuyService groupBuyService;
     private final SharePresentService presentService;
     private final PaySuccessService paySuccessService;
-    private final GroupMessagePublisher publisher;
+    private final GroupRecordFinishService recordFinishService;
+    private final GroupRecordFinishPublisher publisher;
 
     @Autowired
     public GroupRecordService(GroupRecordDao dao, GroupRecordItemDao itemDao, UserService userService,
                               GroupBuyService groupBuyService, SharePresentService presentService,
-                              PaySuccessService paySuccessService, GroupMessagePublisher publisher) {
+                              PaySuccessService paySuccessService, GroupRecordFinishService recordFinishService,
+                              GroupRecordFinishPublisher publisher) {
 
         this.dao = dao;
         this.itemDao = itemDao;
@@ -56,6 +58,7 @@ public class GroupRecordService {
         this.groupBuyService = groupBuyService;
         this.presentService = presentService;
         this.paySuccessService = paySuccessService;
+        this.recordFinishService = recordFinishService;
         this.publisher = publisher;
     }
 
@@ -72,6 +75,14 @@ public class GroupRecordService {
             return Optional.of(dao.findOne(id));
         }catch (DataAccessException e){
             return Optional.empty();
+        }
+    }
+
+    public GroupRecordItem getItem(String id){
+        try{
+            return itemDao.findOne(id);
+        }catch (DataAccessException e){
+            throw new BaseException("明细不存在");
         }
     }
 
@@ -146,10 +157,11 @@ public class GroupRecordService {
 
         for(int i = 0; i < MAX_TRY; i++){
             GroupRecord t = get(id);
-            final int inc = (!t.getFirst()|(t.getFirst() && isFirst)) ? 1 : 0;
-            if(inc == 0){
-                return ;
-            }
+            //TODO 屏蔽倒流首单用户处理
+//            final int inc = (!t.getFirst()||(t.getFirst() && isFirst)) ? 1 : 0;
+//            if(inc == 0){
+//                return ;
+//            }
 
             if(incJoinPersonAndSaveItem(t, user, orderId, isFirst)){
                 return ;
@@ -164,23 +176,38 @@ public class GroupRecordService {
         final int version = t.getVersion();
         final boolean ok = dao.incJoinPerson(id, 1, version);
 
-        if(ok){
-            boolean isOwner = StringUtils.equals(t.getUserId(), user.getId());
-            final boolean isFull = t.getNeedPerson() <= (t.getJoinPerson() + 1);
-            saveItem(id, user, orderId, isOwner, isFirst);
-            updateJoinUserDetail(id);
-            paySuccessService.success(orderId);
-            if(isFull){
-                if(dao.active(id)){
-                    publisher.publishEvent(id, GroupRecord.State.ACTIVATE);
-                }
-            }
+        if(!ok){
+            return false;
         }
 
-        return ok;
+        boolean isOwner = StringUtils.equals(t.getUserId(), user.getId());
+        String itemId = saveItem(id, user, orderId, isOwner, isFirst);
+        updateJoinUserDetail(id);
+        paySuccessService.success(orderId);
+
+        if(t.getState() == GroupRecord.State.SUCCESS){
+            finishHandler(t.getId(), itemId, GroupRecord.State.SUCCESS);
+            return true;
+        }
+
+        if(t.getState() == GroupRecord.State.CLOSE){
+            finishHandler(t.getId(), itemId, GroupRecord.State.CLOSE);
+            return true;
+        }
+
+        if(t.getJoinPerson() == 0){
+            dao.active(id);
+        }
+
+        boolean isFull = t.getNeedPerson() <= (t.getJoinPerson() + 1);
+        if(isFull && dao.success(id)){
+            finishHandler(t.getId(), "*", GroupRecord.State.SUCCESS);
+        }
+
+        return true;
     }
 
-    private void saveItem(String id, User user, String orderId, boolean isOwner, boolean isFirst){
+    private String saveItem(String id, User user, String orderId, boolean isOwner, boolean isFirst){
         GroupRecordItem t = new GroupRecordItem();
         t.setId(IdGenerators.uuid());
         t.setOrderId(orderId);
@@ -193,6 +220,8 @@ public class GroupRecordService {
         t.setFirst(isFirst);
 
         itemDao.insert(t);
+
+        return t.getId();
     }
 
     private void updateJoinUserDetail(String id){
@@ -207,6 +236,11 @@ public class GroupRecordService {
                 StringUtils.defaultString(e.getHeadImg(), ""));
     }
 
+    private void finishHandler(String id, String itemId, GroupRecord.State state){
+        recordFinishService.save(id, itemId, state.name());
+        publisher.publishEvent(id, itemId, state);
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public void expire(int limit){
         Date now = new Date();
@@ -219,7 +253,7 @@ public class GroupRecordService {
 
     private void closeExpire(GroupRecord t){
         if(dao.close(t.getId())){
-            publisher.publishEvent(t.getId(), GroupRecord.State.CLOSE);
+            finishHandler(t.getId(), "*", GroupRecord.State.CLOSE);
         }
     }
 
