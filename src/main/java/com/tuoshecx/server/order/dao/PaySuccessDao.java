@@ -24,8 +24,6 @@ public class PaySuccessDao {
       PaySuccess t = new PaySuccess();
 
       t.setId(r.getString("id"));
-      t.setMarketingId(r.getString("marketing_id"));
-      t.setMarketingType(r.getString("marketing_type"));
       t.setState(PaySuccess.State.valueOf(r.getString("state")));
       t.setMessage(r.getString("message"));
       t.setUpdateTime(r.getDate("update_time"));
@@ -39,11 +37,9 @@ public class PaySuccessDao {
     }
 
     public void insert(PaySuccess t){
-        final String sql = "INSERT INTO order_pay_success (id, marketing_id, marketing_type, state, update_time, create_time) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO order_pay_success (id, state, update_time, create_time) VALUES (?, ?, ?, ?)";
         Date now = new Date();
-        jdbcTemplate.update(sql, t.getId(), t.getMarketingId(), t.getMarketingType(),
-                t.getState().name(), DaoUtils.timestamp(now), DaoUtils.timestamp(now));
+        jdbcTemplate.update(sql, t.getId(), t.getState().name(), DaoUtils.timestamp(now), DaoUtils.timestamp(now));
     }
 
     public boolean updateState(String id, PaySuccess.State state, String message){

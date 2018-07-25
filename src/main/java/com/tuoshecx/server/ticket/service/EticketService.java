@@ -53,10 +53,19 @@ public class EticketService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public Eticket save(String userId, String orderId, String goodsId){
+    public void save(String userId, String orderId, String goodsId){
         User user = userService.get(userId);
         Goods goods = goodsService.get(goodsId);
 
+        if(goods.getGroup()){
+            goodsService.queryGroupItems(goodsId).forEach(
+                    e -> saveEticket(user, orderId, e.getItemGoodsId(), e.getName(), e.getIcon()));
+        }else{
+            saveEticket(user, orderId, goods.getId(), goods.getName(), goods.getIcon());
+        }
+    }
+
+    private void saveEticket(User user, String orderId, String goodsId, String goodsName, String goodsIcon){
         Eticket t = new Eticket();
         t.setId(IdGenerators.uuid());
         t.setCode(genCode(user.getShopId()));
@@ -65,16 +74,15 @@ public class EticketService {
         t.setName(StringUtils.isBlank(user.getName())? user.getNickname(): user.getName());
         t.setHeadImg(user.getHeadImg());
         t.setOrderId(orderId);
-        t.setGoodsId(goods.getId());
-        t.setGoodsName(goods.getName());
-        t.setGoodsIcon(goods.getIcon());
+        t.setGoodsId(goodsId);
+        t.setGoodsName(goodsName);
+        t.setGoodsIcon(goodsIcon);
         t.setState(Eticket.State.WAIT);
         Date now = new Date();
         t.setFromDate(now);
         t.setToDate(DateUtils.plusDays(now, 365));
 
         dao.insert(t);
-        return get(t.getId());
     }
 
     private String genCode(String shopId){

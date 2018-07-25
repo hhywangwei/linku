@@ -7,24 +7,12 @@ package com.tuoshecx.server.order.event;
  */
 public class PaySuccessEvent {
     private final String id;
-    private final String marketingId;
-    private final String marketingType;
 
-    public PaySuccessEvent(String id, String marketingId, String marketingType) {
+    public PaySuccessEvent(String id) {
         this.id = id;
-        this.marketingId = marketingId;
-        this.marketingType = marketingType;
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getMarketingId() {
-        return marketingId;
-    }
-
-    public String getMarketingType() {
-        return marketingType;
     }
 }

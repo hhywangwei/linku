@@ -23,7 +23,7 @@ public class PaySuccessPublisher {
     }
 
     public void publishEvent(PaySuccessEvent event){
-        service.save(event.getId(), event.getMarketingId(), event.getMarketingType());
+        service.save(event.getId());
         context.publishEvent(event);
     }
 }

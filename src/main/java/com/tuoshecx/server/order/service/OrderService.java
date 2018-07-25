@@ -8,8 +8,6 @@ import com.tuoshecx.server.order.dao.OrderDao;
 import com.tuoshecx.server.order.dao.OrderItemDao;
 import com.tuoshecx.server.order.domain.Order;
 import com.tuoshecx.server.order.domain.OrderItem;
-import com.tuoshecx.server.order.event.PaySuccessEvent;
-import com.tuoshecx.server.order.event.PaySuccessPublisher;
 import com.tuoshecx.server.shop.domain.Shop;
 import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.user.domain.User;
@@ -43,19 +41,17 @@ public class OrderService {
     private final UserService userService;
     private final ShopService shopService;
     private final GoodsService goodsService;
-    private final PaySuccessPublisher publisher;
 
     @Autowired
     public OrderService(OrderDao dao, OrderItemDao itemDao,
                         UserService userService, ShopService shopService,
-                        GoodsService goodsService, PaySuccessPublisher publisher){
+                        GoodsService goodsService){
 
         this.dao = dao;
         this.itemDao = itemDao;
         this.userService = userService;
         this.shopService = shopService;
         this.goodsService = goodsService;
-        this.publisher = publisher;
     }
 
     public Order get(String id){
@@ -75,7 +71,7 @@ public class OrderService {
                       int payTotal, String marketingId, String marketingType){
 
         User u = userService.get(userId);
-        Shop shop = getValidateShop(u.getShopId());
+        getValidateShop(u.getShopId());
 
         List<Goods> goodsLst = goodsIds.stream()
                 .map(e -> getValidateGoods(e, u.getShopId()))
@@ -167,23 +163,13 @@ public class OrderService {
 
         for(int i = 0; i < MAX_TRY; i++ ){
             Order t = get(id);
-
-            if(isPay(t.getState())){
-                logger.debug("Order already pay, order id is {} state {}", t.getId(), t.getState().name());
-                return ;
-            }
-
             if(!isWait(t.getState())){
-                logger.debug("Order already handler, order id is {} state {}", t.getId(), t.getState().name());
+                logger.warn("Order already handler, order id is {} state {}", t.getId(), t.getState().name());
                 return ;
             }
 
             if(dao.pay(t.getId(), t.getVersion())){
-                if(StringUtils.isNotBlank(t.getMarketingId())){
-                    publisher.publishEvent(new PaySuccessEvent(t.getId(), t.getMarketingId(), t.getMarketingType()));
-                }else{
-                    publisher.publishEvent(new PaySuccessEvent(t.getId(), t.getId(), "GOODS"));
-                }
+                return;
             }
         }
 
@@ -197,10 +183,6 @@ public class OrderService {
 
     private boolean isWait(Order.State state){
         return state == Order.State.WAIT;
-    }
-
-    private boolean isMarketing(Order t){
-        return StringUtils.isNotBlank(t.getMarketingId());
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

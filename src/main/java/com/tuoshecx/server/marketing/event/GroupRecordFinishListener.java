@@ -7,9 +7,7 @@ import com.tuoshecx.server.marketing.service.GroupRecordService;
 import com.tuoshecx.server.order.domain.OrderItem;
 import com.tuoshecx.server.order.service.OrderService;
 import com.tuoshecx.server.ticket.service.EticketService;
-import com.tuoshecx.server.wx.pay.domain.WxUnifiedOrder;
 import com.tuoshecx.server.wx.pay.service.WxPayService;
-import com.tuoshecx.server.wx.pay.service.WxUnifiedOrderService;
 import com.tuoshecx.server.wx.small.message.sender.WxTemplateMessageSender;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,7 +30,6 @@ public class GroupRecordFinishListener {
 
     private final WxTemplateMessageSender sender;
     private final GroupRecordService recordService;
-    private final WxUnifiedOrderService wxOrderService;
     private final EticketService eticketService;
     private final GroupRecordFinishService recordFinishService;
     private final OrderService orderService;
@@ -40,12 +37,10 @@ public class GroupRecordFinishListener {
 
     @Autowired
     public GroupRecordFinishListener(WxTemplateMessageSender sender, GroupRecordService recordService,
-                                     WxUnifiedOrderService wxOrderService, EticketService eticketService,
-                                     GroupRecordFinishService recordFinishService, OrderService orderService,
-                                     WxPayService wxPayService) {
+                                     EticketService eticketService, GroupRecordFinishService recordFinishService,
+                                     OrderService orderService, WxPayService wxPayService) {
         this.sender = sender;
         this.recordService = recordService;
-        this.wxOrderService = wxOrderService;
         this.eticketService = eticketService;
         this.recordFinishService = recordFinishService;
         this.orderService = orderService;
@@ -87,9 +82,8 @@ public class GroupRecordFinishListener {
                 recordService.getItems(t.getId()): Collections.singletonList(recordService.getItem(itemId));
 
         items.forEach(e -> {
-            WxUnifiedOrder o = wxOrderService.getOutTradeNo(e.getOrderId());
-            genEticket(o.getTransactionNo(), o.getUserId());
-            sender.sendGroupSuccess(o.getOpenid(), o.getAppid(), o.getPrepay(), t.getName(), t.getCreateTime());
+            genEticket(e.getOrderId(), e.getUserId());
+            sender.sendGroupSuccess(e.getOrderId(), t.getName(), t.getCreateTime());
         });
     }
 
@@ -101,10 +95,8 @@ public class GroupRecordFinishListener {
     private void sendFail(GroupRecord t){
         List<GroupRecordItem> items = recordService.getItems(t.getId());
         items.forEach(e -> {
-            WxUnifiedOrder o = wxOrderService.getOutTradeNo(e.getOrderId());
-            sender.sendGroupFail(o.getOpenid(), o.getAppid(), o.getPrepay(), t.getName(), t.getJoinPerson());
-            wxPayService.refund(o.getOutTradeNo(), "未达开团人数");
+            sender.sendGroupFail(e.getOrderId(), t.getName(), t.getJoinPerson());
+            wxPayService.refund(e.getOrderId(), "未达开团人数");
         });
     }
-
 }

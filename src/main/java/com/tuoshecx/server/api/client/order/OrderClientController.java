@@ -61,7 +61,7 @@ public class OrderClientController {
 
         final String userId = getCredential().getId();
         Order t = service.save(userId, form.getGoodsIds(), form.getCounts(),
-                0, StringUtils.EMPTY, StringUtils.EMPTY);
+                0, StringUtils.EMPTY, "GOODS");
 
         return get(t.getId());
     }

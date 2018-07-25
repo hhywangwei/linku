@@ -7,7 +7,6 @@ import com.tuoshecx.server.marketing.dao.GroupRecordItemDao;
 import com.tuoshecx.server.common.id.IdGenerators;
 import com.tuoshecx.server.marketing.domain.*;
 import com.tuoshecx.server.marketing.event.GroupRecordFinishPublisher;
-import com.tuoshecx.server.order.service.PaySuccessService;
 import com.tuoshecx.server.user.domain.User;
 import com.tuoshecx.server.user.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -42,22 +41,19 @@ public class GroupRecordService {
     private final UserService userService;
     private final GroupBuyService groupBuyService;
     private final SharePresentService presentService;
-    private final PaySuccessService paySuccessService;
     private final GroupRecordFinishService recordFinishService;
     private final GroupRecordFinishPublisher publisher;
 
     @Autowired
     public GroupRecordService(GroupRecordDao dao, GroupRecordItemDao itemDao, UserService userService,
                               GroupBuyService groupBuyService, SharePresentService presentService,
-                              PaySuccessService paySuccessService, GroupRecordFinishService recordFinishService,
-                              GroupRecordFinishPublisher publisher) {
+                              GroupRecordFinishService recordFinishService, GroupRecordFinishPublisher publisher) {
 
         this.dao = dao;
         this.itemDao = itemDao;
         this.userService = userService;
         this.groupBuyService = groupBuyService;
         this.presentService = presentService;
-        this.paySuccessService = paySuccessService;
         this.recordFinishService = recordFinishService;
         this.publisher = publisher;
     }
@@ -183,7 +179,6 @@ public class GroupRecordService {
         boolean isOwner = StringUtils.equals(t.getUserId(), user.getId());
         String itemId = saveItem(id, user, orderId, isOwner, isFirst);
         updateJoinUserDetail(id);
-        paySuccessService.success(orderId);
 
         if(t.getState() == GroupRecord.State.SUCCESS){
             finishHandler(t.getId(), itemId, GroupRecord.State.SUCCESS);
@@ -244,11 +239,11 @@ public class GroupRecordService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void expire(int limit){
         Date now = new Date();
-
         List<GroupRecord> records;
-        while ((records = dao.findExpired(now, limit)).size() != limit){
+        do {
+            records = dao.findExpired(now, limit);
             records.forEach(this::closeExpire);
-        }
+        } while (records.size() == limit);
     }
 
     private void closeExpire(GroupRecord t){

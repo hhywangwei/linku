@@ -2,11 +2,13 @@ package com.tuoshecx.server.api.client.marketing;
 
 import com.tuoshecx.server.BaseException;
 import com.tuoshecx.server.api.client.CredentialContextClientUtils;
+import com.tuoshecx.server.api.client.marketing.vo.GroupRecordVo;
 import com.tuoshecx.server.api.client.marketing.vo.MarketingVo;
 import com.tuoshecx.server.api.vo.HasVo;
 import com.tuoshecx.server.api.vo.OkVo;
 import com.tuoshecx.server.api.vo.ResultPageVo;
 import com.tuoshecx.server.api.vo.ResultVo;
+import com.tuoshecx.server.marketing.domain.GroupBuy;
 import com.tuoshecx.server.marketing.domain.GroupRecord;
 import com.tuoshecx.server.marketing.domain.Marketing;
 import com.tuoshecx.server.marketing.service.*;
@@ -34,6 +36,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 public class MarketingClientController {
 
     private final GroupRecordService groupRecordService;
+    private final GroupBuyService groupBuyService;
     private final BuyMarketingFactory buyFactory;
     private final GetMarketingFactory getFactory;
     private final QueryMarketing queryMarketing;
@@ -47,6 +50,7 @@ public class MarketingClientController {
         this.queryMarketing = new QueryMarketing(groupBuyService, presentService, secondKillService);
         this.buyFactory = new BuyMarketingFactory(orderService);
         this.groupRecordService = groupRecordService;
+        this.groupBuyService = groupBuyService;
     }
 
     @PostMapping(value = "{type}/{id}", produces = APPLICATION_JSON_UTF8_VALUE)
@@ -59,6 +63,14 @@ public class MarketingClientController {
                              .apply(new BuyMarketingFactory.BuyMarketing(currentUserId(), id));
 
         return ResultVo.success(o);
+    }
+
+    @GetMapping(value = "group_buy/{id}", produces = APPLICATION_JSON_UTF8_VALUE)
+    @ApiOperation("得到团购记录")
+    public ResultVo<GroupRecordVo> getGroupRecord(@PathVariable("id")String id){
+        GroupRecord record = groupRecordService.get(id);
+        GroupBuy info = groupBuyService.get(record.getMarketingId());
+        return ResultVo.success(new GroupRecordVo(info, record));
     }
 
     @GetMapping(value = "group_buy/{marketingId}/record", produces = APPLICATION_JSON_UTF8_VALUE)

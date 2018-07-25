@@ -2,9 +2,10 @@ package com.tuoshecx.server.wx.pay.service;
 
 import com.tuoshecx.server.BaseException;
 import com.tuoshecx.server.common.id.IdGenerators;
-import com.tuoshecx.server.shop.domain.Shop;
+import com.tuoshecx.server.order.event.PaySuccessEvent;
+import com.tuoshecx.server.order.event.PaySuccessPublisher;
+import com.tuoshecx.server.order.service.OrderService;
 import com.tuoshecx.server.shop.domain.ShopWxPay;
-import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.shop.service.ShopWxPayService;
 import com.tuoshecx.server.wx.configure.properties.WxPayProperties;
 import com.tuoshecx.server.wx.pay.client.TradeType;
@@ -16,7 +17,6 @@ import com.tuoshecx.server.wx.pay.client.response.UnifiedOrderResponse;
 import com.tuoshecx.server.wx.pay.domain.WxRefund;
 import com.tuoshecx.server.wx.pay.domain.WxUnifiedOrder;
 import com.tuoshecx.server.wx.pay.domain.WxUnifiedOrderNotify;
-import com.tuoshecx.server.wx.small.message.sender.WxTemplateMessageSender;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,38 +35,38 @@ public class WxPayService {
     private static final Logger logger = LoggerFactory.getLogger(WxPayService.class);
 
     private final WxPayProperties properties;
-    private final WxUnifiedOrderService orderService;
+    private final WxUnifiedOrderService wxUnifiedOrderService;
     private final WxUnifiedOrderNotifyService notifyService;
     private final WxRefundService refundService;
     private final WxPayClientService clientService;
     private final ShopWxPayService shopWxPayService;
-    private final ShopService shopService;
-    private final WxTemplateMessageSender sender;
+    private final OrderService orderService;
+    private final PaySuccessPublisher publisher;
 
     @Autowired
-    public WxPayService(WxPayProperties properties, WxUnifiedOrderService orderService,
+    public WxPayService(WxPayProperties properties, WxUnifiedOrderService wxUnifiedOrderService,
                         WxUnifiedOrderNotifyService notifyService, WxRefundService refundService,
                         WxPayClientService clientService, ShopWxPayService shopWxPayService,
-                        ShopService shopService, WxTemplateMessageSender sender) {
+                        OrderService orderService, PaySuccessPublisher publisher) {
 
         this.properties = properties;
-        this.orderService = orderService;
+        this.wxUnifiedOrderService = wxUnifiedOrderService;
         this.clientService = clientService;
         this.notifyService = notifyService;
         this.refundService = refundService;
         this.shopWxPayService = shopWxPayService;
-        this.shopService = shopService;
-        this.sender = sender;
+        this.orderService = orderService;
+        this.publisher = publisher;
     }
 
     public WxUnifiedOrder prePay(String userId, String outTradeNo, TradeType tradeType){
-        WxUnifiedOrder o = orderService.save(userId, outTradeNo, tradeType);
+        WxUnifiedOrder o = wxUnifiedOrderService.save(userId, orderService.get(outTradeNo), tradeType);
         ShopWxPay shopWxPay = shopWxPayService.getShopId(o.getShopId());
         try{
             UnifiedOrderRequest request = buildPerPayRequest(properties, shopWxPay, o);
             UnifiedOrderResponse response = clientService.unifiedOrder(request);
-            orderService.updatePrePay(o.getId(), response.getPrepayId());
-            return orderService.get(o.getId());
+            wxUnifiedOrderService.updatePrePay(o.getId(), response.getPrepayId());
+            return wxUnifiedOrderService.get(o.getId());
         }catch (Exception e){
             logger.error("Wx prePay fail, error is {}", e.getMessage());
             throw new BaseException("支付失败");
@@ -108,19 +108,11 @@ public class WxPayService {
         WxUnifiedOrderNotify t = new WxUnifiedOrderNotify(data);
         t.setId(IdGenerators.uuid());
         notifyService.save(t);
-        boolean ok = orderService.pay(t.getOutTradeNo(), t.getTransactionId(), t.getTotalFee());
+        boolean ok = wxUnifiedOrderService.pay(t.getOutTradeNo(), t.getTransactionId(), t.getTotalFee());
         if(ok){
-            sendOrderPayNotify(t.getOutTradeNo());
+            publisher.publishEvent(new PaySuccessEvent(t.getOutTradeNo()));
         }
         return ok;
-    }
-
-    private void sendOrderPayNotify(String outTradeNo){
-        WxUnifiedOrder o = orderService.getOutTradeNo(outTradeNo);
-        Shop shop = shopService.get(o.getShopId());
-
-        sender.sendOrderPaySuccess(o.getOpenid(), o.getAppid(),o.getPrepay(),
-                shop.getName(), o.getBody(), o.getTotalFee(), o.getPayTime());
     }
 
     /**

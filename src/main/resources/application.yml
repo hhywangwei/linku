@@ -93,6 +93,10 @@ wx:
       call_key: group_fail
       keyword_ids: [1, 4, 5]
       remark: 团购失败通知
+    - id: AT1075
+      call_key: second_kill_success
+      keyword_ids: [5, 4, 8]
+      remark: 秒杀成功通知
   pay:
     mchid: 1494207272
     key: Hw0Mrm9QAGIn2r9DyxdP6rU1tmXp2CgJ

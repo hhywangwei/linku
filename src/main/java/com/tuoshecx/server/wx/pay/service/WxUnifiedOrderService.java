@@ -4,7 +4,6 @@ import com.tuoshecx.server.BaseException;
 import com.tuoshecx.server.common.id.IdGenerators;
 import com.tuoshecx.server.common.utils.SecurityUtils;
 import com.tuoshecx.server.order.domain.Order;
-import com.tuoshecx.server.order.service.OrderService;
 import com.tuoshecx.server.shop.domain.Shop;
 import com.tuoshecx.server.shop.service.ShopService;
 import com.tuoshecx.server.user.domain.User;
@@ -35,15 +34,12 @@ public class WxUnifiedOrderService {
     private static final int MAX_TRY = 5;
 
     private final WxUnifiedOrderDao dao;
-    private final OrderService orderService;
     private final UserService userService;
     private final ShopService shopService;
 
     @Autowired
-    public WxUnifiedOrderService(WxUnifiedOrderDao dao, OrderService orderService,
-                                 UserService userService, ShopService shopService) {
+    public WxUnifiedOrderService(WxUnifiedOrderDao dao, UserService userService, ShopService shopService) {
         this.dao = dao;
-        this.orderService = orderService;
         this.userService = userService;
         this.shopService = shopService;
     }
@@ -57,9 +53,8 @@ public class WxUnifiedOrderService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public WxUnifiedOrder save(String userId, String outTradeNo, TradeType tradeType){
+    public WxUnifiedOrder save(String userId, Order o, TradeType tradeType){
         User u = userService.get(userId);
-        Order o = orderService.get(outTradeNo);
 
         if(!isShop(u, o)){
             throw new BaseException("订单不存在");
@@ -69,8 +64,8 @@ public class WxUnifiedOrderService {
             throw new BaseException("订单已经处理");
         }
 
-        if(dao.hasOutTradeNo(outTradeNo)){
-            WxUnifiedOrder t = dao.findOneByOutTradeNo(outTradeNo);
+        if(dao.hasOutTradeNo(o.getId())){
+            WxUnifiedOrder t = dao.findOneByOutTradeNo(o.getId());
             if(!isWait(t.getState())){
                 throw new BaseException("订单已经处理");
             }
@@ -85,7 +80,7 @@ public class WxUnifiedOrderService {
         t.setOpenid(u.getOpenid());
         t.setFeeType("CN");
         t.setBody(buildBody(o));
-        t.setOutTradeNo(outTradeNo);
+        t.setOutTradeNo(o.getId());
 //        t.setTotalFee(o.getPayTotal());
         //TODO 测试只支付1分钱
         t.setTotalFee(1);
@@ -142,7 +137,6 @@ public class WxUnifiedOrderService {
             }
 
             if(dao.pay(o.getId(), transactionId, totalFee)){
-                orderService.pay(o.getOutTradeNo());
                 return true;
             }
         }

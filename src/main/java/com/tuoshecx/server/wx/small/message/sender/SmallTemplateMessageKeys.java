@@ -2,7 +2,10 @@ package com.tuoshecx.server.wx.small.message.sender;
 
 public enum  SmallTemplateMessageKeys {
 
-    ORDER_PAY_SUCCESS("order_pay_success");
+    ORDER_PAY_SUCCESS("order_pay_success"),
+    GROUP_SUCCESS("group_success"),
+    GROUP_FAIL("group_fail"),
+    SECOND_KILL_SUCCESS("second_kill_success");
 
     private final String key;
 

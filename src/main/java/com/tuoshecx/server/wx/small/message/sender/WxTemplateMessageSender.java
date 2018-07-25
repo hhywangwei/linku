@@ -2,6 +2,8 @@ package com.tuoshecx.server.wx.small.message.sender;
 
 import com.tuoshecx.server.common.id.IdGenerators;
 import com.tuoshecx.server.common.utils.DateUtils;
+import com.tuoshecx.server.wx.pay.domain.WxUnifiedOrder;
+import com.tuoshecx.server.wx.pay.service.WxUnifiedOrderService;
 import com.tuoshecx.server.wx.small.client.WxSmallClientService;
 import com.tuoshecx.server.wx.small.client.request.SendTemplateMsgRequest;
 import com.tuoshecx.server.wx.small.client.response.WxSmallResponse;
@@ -31,12 +33,15 @@ public class WxTemplateMessageSender {
 
     private final SendMessageService service;
     private final WxSmallTemplateService templateService;
+    private final WxUnifiedOrderService wxUnifiedOrderService;
     private final WxSmallClientService clientService;
 
     @Autowired
-    public WxTemplateMessageSender(SendMessageService service, WxSmallTemplateService templateService, WxSmallClientService clientService) {
+    public WxTemplateMessageSender(SendMessageService service, WxSmallTemplateService templateService,
+                                   WxUnifiedOrderService wxUnifiedOrderService, WxSmallClientService clientService) {
         this.service = service;
         this.templateService = templateService;
+        this.wxUnifiedOrderService = wxUnifiedOrderService;
         this.clientService = clientService;
     }
 
@@ -95,25 +100,32 @@ public class WxTemplateMessageSender {
                 + "}";
     }
 
-    public void sendOrderPaySuccess(String openid, String appid, String formId, String shopName, String orderContent, Integer totalFee, Date payTime){
-        int fen = totalFee % 100;
-        int yuan = totalFee / 100;
+    public void sendOrderPaySuccess(String orderId, String shopName, String orderContent){
 
+        WxUnifiedOrder o = wxUnifiedOrderService.getOutTradeNo(orderId);
         SmallTemplateMessage message = new SmallTemplateMessage
-                .Builder(openid, appid, SmallTemplateMessageKeys.ORDER_PAY_SUCCESS.getKey(), formId)
+                .Builder(o.getOpenid(), o.getAppid(), SmallTemplateMessageKeys.ORDER_PAY_SUCCESS.getKey(), o.getPrepay())
                 .addContentItem("keyword1", shopName)
                 .addContentItem("keyword2", orderContent)
-                .addContentItem("keyword3", String.format("%d.%02d元", yuan, fen))
-                .addContentItem("keyword4", DateUtils.formatTimestamp(payTime))
+                .addContentItem("keyword3", formatFee(o.getTotalFee()))
+                .addContentItem("keyword4", DateUtils.formatTimestamp(o.getPayTime()))
                 .setPage("/pages/index/index")
                 .build();
 
         send(message);
     }
 
-    public void sendGroupSuccess(String openid, String appid, String formId, String name, Date openTime){
+    private String formatFee(int totalFee){
+        int fen = totalFee % 100;
+        int yuan = totalFee / 100;
+
+        return String.format("%d.%02d元", yuan, fen);
+    }
+
+    public void sendGroupSuccess(String orderId, String name, Date openTime){
+        WxUnifiedOrder o = wxUnifiedOrderService.getOutTradeNo(orderId);
         SmallTemplateMessage message = new SmallTemplateMessage
-                .Builder(openid, appid, SmallTemplateMessageKeys.ORDER_PAY_SUCCESS.getKey(), formId)
+                .Builder(o.getOpenid(), o.getAppid(), SmallTemplateMessageKeys.GROUP_SUCCESS.getKey(), o.getPrepay())
                 .addContentItem("keyword1", name)
                 .addContentItem("keyword2", "电子券以生成")
                 .addContentItem("keyword3", DateUtils.formatTimestamp(openTime))
@@ -123,12 +135,26 @@ public class WxTemplateMessageSender {
         send(message);
     }
 
-    public void sendGroupFail(String openid, String appid, String formId, String name, int number){
+    public void sendGroupFail(String orderId, String name, int number){
+        WxUnifiedOrder o = wxUnifiedOrderService.getOutTradeNo(orderId);
         SmallTemplateMessage message = new SmallTemplateMessage
-                .Builder(openid, appid, SmallTemplateMessageKeys.ORDER_PAY_SUCCESS.getKey(), formId)
+                .Builder(o.getOpenid(), o.getAppid(), SmallTemplateMessageKeys.GROUP_FAIL.getKey(), o.getPrepay())
                 .addContentItem("keyword1", name)
                 .addContentItem("keyword2", String.valueOf(number))
                 .addContentItem("keyword3", "支付金额将在2工作日内全额退还")
+                .setPage("/pages/index/index")
+                .build();
+
+        send(message);
+    }
+
+    public void sendSecondKillSuccess(String orderId, String name, Date secondKillTime){
+        WxUnifiedOrder o = wxUnifiedOrderService.getOutTradeNo(orderId);
+        SmallTemplateMessage message = new SmallTemplateMessage
+                .Builder(o.getOpenid(), o.getAppid(), SmallTemplateMessageKeys.GROUP_FAIL.getKey(), o.getPrepay())
+                .addContentItem("keyword1", name)
+                .addContentItem("keyword2", formatFee(o.getTotalFee()))
+                .addContentItem("keyword3", DateUtils.formatDate(secondKillTime))
                 .setPage("/pages/index/index")
                 .build();
 

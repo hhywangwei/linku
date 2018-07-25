@@ -11,9 +11,7 @@ import java.util.Objects;
  * @author <a href="mailto:hhywangwei@gmail.com">WangWei</a>
  */
 public class PaySuccess {
-    private String id;
-    private String marketingId;
-    private String marketingType;
+    private String id;;
     private State state;
     private String message;
     private Date updateTime;
@@ -29,22 +27,6 @@ public class PaySuccess {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getMarketingId() {
-        return marketingId;
-    }
-
-    public void setMarketingId(String marketingId) {
-        this.marketingId = marketingId;
-    }
-
-    public String getMarketingType() {
-        return marketingType;
-    }
-
-    public void setMarketingType(String marketingType) {
-        this.marketingType = marketingType;
     }
 
     public State getState() {
@@ -85,8 +67,6 @@ public class PaySuccess {
         if (!(o instanceof PaySuccess)) return false;
         PaySuccess that = (PaySuccess) o;
         return Objects.equals(id, that.id) &&
-                Objects.equals(marketingId, that.marketingId) &&
-                Objects.equals(marketingType, that.marketingType) &&
                 state == that.state &&
                 Objects.equals(message, that.message) &&
                 Objects.equals(updateTime, that.updateTime) &&
@@ -96,15 +76,13 @@ public class PaySuccess {
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, marketingId, marketingType, state, message, updateTime, createTime);
+        return Objects.hash(id, state, message, updateTime, createTime);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("id", id)
-                .append("marketingId", marketingId)
-                .append("marketingType", marketingType)
                 .append("state", state)
                 .append("message", message)
                 .append("updateTime", updateTime)

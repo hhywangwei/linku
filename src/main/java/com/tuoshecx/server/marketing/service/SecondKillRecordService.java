@@ -5,8 +5,10 @@ import com.tuoshecx.server.common.id.IdGenerators;
 import com.tuoshecx.server.marketing.dao.SecondKillRecordDao;
 import com.tuoshecx.server.marketing.domain.SecondKill;
 import com.tuoshecx.server.marketing.domain.SecondKillRecord;
+import com.tuoshecx.server.ticket.service.EticketService;
 import com.tuoshecx.server.user.domain.User;
 import com.tuoshecx.server.user.service.UserService;
+import com.tuoshecx.server.wx.small.message.sender.WxTemplateMessageSender;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -28,14 +30,18 @@ public class SecondKillRecordService {
     private final SecondKillRecordDao dao;
     private final UserService userService;
     private final SecondKillService secondKillService;
+    private final EticketService eticketService;
+    private final WxTemplateMessageSender sender;
 
     @Autowired
-    public SecondKillRecordService(SecondKillRecordDao dao, UserService userService,
-                                   SecondKillService secondKillService) {
+    public SecondKillRecordService(SecondKillRecordDao dao, UserService userService, SecondKillService secondKillService,
+                                   EticketService eticketService, WxTemplateMessageSender sender) {
 
         this.dao = dao;
         this.userService = userService;
         this.secondKillService = secondKillService;
+        this.eticketService = eticketService;
+        this.sender = sender;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -98,7 +104,13 @@ public class SecondKillRecordService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean pay(String id){
-        return dao.pay(id);
+        boolean ok = dao.pay(id);
+        if(ok){
+            SecondKillRecord t = get(id);
+            eticketService.save(t.getUserId(), t.getOrderId(), t.getGoodsId());
+            sender.sendSecondKillSuccess(t.getOrderId(), t.getName(), t.getCreateTime());
+        }
+        return ok;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
